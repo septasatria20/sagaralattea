@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Gabriela&family=Inter:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../js/**/*.jsx';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Gabriela', Georgia, serif;
+    --color-cream: #FFF6DB;
+    --color-forest: #176637;
+    --color-orange: #FF901A;
+    --color-green-light: #72AD43;
+    --color-forest-deep: #0f4e2a;
+}
+
+@layer base {
+    body {
+        @apply bg-[var(--color-cream)] text-[var(--color-forest-deep)];
+    }
+
+    .font-gabriela {
+        font-family: 'Gabriela', Georgia, serif;
+    }
+
+    .font-inter {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    }
+}
+
+@layer utilities {
+    .bg-cream {
+        background-color: var(--color-cream);
+    }
+
+    .text-forest {
+        color: var(--color-forest);
+    }
+
+    .text-forest-deep {
+        color: var(--color-forest-deep);
+    }
+}

@@ -1,0 +1,391 @@
+import React, { useState, useEffect } from 'react';
+import { Menu, X, Instagram, Twitter, ShoppingBag, MapPin } from 'lucide-react';
+
+const GlobalStyles = () => (
+  <style>{`
+    @import url('https://fonts.googleapis.com/css2?family=Gabriela&family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+      background-color: #FFF6DB; /* Base Cream */
+      color: #176637; /* Base Green */
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    .font-gabriela {
+      font-family: 'Gabriela', serif;
+    }
+
+    .font-inter {
+      font-family: 'Inter', sans-serif;
+    }
+
+    @keyframes steamRise {
+      0% { transform: translateY(0) scaleX(1); opacity: 0; }
+      20% { opacity: 0.6; }
+      50% { transform: translateY(-20px) scaleX(1.2); opacity: 0.3; }
+      100% { transform: translateY(-40px) scaleX(1); opacity: 0; }
+    }
+    .animate-steam {
+      animation: steamRise 4s infinite ease-in-out;
+    }
+
+    @keyframes waveFlow {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-wave {
+      animation: waveFlow 6s infinite linear;
+    }
+
+    @keyframes floatSoft {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .animate-float {
+      animation: floatSoft 4s ease-in-out infinite;
+    }
+  `}</style>
+);
+
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <nav className="relative z-50 flex items-center justify-between px-6 py-6 max-w-7xl mx-auto md:px-8">
+      <div className="flex items-center gap-4">
+        {/* Placeholder Logo - Sesuai panduan wajib pakai SVG asli */}
+        <div className="flex items-center justify-center border-2 border-[#176637] border-dashed w-40 md:w-48 h-12 md:h-16 text-[10px] md:text-xs font-bold text-[#176637] bg-[#FFF6DB]">
+          [GANTI DENGAN LOGO SVG ASLI]
+        </div>
+      </div>
+      
+      {/* Mobile Menu Toggle */}
+      <button className="md:hidden text-[#176637]" onClick={() => setIsOpen(!isOpen)}>
+        {isOpen ? <X size={28} /> : <Menu size={28} />}
+      </button>
+
+      {/* Desktop Navigation */}
+      <div className="hidden md:flex items-center gap-8 font-medium">
+        <a href="#varian" className="hover:text-[#FF901A] transition-colors">Varian</a>
+        <a href="#outlet" className="hover:text-[#FF901A] transition-colors">Outlet</a>
+        <a href="#promo" className="hover:text-[#FF901A] transition-colors">Promo</a>
+        <div className="h-4 w-px bg-[#176637]/30"></div>
+        <button className="text-[#176637] hover:text-[#72AD43] transition-colors">Login</button>
+        <button className="bg-[#FF901A] text-[#FFF6DB] px-6 py-2 rounded-full font-bold shadow-[4px_4px_0px_#176637] hover:translate-y-1 hover:shadow-[2px_2px_0px_#176637] transition-all">
+          Join Us
+        </button>
+      </div>
+
+      {/* Mobile Navigation Dropdown */}
+      {isOpen && (
+        <div className="absolute top-full left-0 w-full bg-[#FFF6DB] border-b-2 border-[#176637] flex flex-col p-6 shadow-xl gap-4 md:hidden">
+          <a href="#varian" className="text-lg hover:text-[#FF901A]" onClick={() => setIsOpen(false)}>Varian</a>
+          <a href="#outlet" className="text-lg hover:text-[#FF901A]" onClick={() => setIsOpen(false)}>Outlet</a>
+          <a href="#promo" className="text-lg hover:text-[#FF901A]" onClick={() => setIsOpen(false)}>Promo</a>
+          <hr className="border-[#176637]/20" />
+          <button className="text-left text-lg text-[#176637] hover:text-[#72AD43]">Login</button>
+          <button className="bg-[#FF901A] text-[#FFF6DB] px-6 py-3 text-center rounded-full font-bold shadow-[4px_4px_0px_#176637] w-full">
+            Join Us
+          </button>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+const Hero = () => {
+  return (
+    <section className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 pt-10 pb-24 flex flex-col-reverse md:flex-row items-center gap-12">
+      {/* Grafis Sekunder: Cropped Leaf di kiri atas bg */}
+      <div className="absolute top-[-100px] left-[-80px] opacity-10 pointer-events-none z-[-1] md:block hidden">
+        <svg width="400" height="400" viewBox="0 0 100 100" fill="#176637" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
+          <path d="M60,10 C80,0 100,20 90,40 C80,60 50,30 60,10 Z" />
+        </svg>
+      </div>
+
+      <div className="w-full md:w-1/2 pr-0 md:pr-12 text-center md:text-left">
+        <h1 className="font-gabriela text-5xl md:text-6xl lg:text-7xl leading-tight mb-6 text-[#176637]">
+          Special <br className="hidden md:block" /> fresh latte tea.
+        </h1>
+        <p className="text-lg mb-8 opacity-90 max-w-md mx-auto md:mx-0">
+          Membawa ketenangan alam dalam setiap seduhan. Temukan harmoni rasa yang diracik khusus untuk menemani harimu.
+        </p>
+        <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
+          <button className="bg-[#176637] text-[#FFF6DB] px-8 py-3.5 font-semibold rounded-br-3xl rounded-tl-3xl hover:bg-[#72AD43] hover:rounded-tl-lg hover:rounded-br-lg transition-all shadow-md flex items-center justify-center gap-2">
+            <ShoppingBag size={20} /> Pesan Sekarang
+          </button>
+          <button className="border-2 border-[#176637] text-[#176637] px-8 py-3.5 font-semibold rounded-bl-3xl rounded-tr-3xl hover:bg-[#176637]/5 transition-all">
+            Lihat Menu
+          </button>
+        </div>
+      </div>
+
+      {/* Animasi Minuman Halus & Produk Placeholder */}
+      <div className="w-full md:w-1/2 relative flex justify-center mt-8 md:mt-0">
+        <div className="relative animate-float">
+          {/* Animasi Uap/Steam */}
+          <div className="absolute top-[-30px] left-1/2 -translate-x-1/2 flex gap-4 opacity-60 z-20">
+            <div className="w-2 h-16 bg-white blur-[4px] rounded-full animate-steam" style={{ animationDelay: '0s' }}></div>
+            <div className="w-3 h-20 bg-white blur-[5px] rounded-full animate-steam" style={{ animationDelay: '1.2s' }}></div>
+            <div className="w-2 h-12 bg-white blur-[4px] rounded-full animate-steam" style={{ animationDelay: '2.4s' }}></div>
+          </div>
+          
+          {/* Wadah Produk / Gelas */}
+          <div className="w-[280px] h-[380px] md:w-[320px] md:h-[420px] bg-[#72AD43]/20 border-2 border-[#176637] rounded-t-[120px] rounded-b-[40px] flex flex-col items-center justify-center relative overflow-hidden text-center shadow-lg">
+            <span className="text-sm font-semibold opacity-60 px-4 text-[#176637] z-10">Ganti dengan <br/>Foto Produk (.png)</span>
+            
+            {/* Liquid Wave (Elemen Air di bawah) */}
+            <div className="absolute bottom-0 left-0 w-[200%] h-[120px] flex items-end animate-wave opacity-50 z-0">
+              <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-full fill-[#72AD43]">
+                <path d="M0,60 C150,100 300,20 450,60 C600,100 750,20 900,60 C1050,100 1200,20 1200,60 L1200,120 L0,120 Z"></path>
+              </svg>
+            </div>
+             <div className="absolute bottom-0 left-0 w-[200%] h-[100px] flex items-end animate-wave opacity-80 z-0" style={{animationDirection: 'reverse', animationDuration: '8s'}}>
+              <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-full fill-[#176637]">
+                <path d="M0,40 C150,80 300,0 450,40 C600,80 750,0 900,40 C1050,80 1200,0 1200,40 L1200,120 L0,120 Z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Divider = () => {
+  return (
+    <div className="w-full overflow-hidden py-8 relative flex flex-col items-center justify-center opacity-50">
+      <div className="flex gap-8 mb-2">
+        {/* Mockup sprout shape (Grafis Turunan) */}
+        {[...Array(5)].map((_, i) => (
+           <svg key={i} width="35" height="25" viewBox="0 0 40 30" fill="#176637" className={`transform ${i % 2 === 0 ? 'scale-90' : 'scale-110'} ${i === 2 ? 'rotate-12' : ''}`}>
+             <path d="M20,30 C20,15 10,10 0,15 C5,5 15,5 20,15 C25,5 35,5 40,15 C30,10 20,15 20,30 Z"/>
+           </svg>
+        ))}
+      </div>
+      <svg viewBox="0 0 1200 20" preserveAspectRatio="none" className="w-full h-4 stroke-[#176637] stroke-[3px] fill-transparent">
+         <path d="M0,10 Q150,25 300,10 T600,10 T900,10 T1200,10"></path>
+      </svg>
+    </div>
+  );
+};
+
+const PromoSection = () => {
+  return (
+    <section id="promo" className="max-w-7xl mx-auto px-6 md:px-8 py-16">
+      <div className="flex justify-between items-end mb-8">
+        <h2 className="font-gabriela text-4xl text-[#176637]">Promo Spesial</h2>
+      </div>
+      <div className="bg-[#FF901A] text-[#FFF6DB] p-8 md:p-12 rounded-tr-[60px] rounded-bl-[60px] relative overflow-hidden flex flex-col md:flex-row justify-between items-center shadow-lg border-2 border-[#176637]">
+        {/* Cropped Leaf di card promo */}
+        <svg className="absolute -right-10 -bottom-10 opacity-20 w-64 h-64 pointer-events-none" viewBox="0 0 100 100" fill="#FFF6DB">
+          <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
+        </svg>
+        
+        <div className="relative z-10 text-center md:text-left">
+          <span className="bg-[#FFF6DB] text-[#FF901A] text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full mb-4 inline-block shadow-sm">
+            Bulan Ini
+          </span>
+          <h3 className="font-gabriela text-3xl md:text-4xl mb-3">Bundling Hangat & Tenang</h3>
+          <p className="font-inter text-lg opacity-90">Beli 2 Varian Latte apa saja, gratis 1 Pastry Pilihan.</p>
+        </div>
+        
+        <button className="relative z-10 mt-8 md:mt-0 bg-[#FFF6DB] text-[#176637] font-bold px-8 py-3 rounded-full hover:bg-[#176637] hover:text-[#FFF6DB] transition-all shadow-[4px_4px_0px_#176637]">
+          Klaim Promo
+        </button>
+      </div>
+    </section>
+  );
+};
+
+const ProductSection = () => {
+  const products = [
+    { id: 1, name: "Matcha Lattea Signature", desc: "Paduan otentik matcha Jepang dengan susu creamy.", price: "25.000" },
+    { id: 2, name: "Houjicha Roasted Calm", desc: "Teh hijau panggang yang kaya rasa dengan sentuhan karamel.", price: "28.000" },
+    { id: 3, name: "Earl Grey Citrus Splash", desc: "Kesegaran earl grey klasik berpadu dengan creamy milk.", price: "26.000" }
+  ];
+
+  return (
+    <section id="varian" className="max-w-7xl mx-auto px-6 md:px-8 py-16">
+      <div className="text-center mb-16">
+        <h2 className="font-gabriela text-4xl text-[#176637] mb-4">Pilihan Rasa</h2>
+        <p className="text-[#176637]/80 text-lg">Diramu dengan daun teh pilihan dan susu segar.</p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+        {products.map((item) => (
+          <div key={item.id} className="bg-white border-2 border-[#176637]/10 hover:border-[#72AD43] transition-all duration-300 rounded-tl-[40px] rounded-br-[40px] p-6 group flex flex-col items-center text-center shadow-sm hover:shadow-xl relative overflow-hidden">
+            
+            {/* Dekorasi Organik Tipis di Kartu */}
+            <div className="absolute top-0 right-0 w-16 h-16 bg-[#72AD43]/10 rounded-bl-[40px] z-0"></div>
+
+             <div className="w-full h-56 bg-[#FFF6DB]/50 mb-6 flex items-center justify-center rounded-tl-2xl rounded-br-2xl relative overflow-hidden border border-[#176637]/5 z-10">
+               {/* Area Foto Produk Asli */}
+               <span className="text-xs text-[#176637]/40 font-medium tracking-wide">FOTO PRODUK <br/> (Transparan)</span>
+             </div>
+             
+             <h3 className="font-inter font-bold text-xl text-[#176637] mb-2 z-10">{item.name}</h3>
+             <p className="text-sm opacity-70 mb-6 z-10 px-2">{item.desc}</p>
+             
+             <div className="mt-auto w-full flex items-center justify-between border-t border-[#176637]/10 pt-4 z-10">
+               <span className="font-bold text-[#FF901A] text-lg tabular-nums">Rp {item.price}</span>
+               <button className="bg-[#176637] text-[#FFF6DB] p-2.5 rounded-full hover:bg-[#72AD43] transition-colors shadow-md">
+                 <ShoppingBag size={18} />
+               </button>
+             </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+const OutletSection = () => {
+  return (
+    <section id="outlet" className="max-w-7xl mx-auto px-6 md:px-8 py-20 flex flex-col md:flex-row gap-16">
+      {/* Kolom Kiri: Peta & Lokasi */}
+      <div className="w-full md:w-1/2">
+        <h2 className="font-gabriela text-4xl text-[#176637] mb-8">Lokasi Kami</h2>
+        
+        {/* Anti-AI Slop: Bentuk kartu organik bukan rounded biasa */}
+        <div className="bg-white p-6 md:p-8 rounded-tr-[50px] rounded-bl-[50px] border border-[#176637]/10 shadow-lg relative">
+          <div className="flex items-start gap-3 mb-4">
+            <MapPin className="text-[#FF901A] shrink-0 mt-1" />
+            <div>
+              <h3 className="font-bold text-xl mb-1 text-[#176637]">Outlet Pusat - Harmoni</h3>
+              <p className="text-sm opacity-80 mb-1">Jl. Ketenangan No. 1, Kota Harmoni.</p>
+              <span className="inline-block bg-[#72AD43]/10 text-[#72AD43] text-xs font-bold px-2 py-1 rounded">Buka: 09.00 - 22.00</span>
+            </div>
+          </div>
+          
+          {/* Placeholder Maps */}
+          <div className="w-full h-48 bg-[#FFF6DB] flex items-center justify-center mt-6 rounded-tr-2xl rounded-bl-2xl border-2 border-dashed border-[#176637]/20">
+             <span className="text-xs text-[#176637]/50 font-medium">[Embed Google Maps API]</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Kolom Kanan: Alur Pemesanan */}
+      <div className="w-full md:w-1/2 flex flex-col justify-center">
+        <h3 className="font-gabriela text-4xl text-[#176637] mb-8">Cara Pemesanan</h3>
+        
+        <div className="space-y-6">
+           <div className="p-5 border-l-4 border-[#176637] bg-white shadow-sm font-medium">
+             1. Pilih produk & varian favoritmu dari menu.
+           </div>
+           <div className="p-5 border-l-4 border-[#72AD43] bg-white shadow-sm font-medium">
+             2. Selesaikan pembayaran dengan aman (Checkout via sistem).
+           </div>
+           <div className="p-6 border-l-4 border-[#FF901A] bg-white shadow-md flex flex-col gap-5 rounded-r-xl">
+              <span className="font-bold text-[#176637]">3. Pilih metode pengambilan / pengiriman:</span>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="flex-1 border-2 border-[#176637] text-[#176637] font-bold py-3 rounded-xl hover:bg-[#176637] hover:text-[#FFF6DB] transition-all">
+                  Ambil di Outlet (Pickup)
+                </button>
+                <button className="flex-1 bg-[#72AD43] text-white font-bold py-3 rounded-xl shadow-[3px_3px_0px_#176637] hover:translate-y-1 hover:shadow-[1px_1px_0px_#176637] transition-all">
+                  Pesan via Grab / GoFood
+                </button>
+              </div>
+           </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Footer = () => {
+  return (
+    <footer className="bg-[#176637] text-[#FFF6DB] pt-20 pb-8 relative overflow-hidden mt-10">
+      {/* Grafis sekunder wave di footer sebagai elemen udara/angin (di atas) */}
+      <div className="absolute top-0 left-0 w-full h-12 opacity-30">
+          <svg viewBox="0 0 1200 40" preserveAspectRatio="none" className="w-full h-full stroke-[#FFF6DB] stroke-[2px] fill-transparent">
+            <path d="M0,20 Q150,40 300,20 T600,20 T900,20 T1200,20"></path>
+          </svg>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 md:px-8 grid grid-cols-1 md:grid-cols-12 gap-12 relative z-10">
+        
+        {/* Kolom 1: Brand Info */}
+        <div className="md:col-span-5">
+          {/* Logo Varian Putih/Cream Placeholder */}
+          <div className="border border-[#FFF6DB]/30 border-dashed w-48 h-16 flex items-center justify-center text-xs mb-6 font-bold bg-[#176637]">
+            [LOGO VARIAN CREAM SVG]
+          </div>
+          <p className="text-sm opacity-90 mb-8 max-w-sm leading-relaxed">
+            Special fresh latte tea. Menyajikan harmoni dan ketenangan di setiap tetesnya, dari alam langsung ke tanganmu.
+          </p>
+          <div className="flex gap-4">
+            <a href="#" className="w-10 h-10 rounded-full bg-[#FFF6DB]/10 flex items-center justify-center cursor-pointer hover:bg-[#FF901A] hover:text-[#176637] transition-all">
+              <Instagram size={20} />
+            </a>
+            <a href="#" className="w-10 h-10 rounded-full bg-[#FFF6DB]/10 flex items-center justify-center cursor-pointer hover:bg-[#FF901A] hover:text-[#176637] transition-all">
+              <Twitter size={20} />
+            </a>
+          </div>
+        </div>
+
+        {/* Kolom 2: Kontak Cepat */}
+        <div className="md:col-span-3">
+           <h4 className="font-gabriela text-xl mb-6 text-[#FF901A]">Kontak Kami</h4>
+           <div className="space-y-3 opacity-90 text-sm">
+             <p>Jl. Ketenangan No. 1,<br/>Kota Harmoni, 60231</p>
+             <p className="pt-2">hello@sagaralattea.com</p>
+             <p>+62 811 2233 4455</p>
+           </div>
+        </div>
+
+        {/* Kolom 3: Form Komplain Ringkas */}
+        <div className="md:col-span-4">
+          <h4 className="font-gabriela text-xl mb-6 text-[#FF901A]">Saran & Komplain</h4>
+          <form className="flex flex-col gap-3">
+            <input 
+              type="text" 
+              placeholder="Nama Anda" 
+              className="bg-[#FFF6DB]/5 border border-[#FFF6DB]/20 text-[#FFF6DB] px-4 py-3 rounded-lg focus:outline-none focus:border-[#FF901A] placeholder:text-[#FFF6DB]/40 text-sm w-full" 
+            />
+            <textarea 
+              placeholder="Pesan, saran, atau komplain..." 
+              rows="3" 
+              className="bg-[#FFF6DB]/5 border border-[#FFF6DB]/20 text-[#FFF6DB] px-4 py-3 rounded-lg focus:outline-none focus:border-[#FF901A] placeholder:text-[#FFF6DB]/40 text-sm w-full resize-none"
+            ></textarea>
+            <button type="submit" className="bg-[#FF901A] text-[#176637] font-bold py-3 rounded-lg hover:bg-[#FFF6DB] transition-colors mt-1">
+              Kirim Pesan
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Copyright */}
+      <div className="max-w-7xl mx-auto px-6 md:px-8 mt-16 pt-8 border-t border-[#FFF6DB]/10 text-center text-xs opacity-70 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p>&copy; 2026 Sagara Lattea. All rights reserved.</p>
+        <div className="flex gap-6">
+          <a href="#" className="hover:text-[#FF901A] transition-colors">Syarat & Ketentuan</a>
+          <a href="#" className="hover:text-[#FF901A] transition-colors">Kebijakan Privasi</a>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default function App() {
+  return (
+    <>
+      <GlobalStyles />
+      <div className="min-h-screen relative font-inter text-[#176637] bg-[#FFF6DB]">
+        <Navbar />
+        <main>
+          <Hero />
+          <Divider />
+          <PromoSection />
+          <ProductSection />
+          <OutletSection />
+        </main>
+        <Footer />
+      </div>
+    </>
+  );
+}
