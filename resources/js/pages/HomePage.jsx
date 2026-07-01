@@ -157,9 +157,32 @@ function Hero({ brand }) {
     );
 }
 
-function PromoSection() {
+function PromoSection({ promos = [] }) {
+    const fallbackPromos = [
+        {
+            title: 'Bundling Hangat & Tenang',
+            summary: 'Beli 2 varian latte, gratis 1 pastry pilihan.',
+            badge: 'Bulan Ini',
+            cta: 'Klaim Promo',
+            accent_color: '#FF901A',
+            code: 'LATTEBUNDLE',
+            period: '01 Jul - 31 Jul 2026',
+        },
+        {
+            title: 'Happy Hour Matcha',
+            summary: 'Diskon 20% untuk Matcha Latte ukuran regular.',
+            badge: 'Senin-Jumat',
+            cta: 'Lihat Detail',
+            accent_color: '#72AD43',
+            code: 'MATCHAHH',
+            period: '14.00 - 17.00',
+        },
+    ];
+    const promoItems = promos.length ? promos : fallbackPromos;
+    const featured = promoItems[0];
+
     return (
-        <section className="mx-auto max-w-7xl px-6 py-16 md:px-8">
+        <section className="mx-auto max-w-7xl px-6 py-16 md:px-8" id="promo">
             <SectionTitle eyebrow="Promo Spesial" title="Bundling hangat & tenang" />
             <div className="relative mt-8 overflow-hidden rounded-tr-[60px] rounded-bl-[60px] border-2 border-[#176637] bg-[#FF901A] p-8 text-[#FFF6DB] shadow-lg md:p-12">
                 <svg className="pointer-events-none absolute -right-10 -bottom-10 h-64 w-64 opacity-20" viewBox="0 0 100 100" fill="#FFF6DB">
@@ -168,15 +191,35 @@ function PromoSection() {
                 <div className="relative z-10 flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
                     <div className="max-w-2xl">
                         <span className="mb-4 inline-flex rounded-full bg-[#FFF6DB] px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#FF901A]">
-                            Bulan ini
+                            {featured?.badge ?? 'Bulan ini'}
                         </span>
-                        <h3 className="font-gabriela text-3xl md:text-4xl">Beli 2 varian latte, gratis 1 pastry pilihan.</h3>
-                        <p className="mt-3 text-lg opacity-90">Promo dibuat untuk tampil jelas, berani, dan tetap sesuai palet brand yang hangat.</p>
+                        <h3 className="font-gabriela text-3xl md:text-4xl">{featured?.title ?? 'Bundling Hangat & Tenang'}</h3>
+                        <p className="mt-3 text-lg opacity-90">{featured?.summary ?? 'Promo dibuat untuk tampil jelas, berani, dan tetap sesuai palet brand yang hangat.'}</p>
+                        <div className="mt-4 flex flex-wrap gap-3 text-sm">
+                            <span className="rounded-full bg-[#FFF6DB]/20 px-3 py-1 font-semibold text-[#FFF6DB]">{featured?.code ?? 'PROMO CODE'}</span>
+                            <span className="rounded-full bg-[#FFF6DB]/20 px-3 py-1 font-semibold text-[#FFF6DB]">{featured?.period ?? 'Periode promo'}</span>
+                        </div>
                     </div>
                     <button className="rounded-full bg-[#FFF6DB] px-8 py-3 font-bold text-[#176637] shadow-[4px_4px_0px_#176637] transition hover:-translate-y-0.5">
-                        Klaim Promo
+                        {featured?.cta ?? 'Klaim Promo'}
                     </button>
                 </div>
+            </div>
+            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+                {promoItems.slice(1).map((promo) => (
+                    <article key={promo.code} className="rounded-[28px] border border-[#176637]/10 bg-white/85 p-5 shadow-sm">
+                        <div className="mb-2 flex items-center justify-between">
+                            <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{promo.badge}</span>
+                            <span className="text-xs font-semibold text-[#176637]/50">{promo.code}</span>
+                        </div>
+                        <h4 className="font-gabriela text-2xl text-[#176637]">{promo.title}</h4>
+                        <p className="mt-2 text-sm leading-7 text-[#176637]/75">{promo.summary}</p>
+                        <div className="mt-4 flex items-center justify-between text-xs text-[#176637]/60">
+                            <span>{promo.period}</span>
+                            <span className="font-semibold text-[#FF901A]">{promo.cta}</span>
+                        </div>
+                    </article>
+                ))}
             </div>
         </section>
     );
@@ -326,6 +369,7 @@ function Footer() {
 export default function HomePage({ data = {} }) {
     const menuItems = data.menuItems ?? [];
     const testimonials = data.testimonials ?? [];
+    const promos = data.promos ?? [];
 
     return (
         <div className="min-h-screen bg-[#FFF6DB] text-[#176637]">
@@ -393,7 +437,7 @@ export default function HomePage({ data = {} }) {
             <main>
                 <Hero brand={data.brand} />
                 <WaveDivider />
-                <PromoSection />
+                <PromoSection promos={promos} />
                 <ProductSection items={menuItems} />
                 <OutletSection />
                 <section className="mx-auto max-w-7xl px-6 py-10 md:px-8">

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 
 const navigation = [
     { id: 'overview', label: 'Overview', icon: 'dashboard' },
-    { id: 'outlet', label: 'Manajemen Outlet', icon: 'store' },
+    { id: 'outlet', label: 'Manajemen Mitra / Outlet', icon: 'store' },
     { id: 'promo', label: 'Manajemen Promo', icon: 'tag' },
     { id: 'karyawan', label: 'Karyawan (Global)', icon: 'users' },
     { id: 'member', label: 'Membership', icon: 'award' },
@@ -22,9 +22,15 @@ const salesData = [
 ];
 
 const outletFallback = [
-    { id: 1, name: 'Harmoni Pusat', location: 'Kota Harmoni', omzet: 'Rp 28.5M', status: 'Aktif' },
-    { id: 2, name: 'Senja Kopi & Teh', location: 'Bandung', omzet: 'Rp 14.2M', status: 'Aktif' },
-    { id: 3, name: 'Sagara Sudirman', location: 'Jakarta', omzet: 'Rp 21.0M', status: 'Aktif' },
+    { id: 1, name: 'Harmoni Pusat', location: 'Kota Harmoni', account: 'harmoni.pusat@sagaralattea.id', omzet: 'Rp 28.5M', status: 'Aktif' },
+    { id: 2, name: 'Senja Kopi & Teh', location: 'Bandung', account: 'senja.kopi@sagaralattea.id', omzet: 'Rp 14.2M', status: 'Aktif' },
+    { id: 3, name: 'Sagara Sudirman', location: 'Jakarta', account: 'sudirman@sagaralattea.id', omzet: 'Rp 21.0M', status: 'Aktif' },
+];
+
+const promoFallback = [
+    { id: 1, title: 'Bundling Hangat & Tenang', code: 'LATTEBUNDLE', summary: 'Beli 2 varian latte, gratis 1 pastry pilihan.', period: '01 Jul - 31 Jul 2026', target: 'Semua outlet', status: 'Aktif' },
+    { id: 2, title: 'Happy Hour Matcha', code: 'MATCHAHH', summary: 'Diskon 20% untuk Matcha Latte ukuran regular.', period: 'Senin-Jumat, 14.00 - 17.00', target: 'Outlet pusat', status: 'Jadwal' },
+    { id: 3, title: 'Member Morning Deal', code: 'MEMBERAM', summary: 'Promo pagi untuk pembelian menu minuman pertama.', period: 'Setiap hari, 08.00 - 11.00', target: 'Member aktif', status: 'Aktif' },
 ];
 
 const complaintFallback = [
@@ -294,12 +300,12 @@ function OutletTab({ outletData }) {
         <div className="animate-slide-up">
             <div className="mb-6 flex items-center justify-between">
                 <div>
-                    <h2 className="mb-1 font-gabriela text-2xl text-[#176637]">Daftar Outlet Mitra</h2>
-                    <p className="text-sm text-[#176637]/70">Kelola dan pantau performa seluruh cabang.</p>
+                    <h2 className="mb-1 font-gabriela text-2xl text-[#176637]">Daftar Mitra / Outlet</h2>
+                    <p className="text-sm text-[#176637]/70">Setiap outlet baru otomatis menyiapkan akun mitra.</p>
                 </div>
                 <button className="flex items-center gap-2 rounded-xl bg-[#FF901A] px-5 py-2.5 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-1 hover:shadow-[1px_1px_0px_#176637]">
                     <Icon name="plus" className="h-4 w-4" stroke />
-                    Tambah Outlet
+                    Tambah Mitra / Outlet
                 </button>
             </div>
 
@@ -307,8 +313,9 @@ function OutletTab({ outletData }) {
                 <table className="w-full border-collapse text-left">
                     <thead>
                         <tr className="border-b-2 border-[#176637]/10 bg-[#FFF6DB]/50 text-sm font-bold text-[#176637]">
-                            <th className="p-4 pl-6">Nama Outlet</th>
+                            <th className="p-4 pl-6">Nama Mitra / Outlet</th>
                             <th className="p-4">Lokasi</th>
+                            <th className="p-4">Akun Mitra</th>
                             <th className="p-4">Total Omzet (Bulan Ini)</th>
                             <th className="p-4">Status</th>
                             <th className="p-4 pr-6 text-center">Aksi</th>
@@ -327,6 +334,7 @@ function OutletTab({ outletData }) {
                                     <Icon name="mapPin" className="h-3.5 w-3.5 text-[#FF901A]" stroke />
                                     {outlet.location}
                                 </td>
+                                <td className="p-4 text-sm text-[#176637]/70">{outlet.account}</td>
                                 <td className="p-4 font-bold tabular-nums text-[#176637]">{outlet.omzet}</td>
                                 <td className="p-4">
                                     <span className="rounded-full bg-[#72AD43]/10 px-3 py-1.5 text-xs font-bold text-[#72AD43]">{outlet.status}</span>
@@ -340,6 +348,56 @@ function OutletTab({ outletData }) {
                         ))}
                     </tbody>
                 </table>
+            </div>
+        </div>
+    );
+}
+
+function PromoTab({ promoData }) {
+    return (
+        <div className="animate-slide-up">
+            <div className="mb-6 flex items-center justify-between">
+                <div>
+                    <h2 className="mb-1 font-gabriela text-2xl text-[#176637]">Manajemen Promo</h2>
+                    <p className="text-sm text-[#176637]/70">Promo yang dibuat di sini akan tampil di landing page.</p>
+                </div>
+                <button className="flex items-center gap-2 rounded-xl bg-[#FF901A] px-5 py-2.5 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-1 hover:shadow-[1px_1px_0px_#176637]">
+                    <Icon name="plus" className="h-4 w-4" stroke />
+                    Tambah Promo
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                {promoData.map((promo) => (
+                    <article key={promo.id} className="rounded-tr-[36px] rounded-bl-[36px] rounded-tl-xl rounded-br-xl border border-[#176637]/10 bg-white p-6 shadow-sm">
+                        <div className="mb-4 flex items-start justify-between gap-4">
+                            <div>
+                                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${promo.status === 'Aktif' ? 'bg-[#72AD43]/20 text-[#176637]' : 'bg-[#FF901A]/20 text-[#FF901A]'}`}>{promo.status}</span>
+                                <h3 className="mt-3 font-gabriela text-2xl text-[#176637]">{promo.title}</h3>
+                            </div>
+                            <span className="rounded-xl bg-[#176637]/10 px-3 py-2 text-xs font-bold text-[#176637]">{promo.code}</span>
+                        </div>
+                        <p className="text-sm leading-7 text-[#176637]/75">{promo.summary}</p>
+                        <div className="mt-5 space-y-2 text-sm">
+                            <div className="flex justify-between gap-4">
+                                <span className="text-[#176637]/60">Periode</span>
+                                <span className="text-right font-semibold text-[#176637]">{promo.period}</span>
+                            </div>
+                            <div className="flex justify-between gap-4">
+                                <span className="text-[#176637]/60">Target</span>
+                                <span className="text-right font-semibold text-[#176637]">{promo.target}</span>
+                            </div>
+                        </div>
+                        <div className="mt-6 flex gap-3">
+                            <button className="flex-1 rounded-xl border-2 border-[#176637] py-2.5 text-sm font-bold text-[#176637] transition-colors hover:bg-[#176637] hover:text-[#FFF6DB]">
+                                Edit
+                            </button>
+                            <button className="flex-1 rounded-xl bg-[#FF901A] py-2.5 text-sm font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-0.5">
+                                Tampilkan di Landing
+                            </button>
+                        </div>
+                    </article>
+                ))}
             </div>
         </div>
     );
@@ -362,6 +420,7 @@ export default function AdminDashboardPage({ data = {} }) {
     const stats = data.stats ?? [];
     const sales = data.salesData ?? salesData;
     const outlets = data.outletData ?? outletFallback;
+    const promos = data.promoData ?? promoFallback;
     const complaints = data.recentComplaints ?? complaintFallback;
     const logoUrl = data.brand?.logoUrl ?? '/logosagaralattea.png';
 
@@ -370,7 +429,9 @@ export default function AdminDashboardPage({ data = {} }) {
             case 'overview':
                 return 'Dashboard Overview';
             case 'outlet':
-                return 'Manajemen Outlet';
+                return 'Manajemen Mitra / Outlet';
+            case 'promo':
+                return 'Manajemen Promo';
             case 'komplain':
                 return 'Tiket Komplain Masuk';
             default:
@@ -425,7 +486,7 @@ export default function AdminDashboardPage({ data = {} }) {
 
             <Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} logoUrl={logoUrl} />
 
-            <main className="relative ml-64 flex flex-1 flex-col overflow-hidden">
+            <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
                 <Header title={title} />
 
                 <div className="relative z-0 flex-1 overflow-y-auto p-8">
@@ -437,7 +498,8 @@ export default function AdminDashboardPage({ data = {} }) {
 
                     {activeMenu === 'overview' && <OverviewTab stats={stats} salesData={sales} recentComplaints={complaints} />}
                     {activeMenu === 'outlet' && <OutletTab outletData={outlets} />}
-                    {['promo', 'karyawan', 'member', 'stok', 'investor'].includes(activeMenu) && (
+                    {activeMenu === 'promo' && <PromoTab promoData={promos} />}
+                    {['karyawan', 'member', 'stok', 'investor'].includes(activeMenu) && (
                         <PlaceholderTab title={`Modul ${activeMenu}`} description="Modul ini akan menggunakan bahasa visual tabel dan form yang sama." />
                     )}
                     {activeMenu === 'komplain' && <PlaceholderTab title="Tiket Komplain" description="Daftar tiket komplain akan mengikuti gaya kartu yang sama dengan overview." />}

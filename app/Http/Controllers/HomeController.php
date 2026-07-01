@@ -23,6 +23,7 @@ class HomeController extends Controller
                     ['value' => '98%', 'label' => 'happy customer'],
                     ['value' => '4.9/5', 'label' => 'taste rating'],
                 ],
+                'promos' => $this->fallbackPromotions(),
                 'menuItems' => $this->menuItems()->values()->all(),
                 'testimonials' => $this->testimonials()->values()->all(),
             ],
@@ -114,6 +115,30 @@ class HomeController extends Controller
                 'role' => 'Weekend Regular',
                 'quote' => 'Bukan coffee shop yang generik. Ada karakter dari warna, gelas, dan penyajian menunya.',
                 'rating' => 5,
+            ],
+        ];
+    }
+
+    protected function fallbackPromotions(): array
+    {
+        return [
+            [
+                'title' => 'Bundling Hangat & Tenang',
+                'summary' => 'Beli 2 varian latte, gratis 1 pastry pilihan.',
+                'badge' => 'Bulan Ini',
+                'cta' => 'Klaim Promo',
+                'accent_color' => '#FF901A',
+                'code' => 'LATTEBUNDLE',
+                'period' => '01 Jul - 31 Jul 2026',
+            ],
+            [
+                'title' => 'Happy Hour Matcha',
+                'summary' => 'Diskon 20% untuk Matcha Latte ukuran regular.',
+                'badge' => 'Senin-Jumat',
+                'cta' => 'Lihat Detail',
+                'accent_color' => '#72AD43',
+                'code' => 'MATCHAHH',
+                'period' => '14.00 - 17.00',
             ],
         ];
     }

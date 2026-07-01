@@ -30,9 +30,14 @@ class AdminDashboardController extends Controller
                     ['name' => 'Min', 'omzet' => 9100000, 'laba' => 4200000],
                 ],
                 'outletData' => [
-                    ['id' => 1, 'name' => 'Harmoni Pusat', 'location' => 'Kota Harmoni', 'omzet' => 'Rp 28.5M', 'status' => 'Aktif'],
-                    ['id' => 2, 'name' => 'Senja Kopi & Teh', 'location' => 'Bandung', 'omzet' => 'Rp 14.2M', 'status' => 'Aktif'],
-                    ['id' => 3, 'name' => 'Sagara Sudirman', 'location' => 'Jakarta', 'omzet' => 'Rp 21.0M', 'status' => 'Aktif'],
+                    ['id' => 1, 'name' => 'Harmoni Pusat', 'location' => 'Kota Harmoni', 'account' => 'harmoni.pusat@sagaralattea.id', 'omzet' => 'Rp 28.5M', 'status' => 'Aktif'],
+                    ['id' => 2, 'name' => 'Senja Kopi & Teh', 'location' => 'Bandung', 'account' => 'senja.kopi@sagaralattea.id', 'omzet' => 'Rp 14.2M', 'status' => 'Aktif'],
+                    ['id' => 3, 'name' => 'Sagara Sudirman', 'location' => 'Jakarta', 'account' => 'sudirman@sagaralattea.id', 'omzet' => 'Rp 21.0M', 'status' => 'Aktif'],
+                ],
+                'promoData' => [
+                    ['id' => 1, 'title' => 'Bundling Hangat & Tenang', 'code' => 'LATTEBUNDLE', 'period' => '01 Jul - 31 Jul 2026', 'target' => 'Semua outlet', 'status' => 'Aktif', 'summary' => 'Beli 2 varian latte, gratis 1 pastry pilihan.'],
+                    ['id' => 2, 'title' => 'Happy Hour Matcha', 'code' => 'MATCHAHH', 'period' => 'Senin-Jumat, 14.00 - 17.00', 'target' => 'Outlet pusat', 'status' => 'Jadwal', 'summary' => 'Diskon 20% untuk Matcha Latte ukuran regular.'],
+                    ['id' => 3, 'title' => 'Member Morning Deal', 'code' => 'MEMBERAM', 'period' => 'Setiap hari, 08.00 - 11.00', 'target' => 'Member aktif', 'status' => 'Aktif', 'summary' => 'Promo pagi untuk pembelian menu minuman pertama.'],
                 ],
                 'recentComplaints' => [
                     ['id' => 'TKT-091', 'outlet' => 'Sagara Sudirman', 'issue' => 'Pesanan Gofood tumpah', 'status' => 'Baru', 'date' => 'Hari ini, 14:30'],
