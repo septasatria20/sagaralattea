@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import HomePage from './pages/HomePage';
 import MitraDashboardPage from './pages/MitraDashboardPage';
+import InvestorDashboardPage from './pages/InvestorDashboardPage';
 
 const root = createRoot(document.getElementById('app'));
 const pageData = window.__INITIAL_PAGE_DATA__ ?? {};
@@ -11,6 +12,8 @@ const PageComponent = page === 'admin-dashboard'
     ? AdminDashboardPage
     : page === 'mitra-dashboard'
         ? MitraDashboardPage
+        : page === 'investor-dashboard'
+            ? InvestorDashboardPage
         : HomePage;
 
 root.render(

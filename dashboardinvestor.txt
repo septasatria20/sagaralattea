@@ -1,0 +1,720 @@
+import React, { useState } from 'react';
+import { 
+  Search, Bell, Plus, Minus, ChevronRight, 
+  Coffee, Leaf, Cookie, UserCheck, Settings, 
+  LogOut, LayoutDashboard, Store, Package, 
+  TrendingUp, Users, AlertCircle
+} from 'lucide-react';
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar
+} from 'recharts';
+
+const GlobalStyles = () => (
+  <style>{`
+    @import url('https://fonts.googleapis.com/css2?family=Gabriela&family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+      background-color: #FFF6DB; /* Base Cream Sagara */
+      color: #176637; /* Base Green Sagara */
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    .font-gabriela { font-family: 'Gabriela', serif; }
+    .font-inter { font-family: 'Inter', sans-serif; }
+
+    /* Organic Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: #72AD43;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: #176637; }
+
+    .hide-scroll::-webkit-scrollbar { display: none; }
+    .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Recharts Customization for Sagara */
+    .recharts-cartesian-grid-horizontal line, 
+    .recharts-cartesian-grid-vertical line {
+      stroke: rgba(23, 102, 55, 0.1);
+    }
+  `}</style>
+);
+
+const salesData = [
+  { name: 'Sen', omzet: 2400000 },
+  { name: 'Sel', omzet: 1398000 },
+  { name: 'Rab', omzet: 3800000 },
+  { name: 'Kam', omzet: 3908000 },
+  { name: 'Jum', omzet: 4800000 },
+  { name: 'Sab', omzet: 6800000 },
+  { name: 'Min', omzet: 7300000 },
+];
+
+const categories = [
+  { id: 'latte', name: 'Latte Tea', count: 12, icon: Coffee },
+  { id: 'pure', name: 'Pure Tea', count: 8, icon: Leaf },
+  { id: 'pastry', name: 'Pastry', count: 5, icon: Cookie, alert: 'Stok Menipis' },
+];
+
+const mockProducts = [
+  { id: 1, name: 'Matcha Lattea Signature', price: 25000, category: 'latte', img: '🍵' },
+  { id: 2, name: 'Hojicha Roasted Milk', price: 23000, category: 'latte', img: '🧋' },
+  { id: 3, name: 'Earl Grey Macchiato', price: 24000, category: 'latte', img: '☕' },
+  { id: 4, name: 'Jasmine Sea Salt', price: 22000, category: 'latte', img: '🥛' },
+  { id: 5, name: 'Oolong Clear Tea', price: 18000, category: 'pure', img: '🍵' },
+  { id: 6, name: 'Chamomile Relax', price: 20000, category: 'pure', img: '🌼' },
+  { id: 7, name: 'Butter Croissant', price: 15000, category: 'pastry', img: '🥐' },
+  { id: 8, name: 'Matcha Cromboloni', price: 28000, category: 'pastry', img: '🍩' },
+];
+
+const DashboardView = () => (
+  <div className="flex-1 overflow-y-auto p-8 pr-10 relative">
+    {/* Grafis Sekunder - Wave Background */}
+    <div className="absolute top-0 right-0 w-full h-64 opacity-5 pointer-events-none z-0">
+       <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-full fill-[#176637]">
+          <path d="M0,60 C150,100 300,20 450,60 C600,100 750,20 900,60 C1050,100 1200,20 1200,60 L1200,120 L0,120 Z"></path>
+       </svg>
+    </div>
+
+    <div className="relative z-10">
+      <header className="mb-8">
+        <h1 className="font-gabriela text-3xl text-[#176637] mb-1">Dashboard Mitra</h1>
+        <p className="text-sm font-medium text-[#72AD43]">Outlet Harmoni - Ringkasan Hari Ini</p>
+      </header>
+
+      {/* Metric Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {[
+          { title: 'Pendapatan Hari Ini', value: 'Rp 4.250.000', icon: TrendingUp, color: 'text-[#176637]' },
+          { title: 'Total Pesanan', value: '142', sub: 'Minuman & Pastry', icon: Store, color: 'text-[#72AD43]' },
+          { title: 'Member Baru', value: '18', sub: '+5% dari kemarin', icon: UserCheck, color: 'text-[#FF901A]' },
+          { title: 'Peringatan Stok', value: '3 Item', sub: 'Cup, Sedotan, Croissant', icon: AlertCircle, color: 'text-red-500', alert: true }
+        ].map((metric, idx) => (
+          <div key={idx} className={`bg-white p-6 border-2 ${metric.alert ? 'border-red-200 bg-red-50' : 'border-[#176637]/10'} 
+            rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl shadow-[4px_4px_0px_rgba(23,102,55,0.05)]
+            hover:-translate-y-1 transition-transform`}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div className={`p-3 rounded-2xl ${metric.alert ? 'bg-red-100' : 'bg-[#FFF6DB]'}`}>
+                <metric.icon size={24} className={metric.color} />
+              </div>
+            </div>
+            <h3 className="text-sm text-[#176637]/70 font-medium mb-1">{metric.title}</h3>
+            <p className={`font-gabriela text-2xl font-bold ${metric.alert ? 'text-red-600' : 'text-[#176637]'}`}>{metric.value}</p>
+            {metric.sub && <p className="text-xs text-[#176637]/50 mt-2">{metric.sub}</p>}
+          </div>
+        ))}
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white p-6 border-2 border-[#176637]/10 rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl">
+          <h3 className="font-gabriela text-xl text-[#176637] mb-6">Tren Penjualan (Minggu Ini)</h3>
+          <div className="h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={salesData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorOmzet" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#72AD43" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#72AD43" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#176637', fontSize: 12}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#176637', fontSize: 12}} tickFormatter={(val) => `Rp${val/1000000}M`} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#FFF6DB', borderColor: '#176637', borderRadius: '16px', color: '#176637' }}
+                  itemStyle={{ color: '#176637', fontWeight: 'bold' }}
+                  formatter={(value) => [`Rp ${value.toLocaleString('id-ID')}`, 'Omzet']}
+                />
+                <Area type="monotone" dataKey="omzet" stroke="#176637" strokeWidth={3} fillOpacity={1} fill="url(#colorOmzet)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 border-2 border-[#176637]/10 rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl">
+          <h3 className="font-gabriela text-xl text-[#176637] mb-6">Penjualan Varian</h3>
+          <div className="space-y-4">
+            {[
+              { name: 'Matcha Lattea', val: 78, color: 'bg-[#176637]' },
+              { name: 'Hojicha Roasted', val: 65, color: 'bg-[#72AD43]' },
+              { name: 'Earl Grey Macchiato', val: 45, color: 'bg-[#FF901A]' },
+              { name: 'Jasmine Sea Salt', val: 30, color: 'bg-[#176637]/40' },
+            ].map((item, idx) => (
+              <div key={idx}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-medium text-[#176637]">{item.name}</span>
+                  <span className="font-bold text-[#176637]">{item.val}%</span>
+                </div>
+                <div className="w-full bg-[#FFF6DB] rounded-full h-2.5">
+                  <div className={`${item.color} h-2.5 rounded-full`} style={{ width: `${item.val}%` }}></div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-8 p-4 bg-[#FFF6DB]/50 rounded-xl border border-[#176637]/10 text-center relative overflow-hidden">
+             <svg className="absolute -right-4 -bottom-4 opacity-10 w-24 h-24" viewBox="0 0 100 100" fill="#176637">
+               <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
+             </svg>
+             <h4 className="font-bold text-sm text-[#176637] mb-1">Target Harian</h4>
+             <p className="text-2xl font-gabriela text-[#72AD43]">85%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const POSView = () => {
+  const [activeCategory, setActiveCategory] = useState('latte');
+  const [cart, setCart] = useState([]);
+  const [customerName, setCustomerName] = useState('');
+  const [isMember, setIsMember] = useState(false);
+  const [orderType, setOrderType] = useState('Dine In');
+
+  const filteredProducts = mockProducts.filter(p => p.category === activeCategory);
+
+  const addToCart = (product) => {
+    setCart(prev => {
+      const existing = prev.find(item => item.id === product.id);
+      if (existing) {
+        return prev.map(item => item.id === product.id ? { ...item, qty: item.qty + 1 } : item);
+      }
+      return [...prev, { ...product, qty: 1 }];
+    });
+  };
+
+  const updateQty = (id, delta) => {
+    setCart(prev => prev.map(item => {
+      if (item.id === id) {
+        const newQty = item.qty + delta;
+        return newQty > 0 ? { ...item, qty: newQty } : item;
+      }
+      return item;
+    }).filter(item => item.qty > 0));
+  };
+
+  const censorName = (name) => {
+    if (!name) return 'Pelanggan Umum';
+    if (!isMember) return name;
+    
+    const parts = name.split(' ');
+    if (parts.length === 1) {
+      return name.substring(0, 3) + '*'.repeat(Math.max(0, name.length - 3));
+    }
+    const first = parts[0];
+    const rest = parts.slice(1).join(' ');
+    return `${first} ${rest.charAt(0)}${'*'.repeat(Math.max(0, rest.length - 1))}`;
+  };
+
+  const checkMembership = () => {
+    if (customerName.trim().length > 2) setIsMember(true);
+  };
+
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const tax = subtotal * 0.11;
+  const total = subtotal + tax;
+  const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+  return (
+    <div className="flex-1 flex overflow-hidden">
+      {/* Area Utama POS (Kiri) */}
+      <main className="flex-1 flex flex-col p-6 pr-0 overflow-hidden relative">
+        <header className="flex justify-between items-center mb-8 pr-6 relative z-10">
+          <div>
+            <h1 className="font-gabriela text-2xl text-[#176637] mb-1">Kasir Sagara</h1>
+            <p className="text-sm font-medium text-[#72AD43]">{today}</p>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#176637]/40" size={18} />
+              <input type="text" placeholder="Cari menu (⌘K)" className="bg-white border-2 border-[#176637]/10 rounded-full pl-12 pr-4 py-2 w-64 text-sm focus:outline-none focus:border-[#72AD43] transition-colors text-[#176637]" />
+            </div>
+          </div>
+        </header>
+
+        {/* Kategori Menu */}
+        <div className="flex gap-4 overflow-x-auto hide-scroll pb-2 mb-6 pr-6 relative z-10">
+          {categories.map((cat) => {
+            const isActive = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`flex-shrink-0 relative overflow-hidden flex flex-col justify-between p-5 w-44 h-24 text-left transition-all duration-300 ${
+                  isActive 
+                    ? 'bg-[#176637] text-[#FFF6DB] rounded-tr-[30px] rounded-bl-[30px] rounded-tl-xl rounded-br-xl shadow-[4px_4px_0px_#72AD43]' 
+                    : 'bg-white text-[#176637] border-2 border-[#176637]/10 rounded-tr-[30px] rounded-bl-[30px] rounded-tl-xl rounded-br-xl hover:border-[#72AD43]'
+                }`}
+              >
+                <div className="relative z-10 flex justify-between items-center w-full">
+                  <h3 className="font-gabriela text-lg leading-tight">{cat.name}</h3>
+                  {cat.alert && <span className="bg-red-500 w-2 h-2 rounded-full"></span>}
+                </div>
+                <p className="text-xs opacity-80 relative z-10">{cat.count} items</p>
+                {isActive && (
+                  <svg className="absolute -right-2 -bottom-2 opacity-20 w-20 h-20" viewBox="0 0 100 100" fill="#FFF6DB">
+                    <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
+                  </svg>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Grid Produk */}
+        <div className="flex-1 overflow-y-auto pr-6 pb-6 relative z-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredProducts.map((product) => (
+              <div key={product.id} className="bg-white p-4 flex flex-col h-56 border border-[#176637]/10 hover:border-[#72AD43] hover:shadow-[4px_4px_0px_#176637] transition-all duration-300 group rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg">
+                <div className="w-full h-24 bg-[#FFF6DB]/50 rounded-tl-xl rounded-br-xl mb-3 flex items-center justify-center text-4xl group-hover:scale-105 transition-transform">
+                  {product.img}
+                </div>
+                <h4 className="font-semibold text-sm text-[#176637] leading-tight mb-1 flex-1">{product.name}</h4>
+                <div className="flex justify-between items-end mt-auto">
+                  <span className="font-bold text-[#FF901A] text-sm">Rp {product.price.toLocaleString('id-ID')}</span>
+                  <button onClick={() => addToCart(product)} className="w-7 h-7 rounded-full border-2 border-[#176637] text-[#176637] flex items-center justify-center hover:bg-[#176637] hover:text-[#FFF6DB] transition-colors">
+                    <Plus size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      {/* Cart Aside (Kanan) */}
+      <aside className="w-[380px] bg-white shadow-[-10px_0_30px_rgba(23,102,55,0.05)] rounded-tl-[40px] flex flex-col h-full border-l border-[#176637]/10 relative z-20">
+        <div className="p-6 border-b border-[#176637]/5 flex justify-between items-center bg-[#FFF6DB]/30 rounded-tl-[40px]">
+          <div className="text-center w-full">
+            <h2 className="font-gabriela text-lg font-bold text-[#176637]">Nota Pesanan</h2>
+            <p className="text-xs text-[#176637]/60">#TRX-88291</p>
+          </div>
+        </div>
+
+        <div className="p-6 flex-1 flex flex-col overflow-hidden">
+          <div className="flex bg-[#FFF6DB] rounded-full p-1 mb-5 border border-[#176637]/10">
+            {['Dine In', 'Take Away', 'Delivery'].map(type => (
+              <button 
+                key={type} onClick={() => setOrderType(type)}
+                className={`flex-1 text-xs py-2 rounded-full font-medium transition-colors ${
+                  orderType === type ? 'bg-[#176637] text-[#FFF6DB] shadow-sm' : 'text-[#176637]/70 hover:text-[#176637]'
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-2 mb-5">
+            <input 
+              type="text" placeholder="Nama Pelanggan" value={customerName} onChange={(e) => setCustomerName(e.target.value)}
+              className="flex-1 border-2 border-[#176637]/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#72AD43] text-[#176637]"
+            />
+            <button onClick={checkMembership} className={`px-3 rounded-xl text-xs font-bold border-2 transition-all ${isMember ? 'bg-[#72AD43]/20 border-[#72AD43] text-[#176637]' : 'border-[#FF901A] text-[#FF901A] hover:bg-[#FF901A] hover:text-[#FFF6DB]'}`}>
+              {isMember ? '✓ Member' : 'Cek'}
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto hide-scroll mb-6">
+            {cart.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-[#176637]/30">
+                <Coffee size={32} className="mb-2" />
+                <p className="text-sm">Belum ada pesanan</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {cart.map(item => (
+                  <div key={item.id} className="flex items-center gap-3 bg-[#FFF6DB]/20 p-2 rounded-xl border border-[#FFF6DB]">
+                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-xl shadow-sm">{item.img}</div>
+                    <div className="flex-1 overflow-hidden">
+                      <h4 className="text-sm font-semibold text-[#176637] truncate">{item.name}</h4>
+                      <p className="text-xs text-[#176637]/60">Rp {item.price.toLocaleString('id-ID')}</p>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white px-1.5 py-1 rounded-lg border border-[#176637]/10">
+                      <button onClick={() => updateQty(item.id, -1)} className="text-[#176637]"><Minus size={12} /></button>
+                      <span className="text-xs font-bold w-3 text-center">{item.qty}</span>
+                      <button onClick={() => updateQty(item.id, 1)} className="text-[#176637]"><Plus size={12} /></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-auto border-t-2 border-dashed border-[#176637]/10 pt-4">
+            {customerName && (
+              <div className="bg-[#176637]/5 p-2.5 rounded-lg mb-3 border border-[#176637]/10 flex justify-between items-center">
+                <span className="text-xs text-[#176637]/70">Pelanggan:</span>
+                <span className="text-sm font-bold text-[#176637] font-gabriela">{censorName(customerName)}</span>
+              </div>
+            )}
+            <div className="space-y-1.5 mb-4">
+              <div className="flex justify-between text-sm text-[#176637]/70">
+                <span>Subtotal</span><span>Rp {subtotal.toLocaleString('id-ID')}</span>
+              </div>
+              <div className="flex justify-between text-sm text-[#176637]/70">
+                <span>Pajak (11%)</span><span>Rp {tax.toLocaleString('id-ID')}</span>
+              </div>
+              <div className="flex justify-between text-lg font-bold text-[#176637] pt-2 border-t border-[#176637]/10 mt-2">
+                <span>Total</span><span>Rp {total.toLocaleString('id-ID')}</span>
+              </div>
+            </div>
+            <button 
+              className={`w-full py-3 rounded-xl font-bold flex items-center justify-between px-5 transition-all shadow-[4px_4px_0px_#72AD43] ${cart.length > 0 ? 'bg-[#176637] text-[#FFF6DB] hover:-translate-y-1' : 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'}`}
+              disabled={cart.length === 0}
+            >
+              <span>Bayar</span>
+              <span className="bg-[#FFF6DB]/20 px-2 py-1 rounded-lg text-sm">Rp {total.toLocaleString('id-ID')}</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
+};
+
+const EmployeeView = () => (
+  <div className="flex-1 overflow-y-auto p-8 pr-10 relative">
+    <header className="flex justify-between items-center mb-8">
+      <div>
+        <h1 className="font-gabriela text-3xl text-[#176637] mb-1">Manajemen Tim</h1>
+        <p className="text-sm font-medium text-[#72AD43]">Daftar Karyawan Outlet Harmoni</p>
+      </div>
+      <button className="bg-[#FF901A] text-[#FFF6DB] px-6 py-2 rounded-full font-bold shadow-[4px_4px_0px_#176637] hover:translate-y-1 hover:shadow-[2px_2px_0px_#176637] transition-all flex items-center gap-2">
+        <Plus size={18} /> Tambah Karyawan
+      </button>
+    </header>
+
+    <div className="bg-white border-2 border-[#176637]/10 rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl overflow-hidden shadow-sm">
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="bg-[#FFF6DB]/50 border-b border-[#176637]/10">
+            <th className="p-4 font-semibold text-[#176637] text-sm">NIK</th>
+            <th className="p-4 font-semibold text-[#176637] text-sm">Nama Karyawan</th>
+            <th className="p-4 font-semibold text-[#176637] text-sm">Posisi</th>
+            <th className="p-4 font-semibold text-[#176637] text-sm">Kontribusi Laba (Bulan Ini)</th>
+            <th className="p-4 font-semibold text-[#176637] text-sm">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            { nik: '32019920192', name: 'Samantha W.', role: 'Kasir Utama', perf: 'Rp 12.500.000', status: 'Aktif' },
+            { nik: '32019920193', name: 'Muadz H.', role: 'Barista', perf: 'Rp 10.200.000', status: 'Aktif' },
+            { nik: '32019920194', name: 'Dianita S.', role: 'Kasir Shift 2', perf: 'Rp 8.100.000', status: 'Cuti' },
+          ].map((emp, i) => (
+            <tr key={i} className="border-b border-[#176637]/5 hover:bg-[#FFF6DB]/20 transition-colors">
+              <td className="p-4 text-sm font-medium text-[#176637]/60">{emp.nik}</td>
+              <td className="p-4 text-sm font-bold text-[#176637]">{emp.name}</td>
+              <td className="p-4 text-sm text-[#176637]">{emp.role}</td>
+              <td className="p-4 text-sm text-[#72AD43] font-semibold">{emp.perf}</td>
+              <td className="p-4">
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${emp.status === 'Aktif' ? 'bg-[#72AD43]/20 text-[#176637]' : 'bg-gray-100 text-gray-500'}`}>
+                  {emp.status}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
+const SupplyView = () => (
+  <div className="flex-1 overflow-y-auto p-8 pr-10 relative">
+    <header className="flex justify-between items-center mb-8">
+      <div>
+        <h1 className="font-gabriela text-3xl text-[#176637] mb-1">Inventaris & Stok</h1>
+        <p className="text-sm font-medium text-[#72AD43]">Pantau ketersediaan bahan operasional</p>
+      </div>
+      <button className="border-2 border-[#176637] text-[#176637] px-6 py-2 rounded-full font-bold hover:bg-[#176637] hover:text-[#FFF6DB] transition-all">
+        Minta Stok ke Pusat
+      </button>
+    </header>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[
+        { name: 'Cup Reguler', sisa: 120, min: 200, unit: 'pcs', status: 'warning' },
+        { name: 'Cup Large', sisa: 340, min: 150, unit: 'pcs', status: 'safe' },
+        { name: 'Sedotan Organik', sisa: 50, min: 300, unit: 'pcs', status: 'danger' },
+        { name: 'Susu UHT Full Cream', sisa: 12, min: 20, unit: 'karton', status: 'warning' },
+        { name: 'Daun Teh Matcha', sisa: 5, min: 2, unit: 'kg', status: 'safe' },
+        { name: 'Gula Cair', sisa: 8, min: 5, unit: 'jerigen', status: 'safe' },
+      ].map((item, i) => (
+        <div key={i} className="bg-white p-5 border-2 border-[#176637]/10 rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg relative overflow-hidden group">
+          {item.status !== 'safe' && (
+            <div className={`absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-xs font-bold text-white ${item.status === 'danger' ? 'bg-red-500' : 'bg-[#FF901A]'}`}>
+              {item.status === 'danger' ? 'Kritis' : 'Menipis'}
+            </div>
+          )}
+          <h3 className="font-semibold text-[#176637] text-lg mb-4">{item.name}</h3>
+          
+          <div className="flex items-end gap-2 mb-2">
+            <span className={`text-4xl font-gabriela leading-none ${item.status === 'safe' ? 'text-[#176637]' : item.status === 'warning' ? 'text-[#FF901A]' : 'text-red-600'}`}>
+              {item.sisa}
+            </span>
+            <span className="text-[#176637]/60 text-sm mb-1">{item.unit}</span>
+          </div>
+          
+          <div className="w-full bg-gray-100 rounded-full h-1.5 mb-2 mt-4">
+             <div 
+               className={`h-1.5 rounded-full ${item.status === 'safe' ? 'bg-[#72AD43]' : item.status === 'warning' ? 'bg-[#FF901A]' : 'bg-red-500'}`} 
+               style={{ width: `${Math.min((item.sisa / (item.min * 2)) * 100, 100)}%` }}
+             ></div>
+          </div>
+          <p className="text-xs text-[#176637]/50">Batas minimum: {item.min} {item.unit}</p>
+          
+          <div className="absolute -bottom-4 -right-4 opacity-0 group-hover:opacity-10 transition-opacity">
+             <Package size={80} className="text-[#176637]" />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const InvestorView = () => {
+  const [selectedOutlet, setSelectedOutlet] = useState('Semua Outlet');
+
+  const performanceData = [
+    { name: 'Jan', omzet: 45000000, laba: 15000000 },
+    { name: 'Feb', omzet: 52000000, laba: 18000000 },
+    { name: 'Mar', omzet: 48000000, laba: 16000000 },
+    { name: 'Apr', omzet: 61000000, laba: 22000000 },
+    { name: 'Mei', omzet: 59000000, laba: 20000000 },
+    { name: 'Jun', omzet: 75000000, laba: 28000000 },
+  ];
+
+  const outletStats = [
+    { name: 'Outlet Harmoni', omzet: 'Rp 28.500.000', trend: '+12%', status: 'Sangat Baik' },
+    { name: 'Outlet Sudirman', omzet: 'Rp 24.200.000', trend: '+5%', status: 'Baik' },
+    { name: 'Outlet Senayan', omzet: 'Rp 22.300.000', trend: '-2%', status: 'Perlu Perhatian' },
+  ];
+
+  return (
+    <div className="flex-1 overflow-y-auto p-8 pr-10 relative">
+      {/* Grafis Sekunder - Wave Background (Sesuai panduan) */}
+      <div className="absolute top-0 right-0 w-full h-64 opacity-5 pointer-events-none z-0">
+         <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-full fill-[#176637]">
+            <path d="M0,60 C150,100 300,20 450,60 C600,100 750,20 900,60 C1050,100 1200,20 1200,60 L1200,120 L0,120 Z"></path>
+         </svg>
+      </div>
+
+      <div className="relative z-10">
+        <header className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
+          <div>
+            <h1 className="font-gabriela text-3xl text-[#176637] mb-1">Dashboard Investor</h1>
+            <p className="text-sm font-medium text-[#72AD43]">Pantau performa bisnis dan ROI Sagara Lattea</p>
+          </div>
+          {/* Fitur Filter Outlet */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold text-[#176637]/70">Filter:</span>
+            <div className="relative">
+              <select 
+                value={selectedOutlet}
+                onChange={(e) => setSelectedOutlet(e.target.value)}
+                className="appearance-none bg-white border-2 border-[#176637]/20 text-[#176637] font-bold py-2 pl-4 pr-10 rounded-full focus:outline-none focus:border-[#72AD43] shadow-[2px_2px_0px_rgba(23,102,55,0.1)] cursor-pointer transition-colors"
+              >
+                <option>Semua Outlet</option>
+                <option>Outlet Harmoni</option>
+                <option>Outlet Sudirman</option>
+                <option>Outlet Senayan</option>
+              </select>
+              <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-[#176637] pointer-events-none" size={16} />
+            </div>
+          </div>
+        </header>
+
+        {/* Metric Cards - Read Only (Tanpa tombol operasional) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {[
+            { title: 'Total Omzet (Bulan Ini)', value: 'Rp 75.000.000', icon: TrendingUp, color: 'text-[#176637]', trend: '+15.2%' },
+            { title: 'Estimasi Laba Bersih', value: 'Rp 28.000.000', icon: Store, color: 'text-[#72AD43]', trend: '+18.1%' },
+            { title: 'Total Transaksi', value: '3,240', sub: 'Semua cabang', icon: Users, color: 'text-[#FF901A]' },
+            { title: 'Status Operasional', value: '3/3 Aktif', sub: 'Semua outlet beroperasi', icon: AlertCircle, color: 'text-[#72AD43]' }
+          ].map((metric, idx) => (
+            <div key={idx} className="bg-white p-6 border-2 border-[#176637]/10 rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl shadow-[4px_4px_0px_rgba(23,102,55,0.05)] hover:-translate-y-1 transition-transform group relative overflow-hidden">
+              <svg className="absolute -right-4 -bottom-4 opacity-[0.03] w-24 h-24 group-hover:opacity-10 transition-opacity" viewBox="0 0 100 100" fill="#176637">
+                <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
+              </svg>
+              <div className="flex justify-between items-start mb-4 relative z-10">
+                <div className="p-3 rounded-2xl bg-[#FFF6DB]">
+                  <metric.icon size={24} className={metric.color} />
+                </div>
+                {metric.trend && (
+                  <span className="text-xs font-bold bg-[#72AD43]/20 text-[#176637] px-2 py-1 rounded-lg">{metric.trend}</span>
+                )}
+              </div>
+              <h3 className="text-sm text-[#176637]/70 font-medium mb-1 relative z-10">{metric.title}</h3>
+              <p className="font-gabriela text-2xl font-bold text-[#176637] relative z-10">{metric.value}</p>
+              {metric.sub && <p className="text-xs text-[#176637]/50 mt-2 relative z-10">{metric.sub}</p>}
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Grafik Pertumbuhan Ganda (Omzet vs Laba) */}
+          <div className="lg:col-span-2 bg-white p-6 border-2 border-[#176637]/10 rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-gabriela text-xl text-[#176637]">Tren Pertumbuhan Bisnis</h3>
+              <div className="flex items-center gap-4 text-xs font-medium">
+                <div className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-[#176637]"></span> Omzet</div>
+                <div className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-[#FF901A]"></span> Laba</div>
+              </div>
+            </div>
+            <div className="h-72 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={performanceData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorOmzetInv" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#176637" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#176637" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorLabaInv" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#FF901A" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#FF901A" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#176637', fontSize: 12}} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#176637', fontSize: 12}} tickFormatter={(val) => `Rp${val/1000000}Jt`} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#FFF6DB', borderColor: '#176637', borderRadius: '16px', color: '#176637' }}
+                    itemStyle={{ color: '#176637', fontWeight: 'bold' }}
+                    formatter={(value) => [`Rp ${value.toLocaleString('id-ID')}`, '']}
+                  />
+                  <Area type="monotone" dataKey="omzet" stroke="#176637" strokeWidth={3} fillOpacity={1} fill="url(#colorOmzetInv)" />
+                  <Area type="monotone" dataKey="laba" stroke="#FF901A" strokeWidth={3} fillOpacity={1} fill="url(#colorLabaInv)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Breakdown / Performa Outlet Tabel Visual */}
+          <div className="bg-white p-6 border-2 border-[#176637]/10 rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl flex flex-col">
+            <h3 className="font-gabriela text-xl text-[#176637] mb-6">Performa Outlet</h3>
+            <div className="flex-1 space-y-4">
+              {outletStats.map((outlet, i) => (
+                <div key={i} className="p-4 bg-[#FFF6DB]/30 rounded-xl border border-[#176637]/5 hover:border-[#72AD43] transition-colors">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-bold text-[#176637] text-sm">{outlet.name}</h4>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${
+                      outlet.trend.startsWith('+') ? 'bg-[#72AD43]/20 text-[#176637]' : 'bg-red-100 text-red-600'
+                    }`}>
+                      {outlet.trend}
+                    </span>
+                  </div>
+                  <p className="text-lg font-gabriela text-[#176637] mb-2">{outlet.omzet}</p>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className={`w-2 h-2 rounded-full ${outlet.status === 'Sangat Baik' ? 'bg-[#176637]' : outlet.status === 'Baik' ? 'bg-[#72AD43]' : 'bg-[#FF901A]'}`}></div>
+                    <span className="text-[#176637]/70">{outlet.status}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button className="w-full mt-6 py-3 rounded-xl border-2 border-[#176637] text-[#176637] font-bold hover:bg-[#176637] hover:text-[#FFF6DB] transition-all flex items-center justify-center gap-2">
+              Unduh Laporan Lengkap
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default function App() {
+  const [currentRole, setCurrentRole] = useState('investor');
+  const [activeTab, setActiveTab] = useState('investor_dashboard');
+
+  const handleRoleSwitch = () => {
+    if (currentRole === 'mitra') {
+      setCurrentRole('investor');
+      setActiveTab('investor_dashboard');
+    } else {
+      setCurrentRole('mitra');
+      setActiveTab('pos');
+    }
+  };
+
+  const getNavItems = () => {
+    if (currentRole === 'investor') {
+      return [
+        { id: 'investor_dashboard', icon: LayoutDashboard, label: 'Dashboard Investor' },
+      ];
+    }
+    return [
+      { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard Outlet' },
+      { id: 'pos', icon: Store, label: 'Point of Sale' },
+      { id: 'employees', icon: Users, label: 'Karyawan' },
+      { id: 'supply', icon: Package, label: 'Inventaris' },
+    ];
+  };
+
+  const navItems = getNavItems();
+
+  return (
+    <>
+      <GlobalStyles />
+      <div className="flex h-screen bg-[#FFF6DB] overflow-hidden">
+        
+        {/* Sidebar Navigasi Dinamis */}
+        <aside className="w-20 bg-[#176637] h-screen flex flex-col items-center py-6 shadow-xl relative z-30">
+          <div className="w-12 h-12 border-2 border-[#FFF6DB]/30 border-dashed rounded flex items-center justify-center text-[10px] text-[#FFF6DB] text-center leading-tight mb-4 font-gabriela">
+            Sagara<br/>Logo
+          </div>
+
+          {/* Tombol Demo Switch Role (Investor <-> Mitra) */}
+          <button 
+            onClick={handleRoleSwitch}
+            title="Ganti Role (Demo)"
+            className="mb-8 px-2 py-1 bg-[#FF901A] text-[#FFF6DB] text-[9px] font-bold rounded uppercase tracking-wider hover:scale-105 transition-transform text-center leading-tight"
+          >
+            Role:<br/>{currentRole === 'mitra' ? 'Mitra' : 'Investor'}
+          </button>
+          
+          <nav className="flex flex-col gap-4 w-full">
+            {navItems.map(item => {
+              const isActive = activeTab === item.id;
+              return (
+                <button 
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  title={item.label}
+                  className={`w-full flex justify-center py-4 relative transition-all ${
+                    isActive 
+                      ? 'text-[#FFF6DB] bg-[#FFF6DB]/10 border-r-4 border-[#FF901A]' 
+                      : 'text-[#FFF6DB]/50 hover:text-[#FFF6DB] hover:bg-[#FFF6DB]/5'
+                  }`}
+                >
+                  <item.icon size={24} className={isActive ? 'animate-bounce-short' : ''} />
+                </button>
+              )
+            })}
+          </nav>
+          
+          <div className="mt-auto flex flex-col gap-4 w-full">
+            <button className="w-full flex justify-center text-[#FFF6DB]/50 hover:text-[#FFF6DB] transition-colors py-2"><Settings size={22} /></button>
+            <button className="w-full flex justify-center text-[#FFF6DB]/50 hover:text-[#FF901A] transition-colors py-2"><LogOut size={22} /></button>
+          </div>
+        </aside>
+
+        {/* Dynamic Content Area based on Sidebar Selection */}
+        {activeTab === 'dashboard' && <DashboardView />}
+        {activeTab === 'pos' && <POSView />}
+        {activeTab === 'employees' && <EmployeeView />}
+        {activeTab === 'supply' && <SupplyView />}
+        {activeTab === 'investor_dashboard' && <InvestorView />}
+        
+      </div>
+    </>
+  );
+}
