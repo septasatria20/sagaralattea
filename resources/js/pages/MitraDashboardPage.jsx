@@ -17,6 +17,10 @@ const iconPaths = {
     settings: 'M12 8.5A3.5 3.5 0 1 0 15.5 12 3.5 3.5 0 0 0 12 8.5Zm8.5 3.5a6.9 6.9 0 0 0-.1-1l2-1.6-2-3.5-2.4.8a7.1 7.1 0 0 0-1.7-1L16 3h-4l-.3 2.7a7.1 7.1 0 0 0-1.7 1l-2.4-.8-2 3.5 2 1.6a6.9 6.9 0 0 0 0 2l-2 1.6 2 3.5 2.4-.8a7.1 7.1 0 0 0 1.7 1L12 21h4l.3-2.7a7.1 7.1 0 0 0 1.7-1l2.4.8 2-3.5-2-1.6c.1-.3.1-.6.1-1Z',
     logout: 'M10 17v2a1 1 0 0 0 1 1h8V4h-8a1 1 0 0 0-1 1v2m5 5H3m0 0 3-3m-3 3 3 3',
     alert: 'M12 9v4m0 4h.01M10.3 4.3 1.6 19a2 2 0 0 0 1.7 3h17.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z',
+    report: 'M5 4h14v16H5V4Zm3 3h8v2H8V7Zm0 4h8v2H8v-2Zm0 4h5v2H8v-2Z',
+    pdf: 'M6 3h8l4 4v14H6V3Zm8 1.5V8h3.5',
+    excel: 'M5 4h14v16H5V4Zm3.2 4.2 2.1 3.1 2.1-3.1h1.9L11.9 12l2.4 3.8h-2l-1.6-2.5-1.6 2.5H7.1L9.5 12 7.1 8.2h2.1Z',
+    print: 'M7 8V4h10v4M7 17H6a2 2 0 0 1-2-2v-3h18v3a2 2 0 0 1-2 2h-1M8 17h8v3H8v-3Z',
 };
 
 const categories = [
@@ -49,16 +53,22 @@ const salesData = [
 const teamMembers = [
     { nik: '32019920192', name: 'Samantha W.', role: 'Kasir Utama', perf: 'Rp 12.500.000', status: 'Aktif' },
     { nik: '32019920193', name: 'Muadz H.', role: 'Barista', perf: 'Rp 10.200.000', status: 'Aktif' },
-    { nik: '32019920194', name: 'Dianita S.', role: 'Kasir Shift 2', perf: 'Rp 8.100.000', status: 'Cuti' },
+    { nik: '32019920194', name: 'Dianita S.', role: 'Kasir Shift 2', perf: 'Rp 8.100.000', status: 'Tidak Aktif' },
 ];
 
 const stockItems = [
-    { name: 'Cup Reguler', sisa: 120, min: 200, unit: 'pcs', status: 'warning' },
+    { name: 'Cup Reguler', sisa: 120, min: 200, unit: 'pcs', status: 'menipis' },
     { name: 'Cup Large', sisa: 340, min: 150, unit: 'pcs', status: 'safe' },
-    { name: 'Sedotan Organik', sisa: 50, min: 300, unit: 'pcs', status: 'danger' },
-    { name: 'Susu UHT Full Cream', sisa: 12, min: 20, unit: 'karton', status: 'warning' },
+    { name: 'Sedotan Organik', sisa: 0, min: 300, unit: 'pcs', status: 'habis' },
+    { name: 'Susu UHT Full Cream', sisa: 12, min: 20, unit: 'karton', status: 'menipis' },
     { name: 'Daun Teh Matcha', sisa: 5, min: 2, unit: 'kg', status: 'safe' },
     { name: 'Gula Cair', sisa: 8, min: 5, unit: 'jerigen', status: 'safe' },
+];
+
+const financeReports = [
+    { key: 'daily', label: 'Harian', value: 'Rp 4.250.000', note: 'Omzet hari ini, biaya, dan laba bersih.' },
+    { key: 'monthly', label: 'Bulanan', value: 'Rp 75.000.000', note: 'Rekap bulan berjalan per outlet.' },
+    { key: 'yearly', label: 'Tahunan', value: 'Rp 860.000.000', note: 'Tren keuangan 12 bulan terakhir.' },
 ];
 
 const complaints = [
@@ -196,19 +206,20 @@ function StatCard({ stat }) {
     };
 
     return (
-        <div className={`group rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg border border-[#176637]/5 bg-white p-6 shadow-[2px_2px_15px_rgba(23,102,55,0.05)] transition-all duration-300 hover:shadow-[4px_4px_0px_#176637]`}>
+        <div className={`group flex min-h-[170px] flex-col rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg border border-[#176637]/5 bg-white p-5 shadow-[2px_2px_15px_rgba(23,102,55,0.05)] transition-all duration-300 hover:shadow-[4px_4px_0px_#176637]`}>
             <div className="mb-4 flex items-start justify-between">
-                <div className={`rounded-br-xl rounded-tl-xl p-3 ${palette[stat.accent] ?? palette.forest}`}>
-                    <Icon name={stat.icon} className="h-6 w-6" stroke />
+                <div className={`rounded-br-xl rounded-tl-xl p-2.5 ${palette[stat.accent] ?? palette.forest}`}>
+                    <Icon name={stat.icon} className="h-5 w-5" stroke />
                 </div>
             </div>
-            <p className="mb-1 text-sm font-medium text-[#176637]/70">{stat.title}</p>
-            <p className="font-gabriela text-2xl font-bold tracking-tight text-[#176637]">{stat.value}</p>
+            <p className="mb-1 text-[13px] font-medium leading-snug text-[#176637]/70">{stat.title}</p>
+            <p className="mt-auto whitespace-nowrap text-[clamp(1.05rem,1.8vw,1.45rem)] font-bold leading-none tracking-tight text-[#176637]">{stat.value}</p>
         </div>
     );
 }
 
 function Sidebar({ activeTab, setActiveTab, logoUrl }) {
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
     const items = [
         { id: 'dashboard', icon: 'dashboard', label: 'Dashboard' },
         { id: 'pos', icon: 'store', label: 'Point of Sale' },
@@ -217,10 +228,18 @@ function Sidebar({ activeTab, setActiveTab, logoUrl }) {
     ];
 
     return (
-        <aside className="relative flex h-screen w-20 flex-col items-center bg-[#176637] py-6 shadow-xl md:w-64">
-            <img src={logoUrl} alt="Sagara Lattea" className="mb-8 h-14 w-auto object-contain md:h-16" />
+        <aside className="relative flex min-h-screen w-64 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl">
+            <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
+                <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
+            </svg>
 
-            <nav className="flex w-full flex-col gap-3">
+            <div className="relative z-10 p-6">
+                <div className="mb-8 inline-flex rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg bg-[#FFF6DB] px-4 py-3 shadow-[2px_2px_15px_rgba(23,102,55,0.18)]">
+                    <img src={logoUrl} alt="Sagara Lattea" className="h-16 w-auto object-contain drop-shadow-[0_2px_2px_rgba(0,0,0,0.08)]" />
+                </div>
+                <div className="mb-4 pl-2 text-xs font-bold uppercase tracking-[0.32em] text-[#72AD43]">Mitra Panel</div>
+
+                <nav className="flex flex-col gap-2">
                 {items.map((item) => {
                     const active = activeTab === item.id;
 
@@ -228,25 +247,47 @@ function Sidebar({ activeTab, setActiveTab, logoUrl }) {
                         <button
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
-                            className={`relative flex w-full items-center justify-center gap-3 py-4 text-left transition-all md:justify-start md:px-6 ${
-                                active ? 'bg-[#FFF6DB]/10 text-[#FFF6DB] md:border-r-4 md:border-[#FF901A]' : 'text-[#FFF6DB]/55 hover:bg-[#FFF6DB]/5 hover:text-[#FFF6DB]'
+                            className={`relative flex w-[calc(100%+1.5rem)] items-center gap-3 px-4 py-3 text-left transition-all duration-300 ${
+                                active
+                                    ? 'translate-x-4 rounded-tl-xl rounded-bl-xl bg-[#FFF6DB] text-[#176637] shadow-[-4px_0_10px_rgba(0,0,0,0.1)]'
+                                    : 'text-[#FFF6DB]/72 hover:bg-[#FFF6DB]/10 hover:text-[#FFF6DB]'
                             }`}
                         >
-                            <Icon name={item.icon} className="h-6 w-6" stroke />
-                            <span className="hidden text-sm font-medium md:inline">{item.label}</span>
+                            <Icon name={item.icon} className={`h-5 w-5 ${active ? 'text-[#FF901A]' : ''}`} stroke />
+                            <span className="text-sm font-medium">{item.label}</span>
+                            {active && <span className="absolute right-0 top-0 h-full w-2 bg-[#FF901A]" />}
                         </button>
                     );
                 })}
-            </nav>
-
-            <div className="mt-auto flex flex-col gap-4">
-                <button className="text-[#FFF6DB]/55 transition-colors hover:text-[#FFF6DB]">
-                    <Icon name="settings" className="h-6 w-6" stroke />
-                </button>
-                <button className="text-[#FFF6DB]/55 transition-colors hover:text-[#FF901A]">
-                    <Icon name="logout" className="h-6 w-6" stroke />
-                </button>
+                </nav>
             </div>
+
+            <div className="mt-auto border-t border-[#FFF6DB]/10 p-5">
+                <button
+                    onClick={() => setUserMenuOpen((value) => !value)}
+                    className="flex w-full items-center gap-3 rounded-2xl bg-[#FFF6DB] px-3 py-3 text-left text-[#176637] shadow-[2px_2px_12px_rgba(23,102,55,0.12)] transition hover:-translate-y-0.5"
+                >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-tl-xl rounded-br-xl bg-[#72AD43] font-bold text-white">MH</div>
+                    <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold">Mitra Harmoni</p>
+                        <p className="text-xs text-[#176637]/60">Operator</p>
+                    </div>
+                    <Icon name="chevronRight" className={`h-4 w-4 transition-transform ${userMenuOpen ? 'rotate-90' : 'rotate-90'}`} stroke />
+                </button>
+                {userMenuOpen && (
+                    <div className="mt-3 space-y-2 rounded-2xl bg-[#FFF6DB]/10 p-2">
+                        <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#FFF6DB] transition hover:bg-[#FFF6DB]/10">
+                            <Icon name="settings" className="h-4 w-4" stroke />
+                            Pengaturan
+                        </button>
+                        <button type="button" onClick={() => window.location.assign('/logout')} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#FFF6DB] transition hover:bg-[#FFF6DB]/10">
+                            <Icon name="logout" className="h-4 w-4" stroke />
+                            Logout
+                        </button>
+                    </div>
+                )}
+            </div>
+
         </aside>
     );
 }
@@ -255,8 +296,10 @@ function DashboardView() {
     return (
         <div className="animate-slide-up flex-1 overflow-y-auto p-6 pr-6 lg:p-8 lg:pr-10">
             <header className="mb-8">
-                <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Dashboard Mitra</h1>
-                <p className="text-sm font-medium text-[#72AD43]">Outlet Harmoni - Ringkasan Hari Ini</p>
+                <div>
+                    <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Dashboard Mitra</h1>
+                    <p className="text-sm font-medium text-[#72AD43]">Outlet Harmoni - Ringkasan Hari Ini</p>
+                </div>
             </header>
 
             <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -607,17 +650,17 @@ function SupplyView() {
                 {stockItems.map((item) => (
                     <div key={item.name} className="group relative overflow-hidden rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg border-2 border-[#176637]/10 bg-white p-5 transition-transform hover:-translate-y-1">
                         {item.status !== 'safe' && (
-                            <div className={`absolute right-0 top-0 rounded-bl-xl px-3 py-1 text-xs font-bold text-white ${item.status === 'danger' ? 'bg-red-500' : 'bg-[#FF901A]'}`}>
-                                {item.status === 'danger' ? 'Kritis' : 'Menipis'}
+                            <div className={`absolute right-0 top-0 rounded-bl-xl px-3 py-1 text-xs font-bold text-white ${item.status === 'habis' ? 'bg-gray-600' : 'bg-[#FF901A]'}`}>
+                                {item.status === 'habis' ? 'Habis' : 'Menipis'}
                             </div>
                         )}
                         <h3 className="mb-4 text-lg font-semibold text-[#176637]">{item.name}</h3>
                         <div className="mb-2 flex items-end gap-2">
-                            <span className={`font-gabriela text-4xl leading-none ${item.status === 'safe' ? 'text-[#176637]' : item.status === 'warning' ? 'text-[#FF901A]' : 'text-red-600'}`}>{item.sisa}</span>
+                            <span className={`font-gabriela text-4xl leading-none ${item.status === 'safe' ? 'text-[#176637]' : item.status === 'menipis' ? 'text-[#FF901A]' : 'text-gray-600'}`}>{item.sisa}</span>
                             <span className="mb-1 text-sm text-[#176637]/60">{item.unit}</span>
                         </div>
                         <div className="mb-2 mt-4 h-1.5 w-full rounded-full bg-gray-100">
-                            <div className={`h-1.5 rounded-full ${item.status === 'safe' ? 'bg-[#72AD43]' : item.status === 'warning' ? 'bg-[#FF901A]' : 'bg-red-500'}`} style={{ width: `${Math.min((item.sisa / (item.min * 2)) * 100, 100)}%` }} />
+                            <div className={`h-1.5 rounded-full ${item.status === 'safe' ? 'bg-[#72AD43]' : item.status === 'menipis' ? 'bg-[#FF901A]' : 'bg-gray-500'}`} style={{ width: `${Math.min((item.sisa / (item.min * 2 || 1)) * 100, 100)}%` }} />
                         </div>
                         <p className="text-xs text-[#176637]/50">Batas minimum: {item.min} {item.unit}</p>
                         <div className="pointer-events-none absolute -bottom-4 -right-4 opacity-0 transition-opacity group-hover:opacity-10">
@@ -640,10 +683,12 @@ export default function MitraDashboardPage({ data }) {
             <GlobalStyles />
             <div className="flex h-screen overflow-hidden bg-[#FFF6DB]">
                 <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} logoUrl={logoUrl} />
-                {activeTab === 'dashboard' && <DashboardView />}
-                {activeTab === 'pos' && <POSView />}
-                {activeTab === 'employees' && <EmployeesView />}
-                {activeTab === 'supply' && <SupplyView />}
+                <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+                    {activeTab === 'dashboard' && <DashboardView />}
+                    {activeTab === 'pos' && <POSView />}
+                    {activeTab === 'employees' && <EmployeesView />}
+                    {activeTab === 'supply' && <SupplyView />}
+                </div>
             </div>
         </>
     );

@@ -11,18 +11,13 @@ const navigation = ['Varian', 'Outlet', 'Promo', 'Sosial Media'];
 
 function LogoMark({ variant = 'light' }) {
     const textClass = variant === 'dark' ? 'text-[#FFF6DB]' : 'text-[#176637]';
-    const borderClass = variant === 'dark' ? 'border-[#FFF6DB]/30' : 'border-[#176637]/20';
-    const bgClass = variant === 'dark' ? 'bg-[#176637]' : 'bg-[#FFF6DB]';
     const logoUrl = '/logosagaralattea.png';
 
     return (
-        <div className={`flex items-center gap-3 ${textClass}`}>
-            <div className={`flex h-14 w-14 items-center justify-center overflow-hidden border-2 ${borderClass} ${bgClass}`}>
-                <img src={logoUrl} alt="Sagara Lattea" className="h-full w-full object-contain p-1" />
-            </div>
-            <div>
-                <div className="font-gabriela text-2xl leading-none">Sagara Lattea</div>
-                <div className="mt-1 text-[10px] uppercase tracking-[0.36em] opacity-70">Special fresh latte tea</div>
+        <div className={`-ml-2 flex flex-col items-start gap-1 ${textClass}`}>
+            <img src={logoUrl} alt="Sagara Lattea" className="block h-18 w-auto object-contain sm:h-20 md:h-24" />
+            <div className="pl-1 text-[10px] font-semibold uppercase tracking-[0.38em] opacity-75 sm:text-[11px]">
+                Special fresh latte tea
             </div>
         </div>
     );
@@ -30,7 +25,8 @@ function LogoMark({ variant = 'light' }) {
 
 function Navbar() {
     return (
-        <header className="relative z-50">
+        <header className="relative z-50 overflow-hidden">
+            <LeafArt className="right-[-110px] top-[-40px] hidden h-[220px] w-[220px] lg:block" crop="right" flip opacityClass="opacity-[0.05]" />
             <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-6 md:px-8">
                 <LogoMark />
                 <div className="hidden items-center gap-8 font-medium md:flex">
@@ -40,7 +36,9 @@ function Navbar() {
                         </a>
                     ))}
                     <div className="h-4 w-px bg-[#176637]/30" />
-                    <button className="transition hover:text-[#72AD43]">Login</button>
+                    <a href="/login" className="transition hover:text-[#72AD43]">
+                        Login
+                    </a>
                     <button className="rounded-full bg-[#FF901A] px-6 py-2 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#176637]">
                         Join Us
                     </button>
@@ -87,27 +85,62 @@ function WaveDivider() {
     );
 }
 
+function LeafBackdrop({ className = '' }) {
+    return (
+        <div className={`pointer-events-none absolute opacity-10 ${className}`}>
+            <svg viewBox="0 0 100 100" className="h-full w-full fill-[#176637]">
+                <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
+                <path d="M58,12 C76,4 94,18 90,36 C84,54 64,38 58,12 Z" />
+                <path d="M14,74 C22,60 36,56 48,60" stroke="#176637" strokeWidth="2" fill="none" strokeLinecap="round" />
+            </svg>
+        </div>
+    );
+}
+
+function LeafArt({ className = '', crop = 'center', flip = false, opacityClass = 'opacity-[0.12]' }) {
+    const cropClass =
+        crop === 'top' ? 'object-top' : crop === 'bottom' ? 'object-bottom' : crop === 'left' ? 'object-left' : crop === 'right' ? 'object-right' : 'object-center';
+
+    return (
+        <div className={`pointer-events-none absolute overflow-hidden ${opacityClass} ${className}`}>
+            <img src="/daun.png" alt="" aria-hidden="true" className={`h-full w-full object-cover ${cropClass} ${flip ? '-scale-x-100' : ''}`} />
+        </div>
+    );
+}
+
+function SproutDivider() {
+    const sproutClasses = ['scale-95 opacity-75', 'scale-110 opacity-75 rotate-12', 'scale-100 opacity-90', 'scale-110 opacity-75 -rotate-6', 'scale-95 opacity-75'];
+
+    return (
+        <div className="relative py-8">
+            <div className="mb-3 flex justify-center gap-6">
+                {Array.from({ length: 5 }).map((_, index) => (
+                    <svg key={index} viewBox="0 0 40 30" className={`h-7 w-10 fill-[#176637] ${sproutClasses[index]}`}>
+                        <path d="M20,30 C20,15 10,10 0,15 C5,5 15,5 20,15 C25,5 35,5 40,15 C30,10 20,15 20,30 Z" />
+                    </svg>
+                ))}
+            </div>
+            <svg viewBox="0 0 1200 24" className="h-5 w-full fill-none stroke-[#176637] stroke-[4px] opacity-80">
+                <path d="M0,12 Q100,28 200,12 T400,12 T600,12 T800,12 T1000,12 T1200,12" />
+            </svg>
+        </div>
+    );
+}
+
 function Hero({ brand }) {
     return (
         <section className="relative overflow-hidden">
-            <div className="absolute left-[-80px] top-[-110px] z-0 hidden opacity-10 md:block">
-                <svg width="420" height="420" viewBox="0 0 100 100" fill={colors.forest}>
-                    <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
-                    <path d="M60,10 C80,0 100,20 90,40 C80,60 50,30 60,10 Z" />
-                </svg>
-            </div>
+            <LeafArt className="left-[-120px] top-[-60px] hidden h-[460px] w-[460px] md:block" crop="left" opacityClass="opacity-[0.08]" />
+            <LeafArt className="right-[-90px] top-10 hidden h-[260px] w-[260px] lg:block" crop="right" flip opacityClass="opacity-[0.07]" />
 
             <div className="mx-auto grid max-w-7xl items-center gap-14 px-6 pb-24 pt-10 md:px-8 lg:grid-cols-2 lg:gap-10">
                 <div className="relative z-10 text-center lg:text-left">
-                    <div className="reveal mx-auto inline-flex rounded-full border border-[#176637]/15 bg-white/70 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#176637] lg:mx-0">
-                        Morning ritual, better mood
-                    </div>
                     <h1 className="reveal font-gabriela mt-6 text-5xl leading-tight text-[#176637] md:text-6xl lg:text-7xl">
                         Start your day the Lattea way.
                     </h1>
                     <p className="reveal mx-auto mt-6 max-w-xl text-base leading-8 text-[#176637]/80 lg:mx-0 lg:text-lg" style={{ animationDelay: '0.08s' }}>
-                        {brand?.name ?? 'Sagara Lattea'} dibangun dengan karakter hangat, organik, dan kontras yang tegas. Landing ini mengikuti arahan panduan
-                        Anda, bukan layout generik yang terasa seperti template AI.
+                        Nikmati perpaduan teh premium dan bahan organik terbaik untuk gaya hidup sehatmu. Rasakan kemurnian alam dalam gelas yang menyegarkan
+                        hari-harimu.
                     </p>
                     <div className="reveal mt-8 flex flex-col justify-center gap-4 sm:flex-row lg:justify-start" style={{ animationDelay: '0.16s' }}>
                         <button className="rounded-br-3xl rounded-tl-3xl bg-[#176637] px-8 py-3.5 font-semibold text-[#FFF6DB] shadow-[4px_4px_0px_#0f3f22] transition hover:-translate-y-0.5 hover:bg-[#1c7340]">
@@ -129,16 +162,23 @@ function Hero({ brand }) {
                 </div>
 
                 <div className="relative z-10 flex justify-center">
-                    <div className="relative animate-[floatSoft_4s_ease-in-out_infinite]">
+                    <div className="relative">
+                        <LeafArt className="left-[-40px] top-[70px] hidden h-32 w-32 lg:block" crop="top" opacityClass="opacity-15" />
+                        <LeafArt className="right-[-50px] bottom-[36px] hidden h-28 w-28 lg:block" crop="bottom" flip opacityClass="opacity-[0.12]" />
                         <div className="absolute left-1/2 top-[-30px] z-20 flex -translate-x-1/2 gap-4 opacity-70">
                             <div className="animate-[steamRise_4s_ease-in-out_infinite] h-16 w-2 rounded-full bg-white blur-[4px]" />
                             <div className="animate-[steamRise_4s_ease-in-out_infinite] h-20 w-3 rounded-full bg-white blur-[5px]" style={{ animationDelay: '1.2s' }} />
                             <div className="animate-[steamRise_4s_ease-in-out_infinite] h-12 w-2 rounded-full bg-white blur-[4px]" style={{ animationDelay: '2.4s' }} />
                         </div>
-                        <div className="relative flex h-[420px] w-[320px] flex-col items-center justify-end overflow-hidden rounded-t-[120px] rounded-b-[40px] border-2 border-[#176637] bg-[#72AD43]/20 text-center shadow-lg">
-                            <span className="mb-28 px-6 text-sm font-semibold text-[#176637]/70">
-                                Ganti dengan foto produk transparan
-                            </span>
+                        <div className="relative flex h-[560px] w-[410px] flex-col items-center justify-end overflow-hidden rounded-t-[150px] rounded-b-[46px] border-2 border-[#176637] bg-[#FFF6DB]/40 text-center shadow-lg">
+                            <div className="absolute inset-x-10 top-10 h-40 rounded-full bg-[#72AD43]/12 blur-3xl" />
+                            <div className="relative z-10 mb-0 -translate-y-[72px] flex h-[480px] w-[380px] items-end justify-center">
+                                <img
+                                    src="/minum2.png"
+                                    alt="Minuman Sagara Lattea"
+                                    className="h-full w-full scale-[1.3] transform object-contain object-bottom bg-transparent mix-blend-normal drop-shadow-[0_28px_48px_rgba(23,102,55,0.22)]"
+                                />
+                            </div>
                             <div className="absolute bottom-0 left-0 h-[120px] w-[200%] animate-[waveFlow_6s_linear_infinite] opacity-60">
                                 <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="h-full w-full fill-[#72AD43]">
                                     <path d="M0,60 C150,100 300,20 450,60 C600,100 750,20 900,60 C1050,100 1200,20 1200,60 L1200,120 L0,120 Z" />
@@ -185,9 +225,8 @@ function PromoSection({ promos = [] }) {
         <section className="mx-auto max-w-7xl px-6 py-16 md:px-8" id="promo">
             <SectionTitle eyebrow="Promo Spesial" title="Bundling hangat & tenang" />
             <div className="relative mt-8 overflow-hidden rounded-tr-[60px] rounded-bl-[60px] border-2 border-[#176637] bg-[#FF901A] p-8 text-[#FFF6DB] shadow-lg md:p-12">
-                <svg className="pointer-events-none absolute -right-10 -bottom-10 h-64 w-64 opacity-20" viewBox="0 0 100 100" fill="#FFF6DB">
-                    <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
-                </svg>
+                <LeafArt className="left-[-70px] top-[-70px] h-44 w-44" crop="top" opacityClass="opacity-15" />
+                <LeafArt className="right-[-20px] bottom-[-30px] h-52 w-52" crop="bottom" flip opacityClass="opacity-20" />
                 <div className="relative z-10 flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
                     <div className="max-w-2xl">
                         <span className="mb-4 inline-flex rounded-full bg-[#FFF6DB] px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#FF901A]">
@@ -251,6 +290,7 @@ function ProductSection({ items }) {
                 {products.map((item) => (
                     <article key={item.id} className="group relative overflow-hidden rounded-tl-[40px] rounded-br-[40px] border-2 border-[#176637]/10 bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#72AD43] hover:shadow-xl">
                         <div className="absolute right-0 top-0 h-16 w-16 rounded-bl-[40px] bg-[#72AD43]/10" />
+                        <LeafArt className="left-[-30px] top-[-20px] h-24 w-24" crop="left" opacityClass="opacity-[0.08]" />
                         <div className="relative z-10 mb-6 flex h-56 items-center justify-center overflow-hidden rounded-tl-2xl rounded-br-2xl border border-[#176637]/5 bg-[#FFF6DB]/50">
                             <span className="text-xs font-medium tracking-wide text-[#176637]/40">
                                 FOTO PRODUK
@@ -278,6 +318,7 @@ function OutletSection() {
             <div>
                 <SectionTitle eyebrow="Lokasi Kami" title="Outlet pusat - Harmoni" />
                 <div className="relative mt-8 overflow-hidden rounded-tr-[50px] rounded-bl-[50px] border border-[#176637]/10 bg-white p-6 shadow-lg md:p-8">
+                    <LeafArt className="left-[-55px] top-[-40px] h-36 w-36" crop="left" opacityClass="opacity-[0.08]" />
                     <div className="mb-4 flex items-start gap-3">
                         <svg viewBox="0 0 24 24" className="mt-1 h-5 w-5 shrink-0 fill-[#FF901A]">
                             <path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z" />
@@ -323,10 +364,13 @@ function Footer() {
                     <path d="M0,20 Q150,40 300,20 T600,20 T900,20 T1200,20" />
                 </svg>
             </div>
+            <LeafArt className="left-[-80px] top-[40px] h-56 w-56" crop="left" opacityClass="opacity-10" />
+            <LeafArt className="right-[-70px] top-[10px] h-44 w-44" crop="right" flip opacityClass="opacity-10" />
             <div className="mx-auto grid max-w-7xl gap-12 px-6 md:grid-cols-12 md:px-8">
                 <div className="md:col-span-5">
-                    <div className="mb-6 inline-flex rounded-tr-[20px] rounded-bl-[20px] border border-[#FFF6DB]/30 bg-[#176637] p-4 text-xs font-bold">
-                        LOGO VARIAN CREAM SVG
+                    <div className="mb-6">
+                        <img src="/logosagaralattea.png" alt="Sagara Lattea" className="h-20 w-auto object-contain" />
+                        <div className="mt-2 text-[10px] font-semibold uppercase tracking-[0.38em] text-[#FFF6DB]/80">Special fresh latte tea</div>
                     </div>
                     <p className="max-w-sm text-sm leading-relaxed opacity-90">
                         Special fresh latte tea. Menyajikan harmoni dan ketenangan di setiap tetesnya, dari alam langsung ke tanganmu.
@@ -362,6 +406,8 @@ function Footer() {
                     <a href="#" className="transition hover:text-[#FF901A]">Kebijakan Privasi</a>
                 </div>
             </div>
+            <LeafArt className="bottom-[-20px] left-[38%] h-36 w-36" crop="bottom" opacityClass="opacity-14" />
+            <LeafArt className="bottom-[-30px] right-[10%] h-28 w-28" crop="bottom" flip opacityClass="opacity-12" />
         </footer>
     );
 }
@@ -436,7 +482,7 @@ export default function HomePage({ data = {} }) {
             <Navbar />
             <main>
                 <Hero brand={data.brand} />
-                <WaveDivider />
+                <SproutDivider />
                 <PromoSection promos={promos} />
                 <ProductSection items={menuItems} />
                 <OutletSection />

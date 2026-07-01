@@ -12,6 +12,10 @@ const iconPaths = {
     alert: 'M12 9v4m0 4h.01M10.3 4.3 1.6 19a2 2 0 0 0 1.7 3h17.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z',
     settings: 'M12 8.5A3.5 3.5 0 1 0 15.5 12 3.5 3.5 0 0 0 12 8.5Zm8.5 3.5a6.9 6.9 0 0 0-.1-1l2-1.6-2-3.5-2.4.8a7.1 7.1 0 0 0-1.7-1L16 3h-4l-.3 2.7a7.1 7.1 0 0 0-1.7 1l-2.4-.8-2 3.5 2 1.6a6.9 6.9 0 0 0 0 2l-2 1.6 2 3.5 2.4-.8a7.1 7.1 0 0 0 1.7 1L12 21h4l.3-2.7a7.1 7.1 0 0 0 1.7-1l2.4.8 2-3.5-2-1.6c.1-.3.1-.6.1-1Z',
     logout: 'M10 17v2a1 1 0 0 0 1 1h8V4h-8a1 1 0 0 0-1 1v2m5 5H3m0 0 3-3m-3 3 3 3',
+    report: 'M5 4h14v16H5V4Zm3 3h8v2H8V7Zm0 4h8v2H8v-2Zm0 4h5v2H8v-2Z',
+    pdf: 'M6 3h8l4 4v14H6V3Zm8 1.5V8h3.5',
+    excel: 'M5 4h14v16H5V4Zm3.2 4.2 2.1 3.1 2.1-3.1h1.9L11.9 12l2.4 3.8h-2l-1.6-2.5-1.6 2.5H7.1L9.5 12 7.1 8.2h2.1Z',
+    print: 'M7 8V4h10v4M7 17H6a2 2 0 0 1-2-2v-3h18v3a2 2 0 0 1-2 2h-1M8 17h8v3H8v-3Z',
 };
 
 const metrics = [
@@ -100,26 +104,69 @@ function GlobalStyles() {
     );
 }
 
-function Sidebar({ logoUrl }) {
+function Sidebar({ logoUrl, activeTab, setActiveTab }) {
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const navItems = [
+        { id: 'investor_dashboard', icon: 'dashboard', label: 'Dashboard Investor' },
+    ];
+
     return (
-        <aside className="relative flex h-screen w-20 flex-col items-center bg-[#176637] py-6 shadow-xl md:w-64">
-            <img src={logoUrl} alt="Sagara Lattea" className="mb-8 h-14 w-auto object-contain md:h-16" />
+        <aside className="relative flex min-h-screen w-64 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl">
+            <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
+                <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
+            </svg>
 
-            <nav className="flex w-full flex-col gap-3">
-                <button className="relative flex w-full items-center justify-center gap-3 border-r-4 border-[#FF901A] bg-[#FFF6DB]/10 py-4 text-[#FFF6DB] transition-all md:justify-start md:px-6">
-                    <Icon name="dashboard" className="h-6 w-6" stroke />
-                    <span className="hidden text-sm font-medium md:inline">Dashboard Investor</span>
-                </button>
-            </nav>
+            <div className="relative z-10 p-6">
+                <div className="mb-8 inline-flex rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg bg-[#FFF6DB] px-4 py-3 shadow-[2px_2px_15px_rgba(23,102,55,0.18)]">
+                    <img src={logoUrl} alt="Sagara Lattea" className="h-16 w-auto object-contain drop-shadow-[0_2px_2px_rgba(0,0,0,0.08)]" />
+                </div>
+                <div className="mb-4 pl-2 text-xs font-bold uppercase tracking-[0.32em] text-[#72AD43]">Investor Panel</div>
 
-            <div className="mt-auto flex flex-col gap-4">
-                <button className="text-[#FFF6DB]/55 transition-colors hover:text-[#FFF6DB]">
-                    <Icon name="settings" className="h-6 w-6" stroke />
-                </button>
-                <button className="text-[#FFF6DB]/55 transition-colors hover:text-[#FF901A]">
-                    <Icon name="logout" className="h-6 w-6" stroke />
-                </button>
+                <nav className="flex flex-col gap-2">
+                    {navItems.map((item) => (
+                        <button
+                            key={item.id}
+                            onClick={() => setActiveTab(item.id)}
+                            className={`relative flex w-[calc(100%+1.5rem)] items-center gap-3 px-4 py-3 text-left transition-all duration-300 ${
+                                activeTab === item.id
+                                    ? 'translate-x-4 rounded-tl-xl rounded-bl-xl bg-[#FFF6DB] text-[#176637] shadow-[-4px_0_10px_rgba(0,0,0,0.1)]'
+                                    : 'text-[#FFF6DB]/72 hover:bg-[#FFF6DB]/10 hover:text-[#FFF6DB]'
+                            }`}
+                        >
+                            <Icon name={item.icon} className={`h-5 w-5 ${activeTab === item.id ? 'text-[#FF901A]' : ''}`} stroke />
+                            <span className="text-sm font-medium">{item.label}</span>
+                            {activeTab === item.id && <span className="absolute right-0 top-0 h-full w-2 bg-[#FF901A]" />}
+                        </button>
+                    ))}
+                </nav>
             </div>
+
+            <div className="mt-auto border-t border-[#FFF6DB]/10 p-5">
+                <button
+                    onClick={() => setUserMenuOpen((value) => !value)}
+                    className="flex w-full items-center gap-3 rounded-2xl bg-[#FFF6DB] px-3 py-3 text-left text-[#176637] shadow-[2px_2px_12px_rgba(23,102,55,0.12)] transition hover:-translate-y-0.5"
+                >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-tl-xl rounded-br-xl bg-[#72AD43] font-bold text-white">IV</div>
+                    <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold">Investor</p>
+                        <p className="text-xs text-[#176637]/60">Owner</p>
+                    </div>
+                    <Icon name="chevronRight" className={`h-4 w-4 rotate-90 transition-transform ${userMenuOpen ? 'text-[#176637]' : 'text-[#176637]/60'}`} stroke />
+                </button>
+                {userMenuOpen && (
+                    <div className="mt-3 space-y-2 rounded-2xl bg-[#FFF6DB]/10 p-2">
+                        <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#FFF6DB] transition hover:bg-[#FFF6DB]/10">
+                            <Icon name="settings" className="h-4 w-4" stroke />
+                            Pengaturan
+                        </button>
+                        <button type="button" onClick={() => window.location.assign('/logout')} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#FFF6DB] transition hover:bg-[#FFF6DB]/10">
+                            <Icon name="logout" className="h-4 w-4" stroke />
+                            Logout
+                        </button>
+                    </div>
+                )}
+            </div>
+
         </aside>
     );
 }
@@ -132,18 +179,18 @@ function StatCard({ metric }) {
     };
 
     return (
-        <div className="group relative overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white p-6 shadow-[4px_4px_0px_rgba(23,102,55,0.05)] transition-transform hover:-translate-y-1">
+        <div className="group relative flex min-h-[170px] flex-col overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white p-5 shadow-[4px_4px_0px_rgba(23,102,55,0.05)] transition-transform hover:-translate-y-1">
             <svg className="absolute -right-4 -bottom-4 w-24 h-24 opacity-[0.03] group-hover:opacity-10 transition-opacity" viewBox="0 0 100 100" fill="#176637">
                 <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
             </svg>
             <div className="relative z-10 mb-4 flex items-start justify-between">
-                <div className={`rounded-2xl p-3 bg-[#FFF6DB] ${palette[metric.accent] ?? palette.forest}`}>
-                    <Icon name={metric.icon} className="h-6 w-6" stroke />
+                <div className={`rounded-2xl p-2.5 bg-[#FFF6DB] ${palette[metric.accent] ?? palette.forest}`}>
+                    <Icon name={metric.icon} className="h-5 w-5" stroke />
                 </div>
                 {metric.trend && <span className="rounded-lg bg-[#72AD43]/20 px-2 py-1 text-xs font-bold text-[#176637]">{metric.trend}</span>}
             </div>
-            <h3 className="relative z-10 mb-1 text-sm font-medium text-[#176637]/70">{metric.title}</h3>
-            <p className="relative z-10 font-gabriela text-2xl font-bold text-[#176637]">{metric.value}</p>
+            <h3 className="relative z-10 mb-1 text-[13px] font-medium leading-snug text-[#176637]/70">{metric.title}</h3>
+            <p className="relative z-10 mt-auto whitespace-nowrap text-[clamp(1.05rem,1.8vw,1.45rem)] font-bold leading-none tracking-tight text-[#176637]">{metric.value}</p>
             {metric.sub && <p className="relative z-10 mt-2 text-xs text-[#176637]/50">{metric.sub}</p>}
         </div>
     );
@@ -221,12 +268,12 @@ function Overview() {
             </div>
 
             <div className="relative z-10">
-                <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <header className="mb-8">
                     <div>
                         <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Dashboard Investor</h1>
                         <p className="text-sm font-medium text-[#72AD43]">Pantau performa bisnis dan ROI Sagara Lattea</p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                         <span className="text-sm font-semibold text-[#176637]/70">Filter:</span>
                         <div className="relative">
                             <select className="cursor-pointer appearance-none rounded-full border-2 border-[#176637]/20 bg-white py-2 pl-4 pr-10 font-bold text-[#176637] shadow-[2px_2px_0px_rgba(23,102,55,0.1)] focus:border-[#72AD43] focus:outline-none">
@@ -283,6 +330,23 @@ function Overview() {
                         </button>
                     </aside>
                 </div>
+
+                <div className="mt-8 grid gap-6 md:grid-cols-3">
+                    {[
+                        { title: 'ROI Bulan Ini', value: '18.2%', note: 'Tertinggi dari 3 portofolio aktif', icon: 'trendingUp' },
+                        { title: 'Dividen Terkirim', value: 'Rp 32.000.000', note: 'Distribusi berjalan sesuai jadwal', icon: 'store' },
+                        { title: 'Outlets Terpantau', value: '3 Outlet', note: 'Semua outlet ada dalam dashboard', icon: 'dashboard' },
+                    ].map((item) => (
+                        <div key={item.title} className="rounded-[24px] border border-[#176637]/10 bg-white p-5 shadow-sm">
+                            <div className="mb-3 inline-flex rounded-2xl bg-[#FFF6DB] p-3 text-[#176637]">
+                                <Icon name={item.icon} className="h-5 w-5" stroke />
+                            </div>
+                            <div className="text-sm font-semibold text-[#176637]/70">{item.title}</div>
+                            <div className="mt-2 font-gabriela text-3xl text-[#176637]">{item.value}</div>
+                            <div className="mt-2 text-sm leading-6 text-[#176637]/65">{item.note}</div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );
@@ -291,14 +355,16 @@ function Overview() {
 export default function InvestorDashboardPage({ data }) {
     const pageData = useMemo(() => data ?? {}, [data]);
     const logoUrl = pageData?.brand?.logoUrl ?? '/logosagaralattea.png';
-    const [activeTab] = useState('investor_dashboard');
+    const [activeTab, setActiveTab] = useState('investor_dashboard');
 
     return (
         <>
             <GlobalStyles />
             <div className="flex h-screen overflow-hidden bg-[#FFF6DB]">
-                <Sidebar logoUrl={logoUrl} />
-                {activeTab === 'investor_dashboard' && <Overview />}
+                <Sidebar logoUrl={logoUrl} activeTab={activeTab} setActiveTab={setActiveTab} />
+                <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+                    {activeTab === 'investor_dashboard' && <Overview />}
+                </div>
             </div>
         </>
     );
