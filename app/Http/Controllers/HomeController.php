@@ -16,6 +16,7 @@ class HomeController extends Controller
                 'brand' => [
                     'name' => 'Sagara Lattea',
                     'tagline' => 'Special fresh latte tea',
+                    'logoUrl' => asset('logosagaralattea.png'),
                 ],
                 'stats' => [
                     ['value' => '12K+', 'label' => 'cup served'],

@@ -13,11 +13,12 @@ function LogoMark({ variant = 'light' }) {
     const textClass = variant === 'dark' ? 'text-[#FFF6DB]' : 'text-[#176637]';
     const borderClass = variant === 'dark' ? 'border-[#FFF6DB]/30' : 'border-[#176637]/20';
     const bgClass = variant === 'dark' ? 'bg-[#176637]' : 'bg-[#FFF6DB]';
+    const logoUrl = '/logosagaralattea.png';
 
     return (
         <div className={`flex items-center gap-3 ${textClass}`}>
-            <div className={`flex h-14 w-14 items-center justify-center border-2 ${borderClass} ${bgClass} text-[10px] font-black tracking-[0.28em]`}>
-                SL
+            <div className={`flex h-14 w-14 items-center justify-center overflow-hidden border-2 ${borderClass} ${bgClass}`}>
+                <img src={logoUrl} alt="Sagara Lattea" className="h-full w-full object-contain p-1" />
             </div>
             <div>
                 <div className="font-gabriela text-2xl leading-none">Sagara Lattea</div>
