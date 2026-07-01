@@ -9,6 +9,7 @@ const iconPaths = {
     search: 'M10.5 3a7.5 7.5 0 1 0 4.7 13.3L21 22l1-1-5.8-5.8A7.5 7.5 0 0 0 10.5 3Zm0 2a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z',
     plus: 'M12 5v14M5 12h14',
     minus: 'M5 12h14',
+    pencil: 'M4 20h16M4 16l10.5-10.5a1.5 1.5 0 0 1 2.1 0l1.9 1.9a1.5 1.5 0 0 1 0 2.1L9 20H4v-4Z',
     chevronRight: 'M9 6l6 6-6 6',
     coffee: 'M7 7h8a4 4 0 0 1 0 8H7V7Zm-2 0h2v8H7a4 4 0 0 1 0-8Zm1 12h10',
     leaf: 'M5 19c8 0 14-6 14-14-8 0-14 6-14 14Zm2-2c2 0 5-1 7-3',
@@ -18,6 +19,7 @@ const iconPaths = {
     logout: 'M10 17v2a1 1 0 0 0 1 1h8V4h-8a1 1 0 0 0-1 1v2m5 5H3m0 0 3-3m-3 3 3 3',
     alert: 'M12 9v4m0 4h.01M10.3 4.3 1.6 19a2 2 0 0 0 1.7 3h17.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z',
     report: 'M5 4h14v16H5V4Zm3 3h8v2H8V7Zm0 4h8v2H8v-2Zm0 4h5v2H8v-2Z',
+    whatsapp: 'M20 11.5A7.5 7.5 0 0 1 8.7 18L4 19l1-4.5A7.5 7.5 0 1 1 20 11.5Zm-7.6 4.2c2.5 0 4.5-1.8 4.5-4s-2-4-4.5-4-4.5 1.8-4.5 4c0 .8.2 1.5.6 2.2L8 16l2.3-.5c.7.4 1.4.2 2.1.2Z',
     pdf: 'M6 3h8l4 4v14H6V3Zm8 1.5V8h3.5',
     excel: 'M5 4h14v16H5V4Zm3.2 4.2 2.1 3.1 2.1-3.1h1.9L11.9 12l2.4 3.8h-2l-1.6-2.5-1.6 2.5H7.1L9.5 12 7.1 8.2h2.1Z',
     print: 'M7 8V4h10v4M7 17H6a2 2 0 0 1-2-2v-3h18v3a2 2 0 0 1-2 2h-1M8 17h8v3H8v-3Z',
@@ -30,14 +32,14 @@ const categories = [
 ];
 
 const products = [
-    { id: 1, name: 'Matcha Lattea Signature', price: 25000, category: 'latte', emoji: '🍵' },
-    { id: 2, name: 'Hojicha Roasted Milk', price: 23000, category: 'latte', emoji: '🧋' },
-    { id: 3, name: 'Earl Grey Macchiato', price: 24000, category: 'latte', emoji: '☕' },
-    { id: 4, name: 'Jasmine Sea Salt', price: 22000, category: 'latte', emoji: '🥛' },
-    { id: 5, name: 'Oolong Clear Tea', price: 18000, category: 'pure', emoji: '🍵' },
-    { id: 6, name: 'Chamomile Relax', price: 20000, category: 'pure', emoji: '🌼' },
-    { id: 7, name: 'Butter Croissant', price: 15000, category: 'pastry', emoji: '🥐' },
-    { id: 8, name: 'Matcha Cromboloni', price: 28000, category: 'pastry', emoji: '🍩' },
+    { id: 1, name: 'Matcha Lattea Signature', price: 25000, category: 'latte', image: '/minum2.png' },
+    { id: 2, name: 'Hojicha Roasted Milk', price: 23000, category: 'latte', image: '/minum2.png' },
+    { id: 3, name: 'Earl Grey Macchiato', price: 24000, category: 'latte', image: '/minum2.png' },
+    { id: 4, name: 'Jasmine Sea Salt', price: 22000, category: 'latte', image: '/minum2.png' },
+    { id: 5, name: 'Oolong Clear Tea', price: 18000, category: 'pure', image: '/minum2.png' },
+    { id: 6, name: 'Chamomile Relax', price: 20000, category: 'pure', image: '/minum2.png' },
+    { id: 7, name: 'Butter Croissant', price: 15000, category: 'pastry', image: '/minum2.png' },
+    { id: 8, name: 'Matcha Cromboloni', price: 28000, category: 'pastry', image: '/minum2.png' },
 ];
 
 const salesData = [
@@ -65,10 +67,31 @@ const stockItems = [
     { name: 'Gula Cair', sisa: 8, min: 5, unit: 'jerigen', status: 'safe' },
 ];
 
+const masterStockItems = [
+    { id: 1, name: 'Cup Reguler', category: 'Kemasan', stock: 1200, unit: 'pcs', description: 'Stok utama cup ukuran reguler untuk semua outlet.' },
+    { id: 2, name: 'Cup Large', category: 'Kemasan', stock: 2400, unit: 'pcs', description: 'Stok utama cup ukuran large untuk menu besar.' },
+    { id: 3, name: 'Sedotan Organik', category: 'Kemasan', stock: 300, unit: 'pcs', description: 'Sedotan ramah lingkungan untuk service harian.' },
+    { id: 4, name: 'Susu UHT Full Cream', category: 'Bahan', stock: 65, unit: 'karton', description: 'Bahan dasar untuk menu milk series.' },
+    { id: 5, name: 'Daun Teh Matcha', category: 'Bahan', stock: 18, unit: 'kg', description: 'Bahan utama untuk varian matcha.' },
+];
+
 const financeReports = [
     { key: 'daily', label: 'Harian', value: 'Rp 4.250.000', note: 'Omzet hari ini, biaya, dan laba bersih.' },
     { key: 'monthly', label: 'Bulanan', value: 'Rp 75.000.000', note: 'Rekap bulan berjalan per outlet.' },
     { key: 'yearly', label: 'Tahunan', value: 'Rp 860.000.000', note: 'Tren keuangan 12 bulan terakhir.' },
+];
+
+const orderReports = [
+    { id: 'ORD-901', time: '08:15', item: 'Matcha Lattea Signature', type: 'Dine In', total: 'Rp 38.000' },
+    { id: 'ORD-902', time: '10:05', item: 'Butter Croissant', type: 'Take Away', total: 'Rp 15.000' },
+    { id: 'ORD-903', time: '12:40', item: 'Oolong Clear Tea', type: 'Delivery', total: 'Rp 18.000' },
+    { id: 'ORD-904', time: '14:20', item: 'Matcha Cromboloni', type: 'Dine In', total: 'Rp 28.000' },
+];
+
+const stockMovements = [
+    { id: 'STK-120', item: 'Cup Reguler', change: '+120', source: 'Tambah Stok', time: '09:30' },
+    { id: 'STK-121', item: 'Sedotan Organik', change: '+300', source: 'Tambah Stok', time: '10:10' },
+    { id: 'STK-122', item: 'Susu UHT Full Cream', change: '+12', source: 'Tambah Stok', time: '13:40' },
 ];
 
 const complaints = [
@@ -225,6 +248,7 @@ function Sidebar({ activeTab, setActiveTab, logoUrl }) {
         { id: 'pos', icon: 'store', label: 'Point of Sale' },
         { id: 'employees', icon: 'users', label: 'Karyawan' },
         { id: 'supply', icon: 'package', label: 'Inventaris' },
+        { id: 'report', icon: 'report', label: 'Rekap Laporan' },
     ];
 
     return (
@@ -361,7 +385,7 @@ function DashboardView() {
 function POSView() {
     const [activeCategory, setActiveCategory] = useState('latte');
     const [cart, setCart] = useState([]);
-    const [customerName, setCustomerName] = useState('');
+    const [memberNumber, setMemberNumber] = useState('');
     const [isMember, setIsMember] = useState(false);
     const [orderType, setOrderType] = useState('Dine In');
 
@@ -398,20 +422,6 @@ function POSView() {
     const tax = subtotal * 0.11;
     const total = subtotal + tax;
     const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-
-    const censorName = (name) => {
-        if (!name) return 'Pelanggan Umum';
-        if (!isMember) return name;
-
-        const parts = name.split(' ');
-        if (parts.length === 1) {
-            return `${name.slice(0, 3)}${'*'.repeat(Math.max(0, name.length - 3))}`;
-        }
-
-        const first = parts[0];
-        const rest = parts.slice(1).join(' ');
-        return `${first} ${rest.charAt(0)}${'*'.repeat(Math.max(0, rest.length - 1))}`;
-    };
 
     const orderTypes = ['Dine In', 'Take Away', 'Delivery'];
 
@@ -466,8 +476,8 @@ function POSView() {
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                             {filteredProducts.map((product) => (
                                 <article key={product.id} className="group flex h-56 flex-col rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg border border-[#176637]/10 bg-white p-4 transition-all duration-300 hover:border-[#72AD43] hover:shadow-[4px_4px_0px_#176637]">
-                                    <div className="mb-3 flex h-24 w-full items-center justify-center rounded-tl-xl rounded-br-xl bg-[#FFF6DB]/50 text-4xl transition-transform group-hover:scale-105">
-                                        {product.emoji}
+                                    <div className="mb-3 flex h-24 w-full items-center justify-center overflow-hidden rounded-tl-xl rounded-br-xl bg-[#FFF6DB]/50 transition-transform group-hover:scale-105">
+                                        <img src={product.image} alt={product.name} className="h-full w-full object-contain p-2" />
                                     </div>
                                     <h4 className="mb-1 flex-1 text-sm font-semibold leading-tight text-[#176637]">{product.name}</h4>
                                     <div className="mt-auto flex items-end justify-between">
@@ -506,13 +516,13 @@ function POSView() {
                         <div className="mb-5 flex gap-2">
                             <input
                                 type="text"
-                                placeholder="Nama Pelanggan"
-                                value={customerName}
-                                onChange={(event) => setCustomerName(event.target.value)}
+                                placeholder="Nomor Member"
+                                value={memberNumber}
+                                onChange={(event) => setMemberNumber(event.target.value)}
                                 className="flex-1 rounded-xl border-2 border-[#176637]/10 px-3 py-2 text-sm text-[#176637] focus:border-[#72AD43] focus:outline-none"
                             />
                             <button
-                                onClick={() => setIsMember(customerName.trim().length > 2)}
+                                onClick={() => setIsMember(memberNumber.trim().length > 5)}
                                 className={`rounded-xl border-2 px-3 text-xs font-bold transition-all ${isMember ? 'border-[#72AD43] bg-[#72AD43]/20 text-[#176637]' : 'border-[#FF901A] text-[#FF901A] hover:bg-[#FF901A] hover:text-[#FFF6DB]'}`}
                             >
                                 {isMember ? '✓ Member' : 'Cek'}
@@ -529,7 +539,9 @@ function POSView() {
                                 <div className="space-y-3">
                                     {cart.map((item) => (
                                         <div key={item.id} className="flex items-center gap-3 rounded-xl border border-[#FFF6DB] bg-[#FFF6DB]/20 p-2">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-xl shadow-sm">{item.emoji}</div>
+                                            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm">
+                                                <img src={item.image} alt={item.name} className="h-full w-full object-contain p-1" />
+                                            </div>
                                             <div className="min-w-0 flex-1">
                                                 <h4 className="truncate text-sm font-semibold text-[#176637]">{item.name}</h4>
                                                 <p className="text-xs text-[#176637]/60">Rp {item.price.toLocaleString('id-ID')}</p>
@@ -550,10 +562,10 @@ function POSView() {
                         </div>
 
                         <div className="mt-auto border-t-2 border-dashed border-[#176637]/10 pt-4">
-                            {customerName && (
+                            {memberNumber && (
                                 <div className="mb-3 flex items-center justify-between rounded-lg border border-[#176637]/10 bg-[#176637]/5 p-2.5">
-                                    <span className="text-xs text-[#176637]/70">Pelanggan:</span>
-                                    <span className="font-gabriela text-sm font-bold text-[#176637]">{censorName(customerName)}</span>
+                                    <span className="text-xs text-[#176637]/70">Nomor Member:</span>
+                                    <span className="font-gabriela text-sm font-bold text-[#176637]">{memberNumber}</span>
                                 </div>
                             )}
                             <div className="mb-4 space-y-1.5">
@@ -588,6 +600,25 @@ function POSView() {
 }
 
 function EmployeesView() {
+    const [members, setMembers] = useState(teamMembers);
+    const [editingNik, setEditingNik] = useState(null);
+    const [editForm, setEditForm] = useState({ name: '', phone: '', role: '', status: 'Aktif' });
+
+    const beginEdit = (member) => {
+        setEditingNik(member.nik);
+        setEditForm({
+            name: member.name,
+            phone: member.phone,
+            role: member.role,
+            status: member.status,
+        });
+    };
+
+    const saveEdit = () => {
+        setMembers((current) => current.map((member) => (member.nik === editingNik ? { ...member, ...editForm } : member)));
+        setEditingNik(null);
+    };
+
     return (
         <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
             <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -601,6 +632,34 @@ function EmployeesView() {
                 </button>
             </header>
 
+            {editingNik && (
+                <section className="mb-8 rounded-[28px] border border-[#176637]/10 bg-white p-5 shadow-sm">
+                    <div className="mb-4 flex items-center justify-between">
+                        <div>
+                            <h2 className="font-gabriela text-2xl text-[#176637]">Edit Karyawan</h2>
+                            <p className="text-sm text-[#176637]/60">Ubah nama, nomor HP, posisi, dan status.</p>
+                        </div>
+                        <button onClick={() => setEditingNik(null)} className="text-sm font-semibold text-[#176637]/60 hover:text-[#FF901A]">
+                            Tutup
+                        </button>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                        <input value={editForm.name} onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm outline-none" placeholder="Nama" />
+                        <input value={editForm.phone} onChange={(event) => setEditForm((current) => ({ ...current, phone: event.target.value }))} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm outline-none" placeholder="No HP" />
+                        <input value={editForm.role} onChange={(event) => setEditForm((current) => ({ ...current, role: event.target.value }))} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm outline-none" placeholder="Posisi" />
+                        <select value={editForm.status} onChange={(event) => setEditForm((current) => ({ ...current, status: event.target.value }))} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm outline-none">
+                            <option>Aktif</option>
+                            <option>Tidak Aktif</option>
+                        </select>
+                    </div>
+                    <div className="mt-4 flex justify-end">
+                        <button onClick={saveEdit} className="rounded-full bg-[#176637] px-6 py-2 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A]">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </section>
+            )}
+
             <div className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full border-collapse text-left">
@@ -608,20 +667,44 @@ function EmployeesView() {
                             <tr className="border-b border-[#176637]/10 bg-[#FFF6DB]/50">
                                 <th className="p-4 text-sm font-semibold text-[#176637]">NIK</th>
                                 <th className="p-4 text-sm font-semibold text-[#176637]">Nama Karyawan</th>
+                                <th className="p-4 text-sm font-semibold text-[#176637]">No HP</th>
                                 <th className="p-4 text-sm font-semibold text-[#176637]">Posisi</th>
                                 <th className="p-4 text-sm font-semibold text-[#176637]">Kontribusi Laba (Bulan Ini)</th>
                                 <th className="p-4 text-sm font-semibold text-[#176637]">Status</th>
+                                <th className="p-4 text-sm font-semibold text-[#176637]">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {teamMembers.map((member) => (
+                            {members.map((member) => (
                                 <tr key={member.nik} className="border-b border-[#176637]/5 transition-colors hover:bg-[#FFF6DB]/20">
                                     <td className="p-4 text-sm font-medium text-[#176637]/60">{member.nik}</td>
                                     <td className="p-4 text-sm font-bold text-[#176637]">{member.name}</td>
+                                    <td className="p-4 text-sm text-[#176637]/70">{member.phone}</td>
                                     <td className="p-4 text-sm text-[#176637]">{member.role}</td>
                                     <td className="p-4 text-sm font-semibold text-[#72AD43]">{member.perf}</td>
                                     <td className="p-4">
                                         <span className={`rounded-full px-3 py-1 text-xs font-bold ${member.status === 'Aktif' ? 'bg-[#72AD43]/20 text-[#176637]' : 'bg-gray-100 text-gray-500'}`}>{member.status}</span>
+                                    </td>
+                                    <td className="p-4">
+                                        <div className="flex items-center gap-2">
+                                            <a
+                                                href={`https://wa.me/${member.phone}`}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="inline-flex items-center gap-2 rounded-full bg-[#176637] px-3 py-2 text-xs font-bold text-[#FFF6DB] transition hover:bg-[#0f4b28]"
+                                            >
+                                                <Icon name="whatsapp" className="h-3.5 w-3.5" stroke />
+                                                WA
+                                            </a>
+                                            <button
+                                                type="button"
+                                                onClick={() => beginEdit(member)}
+                                                className="inline-flex items-center gap-2 rounded-full border border-[#176637]/15 px-3 py-2 text-xs font-bold text-[#176637] transition hover:bg-[#FFF6DB]"
+                                            >
+                                                <Icon name="pencil" className="h-3.5 w-3.5" stroke />
+                                                Edit
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -634,6 +717,37 @@ function EmployeesView() {
 }
 
 function SupplyView() {
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [selectedMaster, setSelectedMaster] = useState(masterStockItems[0]?.id ?? 1);
+    const [masterList, setMasterList] = useState(masterStockItems);
+    const [masterForm, setMasterForm] = useState({
+        name: '',
+        category: 'Kemasan',
+        description: '',
+    });
+
+    const selectedMasterItem = masterList.find((item) => item.id === selectedMaster) ?? masterList[0];
+
+    const addMasterItem = () => {
+        if (!masterForm.name.trim()) {
+            return;
+        }
+
+        const nextId = Math.max(0, ...masterList.map((item) => item.id)) + 1;
+        const nextItem = {
+            id: nextId,
+            name: masterForm.name.trim(),
+            category: masterForm.category,
+            stock: 0,
+            unit: 'pcs',
+            description: masterForm.description.trim() || 'Item master stok baru.',
+        };
+
+        setMasterList((current) => [...current, nextItem]);
+        setSelectedMaster(nextId);
+        setMasterForm({ name: '', category: 'Kemasan', description: '' });
+    };
+
     return (
         <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
             <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -641,10 +755,88 @@ function SupplyView() {
                     <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Inventaris & Stok</h1>
                     <p className="text-sm font-medium text-[#72AD43]">Pantau ketersediaan bahan operasional</p>
                 </div>
-                <button className="rounded-full border-2 border-[#176637] px-6 py-2 font-bold text-[#176637] transition-all hover:bg-[#176637] hover:text-[#FFF6DB]">
-                    Minta Stok ke Pusat
+                <button
+                    onClick={() => setShowAddForm((value) => !value)}
+                    className="rounded-full border-2 border-[#176637] px-6 py-2 font-bold text-[#176637] transition-all hover:bg-[#176637] hover:text-[#FFF6DB]"
+                >
+                    Tambah Stok
                 </button>
             </header>
+
+            <section className="mb-8 rounded-[28px] border border-[#176637]/10 bg-white p-5 shadow-sm">
+                <div className="mb-4 flex items-center justify-between">
+                    <div>
+                        <h2 className="font-gabriela text-2xl text-[#176637]">Master Stok</h2>
+                        <p className="text-sm text-[#176637]/60">Tambah nama, kategori, dan keterangan stok pusat dari sini.</p>
+                    </div>
+                    <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{masterList.length} item</span>
+                </div>
+                <div className="grid gap-4 xl:grid-cols-[1fr_0.7fr_1fr_auto]">
+                    <input
+                        value={masterForm.name}
+                        onChange={(event) => setMasterForm((current) => ({ ...current, name: event.target.value }))}
+                        className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
+                        placeholder="Nama item"
+                    />
+                    <select
+                        value={masterForm.category}
+                        onChange={(event) => setMasterForm((current) => ({ ...current, category: event.target.value }))}
+                        className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
+                    >
+                        <option>Kemasan</option>
+                        <option>Bahan</option>
+                        <option>Peralatan</option>
+                    </select>
+                    <input
+                        value={masterForm.description}
+                        onChange={(event) => setMasterForm((current) => ({ ...current, description: event.target.value }))}
+                        className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
+                        placeholder="Keterangan"
+                    />
+                    <button onClick={addMasterItem} className="rounded-2xl bg-[#176637] px-5 py-3 text-sm font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A]">
+                        Tambah
+                    </button>
+                </div>
+            </section>
+
+            {showAddForm && (
+                <section className="mb-8 rounded-[28px] border border-[#176637]/10 bg-white p-5 shadow-sm">
+                    <div className="grid gap-4 xl:grid-cols-[1.1fr_0.7fr_0.3fr]">
+                        <div>
+                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Pilih Produk</label>
+                            <select
+                                value={selectedMaster}
+                                onChange={(event) => setSelectedMaster(Number(event.target.value))}
+                                className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
+                            >
+                                {masterList.map((item) => (
+                                    <option key={item.id} value={item.id}>
+                                        {item.name} - {item.category}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Jumlah Tambah</label>
+                            <input type="number" min="1" placeholder="Contoh: 100" className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]" />
+                        </div>
+                        <div className="flex items-end">
+                            <button className="w-full rounded-2xl bg-[#176637] px-4 py-3 text-sm font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A]">
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[22px] bg-[#FFF6DB]/50 px-4 py-3">
+                        <div>
+                            <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Master stok dipilih</div>
+                            <div className="mt-1 font-semibold text-[#176637]">{selectedMasterItem?.name}</div>
+                        </div>
+                        <div className="text-sm text-[#176637]/70">
+                            {selectedMasterItem?.description} · {selectedMasterItem?.stock} {selectedMasterItem?.unit}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {stockItems.map((item) => (
@@ -669,6 +861,153 @@ function SupplyView() {
                     </div>
                 ))}
             </div>
+
+            <section className="mt-8 rounded-[28px] border border-[#176637]/10 bg-white p-6 shadow-sm">
+                <div className="mb-4 flex items-center justify-between">
+                    <div>
+                        <h2 className="font-gabriela text-3xl text-[#176637]">Master Stok</h2>
+                        <p className="text-sm text-[#176637]/60">Daftar stok pusat untuk kebutuhan operasional outlet.</p>
+                    </div>
+                    <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{masterList.length} item</span>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {masterList.map((item) => (
+                        <div key={item.id} className="rounded-[24px] border border-[#176637]/10 bg-[#FFF6DB]/35 p-4">
+                            <div className="text-sm font-bold text-[#176637]">{item.name}</div>
+                            <div className="mt-1 text-xs uppercase tracking-[0.18em] text-[#176637]/55">{item.category}</div>
+                            <p className="mt-2 text-sm leading-6 text-[#176637]/70">{item.description}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+        </div>
+    );
+}
+
+function ReportView() {
+    return (
+        <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
+            <header className="mb-8 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                <div>
+                    <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Rekap Laporan</h1>
+                    <p className="text-sm font-medium text-[#72AD43]">Finance, order, stok, karyawan, dan laporan outlet</p>
+                </div>
+            </header>
+
+            <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+                <div className="space-y-6">
+                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
+                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
+                            <h2 className="font-gabriela text-2xl text-[#176637]">Rekap Finance</h2>
+                        </div>
+                        <table className="min-w-full text-left">
+                            <thead>
+                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                    <th className="p-4 pl-6">Periode</th>
+                                    <th className="p-4">Nilai</th>
+                                    <th className="p-4">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {financeReports.map((item) => (
+                                    <tr key={item.key} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
+                                        <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
+                                        <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
+                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
+                            <h2 className="font-gabriela text-2xl text-[#176637]">Riwayat Pesanan</h2>
+                        </div>
+                        <table className="min-w-full text-left">
+                            <thead>
+                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                    <th className="p-4 pl-6">No</th>
+                                    <th className="p-4">Item</th>
+                                    <th className="p-4">Tipe</th>
+                                    <th className="p-4">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {orderReports.map((item) => (
+                                    <tr key={item.id} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
+                                        <td className="p-4 text-sm text-[#176637]">
+                                            <div className="font-semibold">{item.item}</div>
+                                            <div className="text-xs text-[#176637]/55">{item.time}</div>
+                                        </td>
+                                        <td className="p-4 text-sm text-[#176637]/70">{item.type}</td>
+                                        <td className="p-4 text-sm font-bold text-[#176637]">{item.total}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
+                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
+                            <h2 className="font-gabriela text-2xl text-[#176637]">Riwayat Tambah Stok</h2>
+                        </div>
+                        <table className="min-w-full text-left">
+                            <thead>
+                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                    <th className="p-4 pl-6">ID</th>
+                                    <th className="p-4">Item</th>
+                                    <th className="p-4">Perubahan</th>
+                                    <th className="p-4">Sumber</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {stockMovements.map((item) => (
+                                    <tr key={item.id} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
+                                        <td className="p-4 text-sm text-[#176637]">{item.item}</td>
+                                        <td className="p-4 text-sm font-bold text-[#176637]">{item.change}</td>
+                                        <td className="p-4 text-sm text-[#176637]/70">{item.source}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+
+                <aside className="space-y-6">
+                    <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                        <h3 className="font-gabriela text-2xl text-[#176637]">Preview Print</h3>
+                        <div className="mt-4 rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB] p-4">
+                            <div className="rounded-[20px] bg-white p-4 shadow-sm">
+                                <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Outlet Harmoni</div>
+                                <div className="mt-2 font-gabriela text-2xl text-[#176637]">Ringkasan Laporan Hari Ini</div>
+                                <div className="mt-4 space-y-3">
+                                    {financeReports.map((item) => (
+                                        <div key={item.key} className="flex items-center justify-between border-b border-[#176637]/8 pb-2 text-sm">
+                                            <span className="text-[#176637]/70">{item.label}</span>
+                                            <span className="font-bold text-[#176637]">{item.value}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                        <h3 className="font-gabriela text-2xl text-[#176637]">Ekspor Cepat</h3>
+                        <div className="mt-4 grid gap-3">
+                            <button className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh PDF</button>
+                            <button className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Excel</button>
+                            <button onClick={() => window.print()} className="rounded-2xl bg-[#176637] px-4 py-3 text-sm font-bold text-[#FFF6DB]">
+                                Buka Print Preview
+                            </button>
+                        </div>
+                    </section>
+                </aside>
+            </div>
         </div>
     );
 }
@@ -688,6 +1027,7 @@ export default function MitraDashboardPage({ data }) {
                     {activeTab === 'pos' && <POSView />}
                     {activeTab === 'employees' && <EmployeesView />}
                     {activeTab === 'supply' && <SupplyView />}
+                    {activeTab === 'report' && <ReportView />}
                 </div>
             </div>
         </>

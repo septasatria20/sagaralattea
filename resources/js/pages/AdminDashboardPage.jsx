@@ -10,6 +10,7 @@ const navigation = [
     { id: 'stok', label: 'Supply Chain', icon: 'package' },
     { id: 'komplain', label: 'Komplain', icon: 'message' },
     { id: 'investor', label: 'Manajemen Investor', icon: 'trending' },
+    { id: 'rekap', label: 'Rekap Laporan', icon: 'report' },
 ];
 
 const salesData = [
@@ -459,6 +460,7 @@ function EmployeeTab({ employees }) {
     const [roleFilter, setRoleFilter] = useState('Semua Peran');
     const [outletFilter, setOutletFilter] = useState('Semua Outlet');
     const [showBlacklistOnly, setShowBlacklistOnly] = useState(false);
+    const [selectedEmployee, setSelectedEmployee] = useState(employees[0] ?? null);
     const [blacklistedIds, setBlacklistedIds] = useState(() => employees.filter((employee) => employee.blacklisted).map((employee) => employee.id));
 
     const roles = ['Semua Peran', ...new Set(employees.map((employee) => employee.role))];
@@ -545,94 +547,130 @@ function EmployeeTab({ employees }) {
                 </div>
             </div>
 
-            <div className="overflow-hidden rounded-[26px] border border-[#176637]/10 bg-white shadow-sm">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full border-collapse text-left">
-                        <thead>
-                            <tr className="bg-[#FFF1C9] text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                <th className="p-4 pl-6">Karyawan</th>
-                                <th className="p-4">NIK</th>
-                                <th className="p-4">Peran</th>
-                                <th className="p-4">Penempatan</th>
-                                <th className="p-4">Bergabung</th>
-                                <th className="p-4">Status</th>
-                                <th className="p-4 pr-6 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredEmployees.map((employee) => {
-                                const isBlacklisted = blacklistedIds.includes(employee.id);
-                                const statusLabel = isBlacklisted ? 'Blacklist' : employee.status;
-                                const statusClass = isBlacklisted
-                                    ? 'bg-red-100 text-red-600'
-                                    : employee.status === 'Aktif'
-                                      ? 'bg-[#72AD43]/15 text-[#176637]'
-                                      : 'bg-[#176637]/10 text-[#176637]/75';
+            <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+                <div className="overflow-hidden rounded-[26px] border border-[#176637]/10 bg-white shadow-sm">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full border-collapse text-left">
+                            <thead>
+                                <tr className="bg-[#FFF1C9] text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                    <th className="p-4 pl-6">Karyawan</th>
+                                    <th className="p-4">NIK</th>
+                                    <th className="p-4">Peran</th>
+                                    <th className="p-4">Penempatan</th>
+                                    <th className="p-4">Bergabung</th>
+                                    <th className="p-4">Status</th>
+                                    <th className="p-4 pr-6 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredEmployees.map((employee) => {
+                                    const isBlacklisted = blacklistedIds.includes(employee.id);
+                                    const statusLabel = isBlacklisted ? 'Blacklist' : employee.status;
+                                    const statusClass = isBlacklisted
+                                        ? 'bg-red-100 text-red-600'
+                                        : employee.status === 'Aktif'
+                                          ? 'bg-[#72AD43]/15 text-[#176637]'
+                                          : 'bg-[#176637]/10 text-[#176637]/75';
 
-                                return (
-                                    <tr key={employee.id} className="border-t border-[#176637]/8 transition-colors hover:bg-[#FFF6DB]/25">
-                                        <td className="p-4 pl-6">
-                                            <div className="flex items-center gap-3">
-                                <div>
-                                    <div className="text-[13px] font-semibold text-[#176637]">{employee.name}</div>
-                                    <div className="text-[11px] text-[#176637]/55">Klik aksi untuk edit / blacklist</div>
-                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 text-[13px] font-medium tracking-wide text-[#176637]/65">{employee.nik}</td>
-                                        <td className="p-4">
-                                            <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-bold ${employee.role === 'Manager' ? 'bg-[#72AD43]/20 text-[#176637]' : employee.role === 'Barista' ? 'bg-[#72AD43]/15 text-[#176637]' : 'bg-[#FFF1C9] text-[#8b6a2f]'}`}>
-                                                {employee.role.toUpperCase()}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 text-[13px] text-[#176637]">{employee.outlet}</td>
-                                        <td className="p-4 text-[13px] text-[#176637]/70">{employee.joined}</td>
-                                        <td className="p-4">
-                                            <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold ${statusClass}`}>
-                                                <span className={`h-2 w-2 rounded-full ${isBlacklisted ? 'bg-red-500' : 'bg-[#176637]'}`} />
-                                                {statusLabel}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 pr-6">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <button className="rounded-lg p-2 text-[#176637]/55 transition-colors hover:bg-[#FFF6DB] hover:text-[#176637]">
-                                                    <Icon name="edit" className="h-4 w-4" stroke />
-                                                </button>
-                                                <button
-                                                    onClick={() => toggleBlacklist(employee.id)}
-                                                    className={`rounded-lg p-2 transition-colors ${isBlacklisted ? 'text-red-600 hover:bg-red-50' : 'text-[#176637]/55 hover:bg-[#FFF6DB] hover:text-red-600'}`}
-                                                    title={isBlacklisted ? 'Hapus dari blacklist' : 'Masukkan blacklist'}
-                                                >
-                                                    <Icon name="alert" className="h-4 w-4" stroke />
-                                                </button>
-                                                <button className="rounded-lg p-2 text-[#176637]/55 transition-colors hover:bg-[#FFF6DB] hover:text-red-500">
-                                                    <Icon name="trash" className="h-4 w-4" stroke />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+                                    return (
+                                        <tr key={employee.id} className="border-t border-[#176637]/8 transition-colors hover:bg-[#FFF6DB]/25">
+                                            <td className="p-4 pl-6">
+                                                <div className="flex items-center gap-3">
+                                                    <div>
+                                                        <div className="text-[13px] font-semibold text-[#176637]">{employee.name}</div>
+                                                        <div className="text-[11px] text-[#176637]/55">Klik aksi untuk edit / blacklist</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 text-[13px] font-medium tracking-wide text-[#176637]/65">{employee.nik}</td>
+                                            <td className="p-4">
+                                                <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-bold ${employee.role === 'Manager' ? 'bg-[#72AD43]/20 text-[#176637]' : employee.role === 'Barista' ? 'bg-[#72AD43]/15 text-[#176637]' : 'bg-[#FFF1C9] text-[#8b6a2f]'}`}>
+                                                    {employee.role.toUpperCase()}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 text-[13px] text-[#176637]">{employee.outlet}</td>
+                                            <td className="p-4 text-[13px] text-[#176637]/70">{employee.joined}</td>
+                                            <td className="p-4">
+                                                <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold ${statusClass}`}>
+                                                    <span className={`h-2 w-2 rounded-full ${isBlacklisted ? 'bg-red-500' : 'bg-[#176637]'}`} />
+                                                    {statusLabel}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 pr-6">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <button onClick={() => setSelectedEmployee(employee)} className="rounded-lg p-2 text-[#176637]/55 transition-colors hover:bg-[#FFF6DB] hover:text-[#176637]">
+                                                        <Icon name="edit" className="h-4 w-4" stroke />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => toggleBlacklist(employee.id)}
+                                                        className={`rounded-lg p-2 transition-colors ${isBlacklisted ? 'text-red-600 hover:bg-red-50' : 'text-[#176637]/55 hover:bg-[#FFF6DB] hover:text-red-600'}`}
+                                                        title={isBlacklisted ? 'Hapus dari blacklist' : 'Masukkan blacklist'}
+                                                    >
+                                                        <Icon name="alert" className="h-4 w-4" stroke />
+                                                    </button>
+                                                    <button className="rounded-lg p-2 text-[#176637]/55 transition-colors hover:bg-[#FFF6DB] hover:text-red-500">
+                                                        <Icon name="trash" className="h-4 w-4" stroke />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
 
-                <div className="flex flex-col gap-4 border-t border-[#176637]/10 bg-[#FFF6DB]/60 px-6 py-4 text-sm text-[#176637]/70 md:flex-row md:items-center md:justify-between">
+                    <div className="flex flex-col gap-4 border-t border-[#176637]/10 bg-[#FFF6DB]/60 px-6 py-4 text-sm text-[#176637]/70 md:flex-row md:items-center md:justify-between">
                         <p>Menampilkan {filteredEmployees.length} dari {employees.length} Karyawan</p>
-                    <div className="flex items-center gap-3">
-                        <button className="rounded-lg border border-[#176637]/10 bg-white p-2 text-[#176637]">
-                            <Icon name="chevronLeft" className="h-4 w-4" stroke />
-                        </button>
-                        {[1, 2, 3].map((page) => (
-                            <button key={page} className={`min-w-10 rounded-lg px-3 py-2 font-bold ${page === 1 ? 'bg-[#176637] text-[#FFF6DB]' : 'text-[#176637]/70 hover:bg-white'}`}>
-                                {page}
+                        <div className="flex items-center gap-3">
+                            <button className="rounded-lg border border-[#176637]/10 bg-white p-2 text-[#176637]">
+                                <Icon name="chevronLeft" className="h-4 w-4" stroke />
                             </button>
-                        ))}
-                        <button className="rounded-lg border border-[#176637]/10 bg-white p-2 text-[#176637]">
-                            <Icon name="chevronRight" className="h-4 w-4" stroke />
-                        </button>
+                            {[1, 2, 3].map((page) => (
+                                <button key={page} className={`min-w-10 rounded-lg px-3 py-2 font-bold ${page === 1 ? 'bg-[#176637] text-[#FFF6DB]' : 'text-[#176637]/70 hover:bg-white'}`}>
+                                    {page}
+                                </button>
+                            ))}
+                            <button className="rounded-lg border border-[#176637]/10 bg-white p-2 text-[#176637]">
+                                <Icon name="chevronRight" className="h-4 w-4" stroke />
+                            </button>
+                        </div>
                     </div>
                 </div>
+
+                <aside className="rounded-[26px] border border-[#176637]/10 bg-white p-5 shadow-sm">
+                    <div className="mb-4">
+                        <h3 className="font-gabriela text-2xl text-[#176637]">Edit Karyawan</h3>
+                        <p className="mt-1 text-sm text-[#176637]/65">Ubah nama, peran, penempatan, dan status aktif/nonaktif.</p>
+                    </div>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Nama</label>
+                            <input defaultValue={selectedEmployee?.name ?? ''} className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]" />
+                        </div>
+                        <div>
+                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Peran</label>
+                            <select defaultValue={selectedEmployee?.role ?? 'Barista'} className="w-full rounded-2xl border border-[#176637]/15 bg-white px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]">
+                                <option>Manager</option>
+                                <option>Barista</option>
+                                <option>Kasir</option>
+                                <option>Waiter</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Penempatan</label>
+                            <input defaultValue={selectedEmployee?.outlet ?? ''} className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]" />
+                        </div>
+                        <div>
+                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Status</label>
+                            <select defaultValue={selectedEmployee?.status ?? 'Aktif'} className="w-full rounded-2xl border border-[#176637]/15 bg-white px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]">
+                                <option>Aktif</option>
+                                <option>Tidak Aktif</option>
+                            </select>
+                        </div>
+                        <button className="w-full rounded-xl bg-[#176637] px-5 py-3 font-bold text-[#FFF6DB] transition hover:bg-[#FF901A]">Simpan Perubahan</button>
+                    </div>
+                </aside>
             </div>
         </div>
     );
@@ -749,14 +787,11 @@ function MembershipTab({ members }) {
     );
 }
 
-function SupplyChainTab({ items, masterItems = [], movements, setActiveMenu }) {
+function SupplyChainTab({ items, movements }) {
     const [outletFilter, setOutletFilter] = useState('Semua Outlet');
-    const [selectedMasterId, setSelectedMasterId] = useState(masterItems[0]?.id ?? null);
-    const [stockToAdd, setStockToAdd] = useState('');
     const outlets = ['Semua Outlet', ...new Set(items.map((item) => item.outlet))];
     const filteredItems = items.filter((item) => outletFilter === 'Semua Outlet' || item.outlet === outletFilter);
     const filteredMovements = movements.filter((move) => outletFilter === 'Semua Outlet' || move.outlet === outletFilter);
-    const selectedMasterItem = masterItems.find((item) => item.id === selectedMasterId) ?? masterItems[0] ?? null;
 
     return (
         <div className="animate-slide-up space-y-8">
@@ -765,75 +800,17 @@ function SupplyChainTab({ items, masterItems = [], movements, setActiveMenu }) {
                     <h2 className="font-gabriela text-4xl text-[#176637]">Supply Chain</h2>
                     <p className="mt-2 text-base text-[#176637]/70">Pantau stok bahan operasional dan riwayat pergerakan barang seluruh outlet.</p>
                 </div>
-                <div className="flex flex-wrap gap-3">
-                    <div className="relative min-w-56">
-                        <select
-                            value={outletFilter}
-                            onChange={(event) => setOutletFilter(event.target.value)}
-                            className="w-full appearance-none rounded-xl border border-[#176637]/15 bg-white px-4 py-3 pr-10 text-sm font-medium text-[#176637] outline-none transition-colors focus:border-[#72AD43]"
-                        >
-                            {outlets.map((outlet) => (
-                                <option key={outlet}>{outlet}</option>
-                            ))}
-                        </select>
-                        <Icon name="chevronDown" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#176637]/50" stroke />
-                    </div>
-                    <button onClick={() => setActiveMenu('master-stok')} className="rounded-xl border-2 border-[#176637] bg-white px-5 py-3 font-bold text-[#176637] transition-colors hover:bg-[#176637]/5">
-                        Master Stok
-                    </button>
-                    <button className="rounded-xl bg-[#176637] px-5 py-3 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A] transition-all hover:translate-y-1">
-                        Tambah Stok
-                    </button>
-                </div>
-            </div>
-
-            <div className="grid gap-6 xl:grid-cols-[0.7fr_1.3fr]">
-                <div className="rounded-[26px] border border-[#176637]/10 bg-white p-5 shadow-sm">
-                    <div className="mb-4">
-                        <h3 className="font-gabriela text-2xl text-[#176637]">Tambah Stok</h3>
-                        <p className="mt-1 text-sm text-[#176637]/65">Pilih item dari master stok lalu isi jumlah penambahannya.</p>
-                    </div>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Pilih Produk</label>
-                            <select
-                                value={selectedMasterItem?.id ?? ''}
-                                onChange={(event) => setSelectedMasterId(Number(event.target.value))}
-                                className="w-full rounded-2xl border border-[#176637]/15 bg-white px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
-                            >
-                                {masterItems.map((item) => (
-                                    <option key={item.id} value={item.id}>
-                                        {item.name} - {item.category}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Jumlah Tambah</label>
-                            <input
-                                value={stockToAdd}
-                                onChange={(event) => setStockToAdd(event.target.value)}
-                                type="number"
-                                min="1"
-                                placeholder="Contoh: 100"
-                                className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
-                            />
-                        </div>
-                        <button className="w-full rounded-xl bg-[#FF901A] px-5 py-3 font-bold text-[#FFF6DB] transition hover:bg-[#176637]">
-                            Simpan Penambahan
-                        </button>
-                    </div>
-                </div>
-
-                <div className="rounded-[26px] border border-[#176637]/10 bg-[#FFF6DB]/35 p-5">
-                    <div className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Item Terpilih</div>
-                    <div className="rounded-[22px] border border-[#176637]/10 bg-white p-5">
-                        <div className="text-[13px] font-semibold text-[#176637]">{selectedMasterItem?.name ?? '-'}</div>
-                        <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-[#176637]/55">{selectedMasterItem?.category ?? '-'}</div>
-                        <p className="mt-3 text-sm leading-7 text-[#176637]/70">
-                            Stok saat ini {selectedMasterItem?.stock ?? 0} {selectedMasterItem?.unit ?? 'pcs'}. Setelah menambah stok, angka ini akan bertambah sesuai input.
-                        </p>
-                    </div>
+                <div className="relative min-w-56">
+                    <select
+                        value={outletFilter}
+                        onChange={(event) => setOutletFilter(event.target.value)}
+                        className="w-full appearance-none rounded-xl border border-[#176637]/15 bg-white px-4 py-3 pr-10 text-sm font-medium text-[#176637] outline-none transition-colors focus:border-[#72AD43]"
+                    >
+                        {outlets.map((outlet) => (
+                            <option key={outlet}>{outlet}</option>
+                        ))}
+                    </select>
+                    <Icon name="chevronDown" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#176637]/50" stroke />
                 </div>
             </div>
 
@@ -845,7 +822,7 @@ function SupplyChainTab({ items, masterItems = [], movements, setActiveMenu }) {
                     <div className="overflow-x-auto">
                         <table className="min-w-full text-left">
                             <thead>
-                            <tr className="text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/75">
+                                <tr className="text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/75">
                                     <th className="p-4 pl-6">Item</th>
                                     <th className="p-4">Kategori</th>
                                     <th className="p-4">Stok</th>
@@ -894,113 +871,6 @@ function SupplyChainTab({ items, masterItems = [], movements, setActiveMenu }) {
                                 </div>
                             </div>
                         ))}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function MasterStockTab({ items, setActiveMenu }) {
-    const [form, setForm] = useState({
-        name: '',
-        category: 'Kemasan',
-        description: '',
-    });
-    const [categoryFilter, setCategoryFilter] = useState('Semua Kategori');
-    const categories = ['Semua Kategori', ...new Set(items.map((item) => item.category))];
-    const filteredItems = items.filter((item) => categoryFilter === 'Semua Kategori' || item.category === categoryFilter);
-
-    return (
-        <div className="animate-slide-up space-y-8">
-            <div className="grid gap-6 lg:grid-cols-[0.42fr_0.58fr]">
-                <aside className="rounded-[28px] border border-[#176637]/10 bg-[#FFF6DB] p-6 shadow-sm">
-                    <h2 className="font-gabriela text-3xl text-[#176637]">Master Stok</h2>
-                    <p className="mt-3 text-sm leading-7 text-[#176637]/70">Tambah nama, kategori, dan keterangan item dasar untuk stok pusat.</p>
-                    <button
-                        onClick={() => setActiveMenu('stok')}
-                        className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#176637] transition hover:text-[#FF901A]"
-                    >
-                        <Icon name="chevronLeft" className="h-4 w-4" stroke />
-                        Kembali ke Stok
-                    </button>
-
-                    <div className="mt-8 space-y-4 rounded-[24px] border border-[#176637]/10 bg-white p-4">
-                        <div>
-                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Nama Item</label>
-                            <input
-                                value={form.name}
-                                onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-                                className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
-                                placeholder="Contoh: Cup Reguler"
-                            />
-                        </div>
-                        <div>
-                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Kategori</label>
-                            <select
-                                value={form.category}
-                                onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}
-                                className="w-full rounded-2xl border border-[#176637]/15 bg-white px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
-                            >
-                                <option>Kemasan</option>
-                                <option>Bahan</option>
-                                <option>Peralatan</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Keterangan</label>
-                            <textarea
-                                value={form.description}
-                                onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
-                                rows={5}
-                                className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] leading-7 text-[#176637] outline-none focus:border-[#72AD43]"
-                                placeholder="Tulis keterangan singkat item stok"
-                            />
-                        </div>
-                        <button className="w-full rounded-xl bg-[#176637] px-5 py-3 font-bold text-[#FFF6DB] transition hover:bg-[#FF901A]">
-                            Simpan Item
-                        </button>
-                    </div>
-                </aside>
-
-                <div className="rounded-[28px] border border-[#176637]/10 bg-white p-6 shadow-sm">
-                    <div className="mb-6 flex items-center justify-between">
-                        <div>
-                            <h3 className="font-gabriela text-2xl text-[#176637]">Detail Item</h3>
-                            <p className="text-sm text-[#176637]/65">Daftar item stok pusat yang bisa difilter per kategori.</p>
-                        </div>
-                        <div className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{filteredItems.length} item</div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {categories.map((category) => (
-                            <button
-                                key={category}
-                                onClick={() => setCategoryFilter(category)}
-                                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                                    categoryFilter === category ? 'bg-[#176637] text-[#FFF6DB]' : 'border border-[#176637]/10 bg-[#FFF6DB] text-[#176637] hover:border-[#72AD43]'
-                                }`}
-                            >
-                                {category}
-                            </button>
-                        ))}
-                    </div>
-                    <div className="mt-6 space-y-4">
-                        {filteredItems.map((item) => (
-                            <div key={item.id} className="rounded-[22px] border border-[#176637]/10 bg-[#FFF6DB]/30 p-4 transition hover:border-[#72AD43]">
-                                <div className="flex items-start justify-between gap-4">
-                                    <div>
-                                        <div className="text-[13px] font-semibold text-[#176637]">{item.name}</div>
-                                        <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-[#176637]/55">{item.category}</div>
-                                        <p className="mt-2 text-sm leading-6 text-[#176637]/70">{item.description}</p>
-                                    </div>
-                                    <span className={`rounded-full px-3 py-1 text-xs font-bold ${item.status === 'Aman' ? 'bg-[#72AD43]/15 text-[#176637]' : item.status === 'Menipis' ? 'bg-[#FF901A]/15 text-[#FF901A]' : 'bg-gray-100 text-gray-600'}`}>{item.status}</span>
-                                </div>
-                                <div className="mt-3 text-sm text-[#176637]/60">Update terakhir: {item.last_update}</div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="mt-6 rounded-2xl border border-dashed border-[#176637]/15 bg-[#FFF6DB]/50 p-4 text-sm leading-7 text-[#176637]/70">
-                        Master stok sekarang hanya menyimpan nama, kategori, dan keterangan.
                     </div>
                 </div>
             </div>
@@ -1370,6 +1240,352 @@ function InvestorTab({ investors }) {
     );
 }
 
+function ReportTab({ menuItems, employees, members, supply, complaints, promos, investorData, outlets, movements, salesData }) {
+    const financeRows = [
+        { label: 'Pendapatan hari ini', value: 'Rp 4.250.000', note: 'Estimasi transaksi outlet hari ini' },
+        { label: 'Total pesanan', value: '142', note: 'Semua order selesai diproses' },
+        { label: 'Laba bersih', value: 'Rp 1.820.000', note: 'Setelah biaya operasional' },
+        { label: 'Arus kas', value: 'Positif', note: 'Periode berjalan' },
+    ];
+
+    const menuRows = menuItems.map((item) => ({
+        name: item.name,
+        category: item.category,
+        price: `Rp ${Number(item.price ?? 0).toLocaleString('id-ID')}`,
+        status: item.status,
+    }));
+
+    const supplyRows = supply.map((item) => ({
+        name: item.item,
+        stock: `${item.stock} ${item.unit}`,
+        status: item.status,
+        outlet: item.outlet,
+    }));
+
+    const complaintRows = complaints.map((ticket) => ({
+        id: ticket.id,
+        issue: ticket.issue,
+        status: ticket.status,
+        outlet: ticket.outlet,
+    }));
+
+    const investorRows = investorData.map((item) => ({
+        name: item.name,
+        roi: item.roi,
+        access: item.access,
+        ticket: item.ticket,
+    }));
+
+    const outletRows = outlets.map((item) => ({
+        name: item.name,
+        omzet: item.omzet,
+        status: item.status,
+        location: item.location,
+    }));
+
+    const movementRows = movements.map((item) => ({
+        id: item.id,
+        item: item.item,
+        direction: item.direction,
+        qty: item.qty,
+        outlet: item.outlet,
+    }));
+
+    const printDashboard = () => window.print();
+
+    return (
+        <div className="animate-slide-up space-y-8">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                <div>
+                    <h2 className="font-gabriela text-4xl text-[#176637]">Rekap Laporan</h2>
+                    <p className="mt-2 text-base text-[#176637]/70">Modul laporan pusat dengan tabel finance, promo, SDM, inventaris, dan investor.</p>
+                </div>
+            </div>
+
+            <div className="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
+                <div className="space-y-6">
+                    <ReportSectionTable
+                        title="Finance"
+                        rows={financeRows}
+                        columns={['Item', 'Nilai', 'Catatan']}
+                        pageSize={3}
+                        actions={[
+                            { label: 'PDF' },
+                            { label: 'Excel' },
+                            { label: 'Print', onClick: printDashboard },
+                        ]}
+                        renderRow={(row) => (
+                            <>
+                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{row.label}</td>
+                                <td className="p-4 text-sm font-semibold text-[#176637]">{row.value}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{row.note}</td>
+                            </>
+                        )}
+                    />
+
+                    <ReportSectionTable
+                        title="Riwayat Promo"
+                        rows={promos}
+                        columns={['Judul', 'Kode', 'Periode', 'Status']}
+                        pageSize={3}
+                        actions={[
+                            { label: 'PDF' },
+                            { label: 'Excel' },
+                            { label: 'Cetak', onClick: printDashboard },
+                        ]}
+                        renderRow={(promo) => (
+                            <>
+                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{promo.title}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{promo.code}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{promo.period}</td>
+                                <td className="p-4 text-sm font-semibold text-[#176637]">{promo.status}</td>
+                            </>
+                        )}
+                    />
+
+                    <ReportSectionTable
+                        title="Karyawan"
+                        rows={employees}
+                        columns={['Nama', 'Peran', 'Penempatan', 'Status']}
+                        pageSize={4}
+                        actions={[
+                            { label: 'PDF' },
+                            { label: 'Excel' },
+                            { label: 'Print', onClick: printDashboard },
+                        ]}
+                        renderRow={(employee) => (
+                            <>
+                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{employee.name}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{employee.role}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{employee.outlet}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{employee.blacklisted ? 'Blacklist' : employee.status}</td>
+                            </>
+                        )}
+                    />
+
+                    <ReportSectionTable
+                        title="Membership"
+                        rows={members}
+                        columns={['Member', 'HP', 'Poin', 'Status']}
+                        pageSize={4}
+                        actions={[
+                            { label: 'PDF' },
+                            { label: 'Excel' },
+                            { label: 'Print', onClick: printDashboard },
+                        ]}
+                        renderRow={(member) => (
+                            <>
+                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{member.name}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{member.phone}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{member.points} pts</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{member.status}</td>
+                            </>
+                        )}
+                    />
+
+                    <ReportSectionTable
+                        title="Inventaris"
+                        rows={supplyRows}
+                        columns={['Item', 'Stok', 'Outlet', 'Status']}
+                        pageSize={4}
+                        actions={[
+                            { label: 'PDF' },
+                            { label: 'Excel' },
+                            { label: 'Print', onClick: printDashboard },
+                        ]}
+                        renderRow={(item) => (
+                            <>
+                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.name}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{item.stock}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{item.outlet}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{item.status}</td>
+                            </>
+                        )}
+                    />
+
+                    <ReportSectionTable
+                        title="Riwayat Tambah Stok"
+                        rows={movementRows}
+                        columns={['ID', 'Item', 'Perubahan', 'Outlet']}
+                        pageSize={4}
+                        actions={[
+                            { label: 'PDF' },
+                            { label: 'Excel' },
+                            { label: 'Print', onClick: printDashboard },
+                        ]}
+                        renderRow={(item) => (
+                            <>
+                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{item.item}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{item.direction} {item.qty}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{item.outlet}</td>
+                            </>
+                        )}
+                    />
+
+                    <ReportSectionTable
+                        title="Komplain"
+                        rows={complaintRows}
+                        columns={['Tiket', 'Masalah', 'Outlet', 'Status']}
+                        pageSize={3}
+                        actions={[
+                            { label: 'PDF' },
+                            { label: 'Excel' },
+                            { label: 'Print', onClick: printDashboard },
+                        ]}
+                        renderRow={(ticket) => (
+                            <>
+                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{ticket.id}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{ticket.issue}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{ticket.outlet}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{ticket.status}</td>
+                            </>
+                        )}
+                    />
+
+                    <ReportSectionTable
+                        title="Investor"
+                        rows={investorRows}
+                        columns={['Investor', 'ROI', 'Akses', 'Ticket']}
+                        pageSize={3}
+                        actions={[
+                            { label: 'PDF' },
+                            { label: 'Excel' },
+                            { label: 'Print', onClick: printDashboard },
+                        ]}
+                        renderRow={(item) => (
+                            <>
+                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.name}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{item.roi}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{item.access}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{item.ticket}</td>
+                            </>
+                        )}
+                    />
+
+                    <ReportSectionTable
+                        title="Menu"
+                        rows={menuRows}
+                        columns={['Menu', 'Kategori', 'Harga', 'Status']}
+                        pageSize={4}
+                        actions={[
+                            { label: 'PDF' },
+                            { label: 'Excel' },
+                            { label: 'Print', onClick: printDashboard },
+                        ]}
+                        renderRow={(item) => (
+                            <>
+                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.name}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{item.category}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{item.price}</td>
+                                <td className="p-4 text-sm text-[#176637]/70">{item.status}</td>
+                            </>
+                        )}
+                    />
+                </div>
+
+                <aside className="space-y-6">
+                    <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                        <h3 className="font-gabriela text-2xl text-[#176637]">Preview Print</h3>
+                        <div className="mt-4 rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB] p-4">
+                            <div className="rounded-[20px] bg-white p-4 shadow-sm">
+                                <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Admin Pusat</div>
+                                <div className="mt-2 font-gabriela text-2xl text-[#176637]">Ringkasan Cetak</div>
+                                <div className="mt-4 space-y-3">
+                                    {financeRows.map((row) => (
+                                        <div key={row.label} className="flex items-center justify-between border-b border-[#176637]/8 pb-2 text-sm">
+                                            <span className="text-[#176637]/70">{row.label}</span>
+                                            <span className="font-bold text-[#176637]">{row.value}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                        <h3 className="font-gabriela text-2xl text-[#176637]">Ekspor Cepat</h3>
+                        <p className="mt-2 text-sm text-[#176637]/65">Unduh semua tabel sekaligus atau pilih tabel tertentu dari masing-masing section.</p>
+                        <div className="mt-4 grid gap-3">
+                            <button className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Semua PDF</button>
+                            <button className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Semua Excel</button>
+                            <button onClick={() => window.print()} className="rounded-2xl bg-[#176637] px-4 py-3 text-sm font-bold text-[#FFF6DB]">
+                                Cetak Semua
+                            </button>
+                        </div>
+                    </section>
+                </aside>
+            </div>
+        </div>
+    );
+}
+
+function ReportSectionTable({ title, rows, columns, renderRow, actions = [], pageSize = 5 }) {
+    const [page, setPage] = useState(1);
+    const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+    const currentPage = Math.min(page, totalPages);
+    const pageRows = rows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+    return (
+        <section className="overflow-hidden rounded-[28px] border-2 border-[#176637]/10 bg-white shadow-sm">
+            <div className="flex flex-col gap-4 border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
+                <h3 className="font-gabriela text-2xl text-[#176637]">{title}</h3>
+                <div className="flex flex-wrap gap-2">
+                    {actions.map((action) => (
+                        <button
+                            key={`${title}-${action.label}`}
+                            onClick={action.onClick}
+                            className={`rounded-full px-3 py-1.5 text-xs font-bold ${
+                                action.label === 'PDF' ? 'bg-[#176637] text-[#FFF6DB]' : 'border border-[#176637]/15 bg-white text-[#176637]'
+                            }`}
+                        >
+                            {action.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+            <div className="overflow-x-auto">
+                <table className="min-w-full text-left">
+                    <thead>
+                        <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                            {columns.map((column) => (
+                                <th key={column} className="p-4 pl-6 first:pl-6">{column}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {pageRows.map((row, index) => (
+                            <tr key={row.id ?? row.key ?? `${title}-${index}`} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                {renderRow(row, index)}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div className="flex flex-col gap-3 border-t border-[#176637]/10 bg-[#FFF6DB]/60 px-6 py-4 text-sm text-[#176637]/70 md:flex-row md:items-center md:justify-between">
+                <div>Menampilkan {pageRows.length} dari {rows.length} data</div>
+                <div className="flex items-center gap-2">
+                    <button onClick={() => setPage((value) => Math.max(1, value - 1))} className="rounded-lg border border-[#176637]/10 bg-white px-3 py-2 text-[#176637]">
+                        <Icon name="chevronLeft" className="h-4 w-4" stroke />
+                    </button>
+                    {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                        <button
+                            key={pageNumber}
+                            onClick={() => setPage(pageNumber)}
+                            className={`min-w-10 rounded-lg px-3 py-2 font-bold ${pageNumber === currentPage ? 'bg-[#176637] text-[#FFF6DB]' : 'text-[#176637]/70 hover:bg-white'}`}
+                        >
+                            {pageNumber}
+                        </button>
+                    ))}
+                    <button onClick={() => setPage((value) => Math.min(totalPages, value + 1))} className="rounded-lg border border-[#176637]/10 bg-white px-3 py-2 text-[#176637]">
+                        <Icon name="chevronRight" className="h-4 w-4" stroke />
+                    </button>
+                </div>
+            </div>
+        </section>
+    );
+}
+
 function PlaceholderTab({ title, description }) {
     return (
         <div className="animate-slide-up flex min-h-[420px] flex-col items-center justify-center text-center text-[#176637]/40">
@@ -1412,12 +1628,12 @@ export default function AdminDashboardPage({ data = {} }) {
                 return 'Membership';
             case 'stok':
                 return 'Supply Chain';
-            case 'master-stok':
-                return 'Master Stok';
             case 'komplain':
                 return 'Komplain';
             case 'investor':
                 return 'Manajemen Investor';
+            case 'rekap':
+                return 'Rekap Laporan';
             default:
                 return 'Menu Sagara Lattea';
         }
@@ -1486,10 +1702,23 @@ export default function AdminDashboardPage({ data = {} }) {
                     {activeMenu === 'menu' && <MenuTab menuItems={menuItems} />}
                     {activeMenu === 'karyawan' && <EmployeeTab employees={employees} />}
                     {activeMenu === 'member' && <MembershipTab members={members} />}
-                    {activeMenu === 'stok' && <SupplyChainTab items={supply} masterItems={data.masterStockData ?? []} movements={movements} setActiveMenu={setActiveMenu} />}
-                    {activeMenu === 'master-stok' && <MasterStockTab items={data.masterStockData ?? supply} setActiveMenu={setActiveMenu} />}
+                    {activeMenu === 'stok' && <SupplyChainTab items={supply} movements={movements} />}
                     {activeMenu === 'komplain' && <ComplaintTab complaints={complaintItems.length ? complaintItems : complaints} />}
                     {activeMenu === 'investor' && <InvestorTab investors={investors} />}
+                    {activeMenu === 'rekap' && (
+                        <ReportTab
+                            menuItems={menuItems}
+                            employees={employees}
+                            members={members}
+                            supply={supply}
+                            complaints={complaintItems.length ? complaintItems : complaints}
+                            promos={promos}
+                            investorData={investors}
+                            outlets={outlets}
+                            movements={movements}
+                            salesData={sales}
+                        />
+                    )}
                 </div>
             </main>
         </div>

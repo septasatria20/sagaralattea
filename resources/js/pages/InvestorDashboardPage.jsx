@@ -40,6 +40,20 @@ const outletStats = [
     { name: 'Outlet Senayan', omzet: 'Rp 22.300.000', trend: '-2%', status: 'Perlu Perhatian' },
 ];
 
+const dailyReports = [
+    { label: 'Pagi', value: 'Rp 8.200.000', note: 'Transaksi 08.00 - 12.00' },
+    { label: 'Siang', value: 'Rp 11.450.000', note: 'Transaksi 12.00 - 16.00' },
+    { label: 'Sore', value: 'Rp 6.850.000', note: 'Transaksi 16.00 - 20.00' },
+    { label: 'Malam', value: 'Rp 3.400.000', note: 'Transaksi 20.00 - 23.00' },
+];
+
+const yearlyReports = [
+    { label: 'Q1', value: 'Rp 145.000.000', note: 'Jan - Mar' },
+    { label: 'Q2', value: 'Rp 168.000.000', note: 'Apr - Jun' },
+    { label: 'Q3', value: 'Rp 182.000.000', note: 'Jul - Sep' },
+    { label: 'Q4', value: 'Rp 220.000.000', note: 'Okt - Des' },
+];
+
 function Icon({ name, className = 'h-5 w-5', stroke = false }) {
     const path = iconPaths[name];
     if (!path) return null;
@@ -108,6 +122,7 @@ function Sidebar({ logoUrl, activeTab, setActiveTab }) {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const navItems = [
         { id: 'investor_dashboard', icon: 'dashboard', label: 'Dashboard Investor' },
+        { id: 'report', icon: 'report', label: 'Rekap Laporan' },
     ];
 
     return (
@@ -259,6 +274,9 @@ function MonthlyChart() {
 }
 
 function Overview() {
+    const [selectedOutlet, setSelectedOutlet] = useState(outletStats[0]?.name ?? '');
+    const activeOutlet = outletStats.find((item) => item.name === selectedOutlet) ?? outletStats[0];
+
     return (
         <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
             <div className="absolute top-0 right-0 h-64 w-full opacity-5 pointer-events-none z-0">
@@ -347,6 +365,204 @@ function Overview() {
                         </div>
                     ))}
                 </div>
+
+                <section className="mt-8 rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                    <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                            <h3 className="font-gabriela text-2xl text-[#176637]">Rekap Laporan Investor</h3>
+                            <p className="text-sm text-[#176637]/60">Pilih outlet dulu, lalu lihat ringkasan finance dan performanya.</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <select
+                                value={selectedOutlet}
+                                onChange={(event) => setSelectedOutlet(event.target.value)}
+                                className="rounded-full border-2 border-[#176637]/15 bg-[#FFF6DB] px-4 py-2 text-sm font-semibold text-[#176637] outline-none"
+                            >
+                                {outletStats.map((outlet) => (
+                                    <option key={outlet.name}>{outlet.name}</option>
+                                ))}
+                            </select>
+                            <button className="rounded-full bg-[#176637] px-4 py-2 text-sm font-bold text-[#FFF6DB]">PDF</button>
+                            <button className="rounded-full border border-[#176637]/15 px-4 py-2 text-sm font-bold text-[#176637]">Excel</button>
+                            <button className="rounded-full border border-[#176637]/15 px-4 py-2 text-sm font-bold text-[#176637]">Print</button>
+                        </div>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-3">
+                        {[
+                            { title: 'Pendapatan Outlet', value: activeOutlet?.omzet ?? '-', note: 'Bulan berjalan' },
+                            { title: 'ROI Outlet', value: activeOutlet?.trend ?? '-', note: 'Perbandingan performa' },
+                            { title: 'Status Outlet', value: activeOutlet?.status ?? '-', note: 'Monitoring operasional' },
+                        ].map((item) => (
+                            <div key={item.title} className="rounded-[24px] border border-[#176637]/10 bg-[#FFF6DB]/35 p-5">
+                                <div className="text-sm font-bold uppercase tracking-[0.18em] text-[#176637]/55">{item.title}</div>
+                                <div className="mt-3 font-gabriela text-2xl text-[#176637]">{item.value}</div>
+                                <div className="mt-2 text-sm text-[#176637]/65">{item.note}</div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            </div>
+        </div>
+    );
+}
+
+function ReportView() {
+    const [selectedOutlet, setSelectedOutlet] = useState('Semua Outlet');
+    const visibleOutlets = selectedOutlet === 'Semua Outlet' ? outletStats : outletStats.filter((item) => item.name === selectedOutlet);
+
+    return (
+        <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
+            <header className="mb-8 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                <div>
+                    <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Rekap Laporan</h1>
+                    <p className="text-sm font-medium text-[#72AD43]">Pilih outlet dulu, lalu buka tabel finance dan performa</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                    <select
+                        value={selectedOutlet}
+                        onChange={(event) => setSelectedOutlet(event.target.value)}
+                        className="rounded-full border-2 border-[#176637]/15 bg-white px-4 py-2 text-sm font-semibold text-[#176637] outline-none"
+                    >
+                        <option>Semua Outlet</option>
+                        {outletStats.map((outlet) => (
+                            <option key={outlet.name}>{outlet.name}</option>
+                        ))}
+                    </select>
+                </div>
+            </header>
+
+            <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+                <div className="space-y-6">
+                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
+                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
+                            <h2 className="font-gabriela text-2xl text-[#176637]">Finance Per Outlet</h2>
+                        </div>
+                        <table className="min-w-full text-left">
+                            <thead>
+                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                    <th className="p-4 pl-6">Item</th>
+                                    <th className="p-4">Nilai</th>
+                                    <th className="p-4">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {visibleOutlets.map((outlet) => (
+                                    <tr key={outlet.name} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{outlet.name}</td>
+                                        <td className="p-4 text-sm font-semibold text-[#176637]">{outlet.omzet}</td>
+                                        <td className="p-4 text-sm text-[#176637]/70">{outlet.status}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
+                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
+                            <h2 className="font-gabriela text-2xl text-[#176637]">Rekap Harian</h2>
+                        </div>
+                        <table className="min-w-full text-left">
+                            <thead>
+                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                    <th className="p-4 pl-6">Periode</th>
+                                    <th className="p-4">Nilai</th>
+                                    <th className="p-4">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {dailyReports.map((item) => (
+                                    <tr key={item.label} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
+                                        <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
+                                        <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
+                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
+                            <h2 className="font-gabriela text-2xl text-[#176637]">Performa Outlet Bulanan</h2>
+                        </div>
+                        <table className="min-w-full text-left">
+                            <thead>
+                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                    <th className="p-4 pl-6">Outlet</th>
+                                    <th className="p-4">Omzet</th>
+                                    <th className="p-4">Trend</th>
+                                    <th className="p-4">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {visibleOutlets.map((outlet) => (
+                                    <tr key={outlet.name} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{outlet.name}</td>
+                                        <td className="p-4 text-sm text-[#176637]/70">{outlet.omzet}</td>
+                                        <td className="p-4 text-sm font-semibold text-[#176637]">{outlet.trend}</td>
+                                        <td className="p-4 text-sm text-[#176637]/70">{outlet.status}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
+                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
+                            <h2 className="font-gabriela text-2xl text-[#176637]">Rekap Tahunan</h2>
+                        </div>
+                        <table className="min-w-full text-left">
+                            <thead>
+                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                    <th className="p-4 pl-6">Periode</th>
+                                    <th className="p-4">Nilai</th>
+                                    <th className="p-4">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {yearlyReports.map((item) => (
+                                    <tr key={item.label} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
+                                        <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
+                                        <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+
+                <aside className="space-y-6">
+                    <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                        <h3 className="font-gabriela text-2xl text-[#176637]">Preview Print</h3>
+                        <div className="mt-4 rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB] p-4">
+                            <div className="rounded-[20px] bg-white p-4 shadow-sm">
+                                <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">{selectedOutlet}</div>
+                                <div className="mt-2 font-gabriela text-2xl text-[#176637]">Investor Report</div>
+                                <div className="mt-4 space-y-3">
+                                    {(visibleOutlets.length ? visibleOutlets : outletStats).map((outlet) => (
+                                        <div key={outlet.name} className="flex items-center justify-between border-b border-[#176637]/8 pb-2 text-sm">
+                                            <span className="text-[#176637]/70">{outlet.name}</span>
+                                            <span className="font-bold text-[#176637]">{outlet.omzet}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                        <h3 className="font-gabriela text-2xl text-[#176637]">Ekspor Cepat</h3>
+                        <div className="mt-4 grid gap-3">
+                            <button className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh PDF</button>
+                            <button className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Excel</button>
+                            <button onClick={() => window.print()} className="rounded-2xl bg-[#176637] px-4 py-3 text-sm font-bold text-[#FFF6DB]">
+                                Buka Print Preview
+                            </button>
+                        </div>
+                    </section>
+                </aside>
             </div>
         </div>
     );
@@ -364,6 +580,7 @@ export default function InvestorDashboardPage({ data }) {
                 <Sidebar logoUrl={logoUrl} activeTab={activeTab} setActiveTab={setActiveTab} />
                 <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
                     {activeTab === 'investor_dashboard' && <Overview />}
+                    {activeTab === 'report' && <ReportView />}
                 </div>
             </div>
         </>
