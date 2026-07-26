@@ -39,7 +39,7 @@ class HomeController extends Controller
         $items = MenuItem::query()
             ->where('is_featured', true)
             ->orderBy('sort_order')
-            ->limit(4)
+            ->limit(9)
             ->get();
 
         return $items->isNotEmpty() ? $items : collect($this->fallbackMenuItems());
@@ -70,6 +70,7 @@ class HomeController extends Controller
                 'price' => 32000,
                 'category' => 'Signature',
                 'accent_color' => '#0f5f43',
+                'image' => asset('minum2.png'),
             ],
             [
                 'name' => 'Aren Cloud',
@@ -77,6 +78,7 @@ class HomeController extends Controller
                 'price' => 29000,
                 'category' => 'Best Seller',
                 'accent_color' => '#8b5e34',
+                'image' => asset('minum2.png'),
             ],
             [
                 'name' => 'Matcha Bloom',
@@ -84,6 +86,7 @@ class HomeController extends Controller
                 'price' => 34000,
                 'category' => 'Fresh Pick',
                 'accent_color' => '#5e7f32',
+                'image' => asset('minum2.png'),
             ],
             [
                 'name' => 'Cocoa Drift',
@@ -91,6 +94,47 @@ class HomeController extends Controller
                 'price' => 30000,
                 'category' => 'Comfort',
                 'accent_color' => '#6f4d38',
+                'image' => asset('minum2.png'),
+            ],
+            [
+                'name' => 'Jasmine Glow',
+                'tagline' => 'Jasmine tea yang ringan dan bersih.',
+                'price' => 27000,
+                'category' => 'Tea Series',
+                'accent_color' => '#72AD43',
+                'image' => asset('minum2.png'),
+            ],
+            [
+                'name' => 'Oolong Breeze',
+                'tagline' => 'Oolong halus dengan aftertaste lembut.',
+                'price' => 30000,
+                'category' => 'Tea Series',
+                'accent_color' => '#176637',
+                'image' => asset('minum2.png'),
+            ],
+            [
+                'name' => 'Honey Milk Tea',
+                'tagline' => 'Teh susu hangat dengan sentuhan madu.',
+                'price' => 31000,
+                'category' => 'Milk Tea',
+                'accent_color' => '#FF901A',
+                'image' => asset('minum2.png'),
+            ],
+            [
+                'name' => 'Caramel Foam',
+                'tagline' => 'Lembut, manis, dan creamy di satu tegukan.',
+                'price' => 33000,
+                'category' => 'Signature',
+                'accent_color' => '#a56a3a',
+                'image' => asset('minum2.png'),
+            ],
+            [
+                'name' => 'Citrus Tea Spark',
+                'tagline' => 'Segar, ringan, dan cocok diminum siang hari.',
+                'price' => 28000,
+                'category' => 'Fresh Pick',
+                'accent_color' => '#5f8f2d',
+                'image' => asset('minum2.png'),
             ],
         ];
     }

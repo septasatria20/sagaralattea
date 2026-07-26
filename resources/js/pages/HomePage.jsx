@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const colors = {
     forest: '#176637',
@@ -10,8 +10,8 @@ const colors = {
 const navigation = ['Varian', 'Outlet', 'Promo', 'Sosial Media'];
 
 function LogoMark({ variant = 'light' }) {
-    const textClass = variant === 'dark' ? 'text-[#FFF6DB]' : 'text-[#176637]';
-    const logoUrl = '/logosagaralattea.png';
+    const textClass = variant === 'light' ? 'text-[#FFF6DB]' : 'text-[#176637]';
+    const logoUrl = variant === 'light' ? '/logofooter.png' : '/logosagaralattea.png';
 
     return (
         <div className={`-ml-2 flex flex-col items-start gap-1 ${textClass}`}>
@@ -23,20 +23,25 @@ function LogoMark({ variant = 'light' }) {
     );
 }
 
-function Navbar() {
+function Navbar({ scrolled = false }) {
+    const navClass = scrolled
+        ? 'bg-[#FFF6DB]/92 text-[#176637] shadow-[0_10px_30px_rgba(23,102,55,0.08)] backdrop-blur-md'
+        : 'bg-transparent text-[#FFF6DB]';
+    const linkClass = scrolled ? 'hover:text-[#FF901A]' : 'hover:text-[#FFF6DB]';
+    const dividerClass = scrolled ? 'bg-[#176637]/20' : 'bg-[#FFF6DB]/45';
+
     return (
-        <header className="relative z-50 overflow-hidden">
-            <LeafArt className="right-[-110px] top-[-40px] hidden h-[220px] w-[220px] lg:block" crop="right" flip opacityClass="opacity-[0.05]" />
-            <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-6 md:px-8">
-                <LogoMark />
+        <header className={`fixed left-0 top-0 z-50 w-full transition-all duration-300 ${navClass}`}>
+            <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 md:px-8">
+                <LogoMark variant={scrolled ? 'dark' : 'light'} />
                 <div className="hidden items-center gap-8 font-medium md:flex">
                     {navigation.map((item) => (
-                        <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} className="transition hover:text-[#FF901A]">
+                        <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} className={`transition ${linkClass}`}>
                             {item}
                         </a>
                     ))}
-                    <div className="h-4 w-px bg-[#176637]/30" />
-                    <a href="/login" className="transition hover:text-[#72AD43]">
+                    <div className={`h-4 w-px ${dividerClass}`} />
+                    <a href="/login" className={`transition ${linkClass}`}>
                         Login
                     </a>
                     <button className="rounded-full bg-[#FF901A] px-6 py-2 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#176637]">
@@ -129,69 +134,44 @@ function SproutDivider() {
 
 function Hero({ brand }) {
     return (
-        <section className="relative overflow-hidden">
+        <section
+            className="relative overflow-hidden bg-cover bg-center bg-no-repeat"
+            style={{
+                backgroundImage: "url('/backgroundlandingpage.png')",
+            }}
+        >
+            <div className="absolute inset-0 bg-gradient-to-r from-[#176637]/85 via-[#176637]/40 to-transparent"></div>
             <LeafArt className="left-[-120px] top-[-60px] hidden h-[460px] w-[460px] md:block" crop="left" opacityClass="opacity-[0.08]" />
             <LeafArt className="right-[-90px] top-10 hidden h-[260px] w-[260px] lg:block" crop="right" flip opacityClass="opacity-[0.07]" />
 
-            <div className="mx-auto grid max-w-7xl items-center gap-14 px-6 pb-24 pt-10 md:px-8 lg:grid-cols-2 lg:gap-10">
+            <div className="relative z-10 mx-auto grid min-h-[720px] max-w-7xl items-center gap-14 px-6 pb-24 pt-32 md:px-8 lg:grid-cols-2 lg:gap-10">
                 <div className="relative z-10 text-center lg:text-left">
-                    <h1 className="reveal font-gabriela mt-6 text-5xl leading-tight text-[#176637] md:text-6xl lg:text-7xl">
+                    <h1 className="reveal font-gabriela mt-6 text-5xl leading-tight text-[#FFF6DB] drop-shadow-md md:text-6xl lg:text-7xl">
                         Start your day the Lattea way.
                     </h1>
-                    <p className="reveal mx-auto mt-6 max-w-xl text-base leading-8 text-[#176637]/80 lg:mx-0 lg:text-lg" style={{ animationDelay: '0.08s' }}>
+                    <p className="reveal mx-auto mt-6 max-w-xl text-base leading-8 text-[#FFF6DB]/90 drop-shadow-sm lg:mx-0 lg:text-lg" style={{ animationDelay: '0.08s' }}>
                         Nikmati perpaduan teh premium dan bahan organik terbaik untuk gaya hidup sehatmu. Rasakan kemurnian alam dalam gelas yang menyegarkan
                         hari-harimu.
                     </p>
                     <div className="reveal mt-8 flex flex-col justify-center gap-4 sm:flex-row lg:justify-start" style={{ animationDelay: '0.16s' }}>
-                        <button className="rounded-br-3xl rounded-tl-3xl bg-[#176637] px-8 py-3.5 font-semibold text-[#FFF6DB] shadow-[4px_4px_0px_#0f3f22] transition hover:-translate-y-0.5 hover:bg-[#1c7340]">
+                        <button className="rounded-br-3xl rounded-tl-3xl bg-[#FF901A] px-8 py-3.5 font-semibold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:-translate-y-0.5 hover:bg-[#e68217] hover:shadow-[2px_2px_0px_#176637]">
                             Pesan Sekarang
                         </button>
-                        <button className="rounded-bl-3xl rounded-tr-3xl border-2 border-[#176637] px-8 py-3.5 font-semibold text-[#176637] transition hover:bg-[#176637]/5">
+                        <button className="rounded-bl-3xl rounded-tr-3xl border-2 border-[#FFF6DB] px-8 py-3.5 font-semibold text-[#FFF6DB] transition hover:bg-[#FFF6DB] hover:text-[#176637]">
                             Lihat Menu
                         </button>
                     </div>
 
                     <div className="reveal mt-12 grid grid-cols-3 gap-3" style={{ animationDelay: '0.24s' }}>
                         {['12K+ cup served', '98% happy customer', '4.9/5 taste rating'].map((item) => (
-                            <div key={item} className="rounded-[28px] border border-[#176637]/10 bg-white/80 px-4 py-5 text-center shadow-sm">
-                                <div className="font-gabriela text-2xl text-[#176637]">{item.split(' ')[0]}</div>
-                                <div className="mt-1 text-[11px] uppercase tracking-[0.2em] text-[#176637]/60">{item.split(' ').slice(1).join(' ')}</div>
+                            <div key={item} className="rounded-[28px] border border-[#FFF6DB]/30 bg-[#176637]/40 px-4 py-5 text-center shadow-lg backdrop-blur-md">
+                                <div className="font-gabriela text-2xl text-[#FFF6DB]">{item.split(' ')[0]}</div>
+                                <div className="mt-1 text-[11px] uppercase tracking-[0.2em] text-[#FFF6DB]/90">{item.split(' ').slice(1).join(' ')}</div>
                             </div>
                         ))}
                     </div>
                 </div>
-
-                <div className="relative z-10 flex justify-center">
-                    <div className="relative">
-                        <LeafArt className="left-[-40px] top-[70px] hidden h-32 w-32 lg:block" crop="top" opacityClass="opacity-15" />
-                        <LeafArt className="right-[-50px] bottom-[36px] hidden h-28 w-28 lg:block" crop="bottom" flip opacityClass="opacity-[0.12]" />
-                        <div className="absolute left-1/2 top-[-30px] z-20 flex -translate-x-1/2 gap-4 opacity-70">
-                            <div className="animate-[steamRise_4s_ease-in-out_infinite] h-16 w-2 rounded-full bg-white blur-[4px]" />
-                            <div className="animate-[steamRise_4s_ease-in-out_infinite] h-20 w-3 rounded-full bg-white blur-[5px]" style={{ animationDelay: '1.2s' }} />
-                            <div className="animate-[steamRise_4s_ease-in-out_infinite] h-12 w-2 rounded-full bg-white blur-[4px]" style={{ animationDelay: '2.4s' }} />
-                        </div>
-                        <div className="relative flex h-[560px] w-[410px] flex-col items-center justify-end overflow-hidden rounded-t-[150px] rounded-b-[46px] border-2 border-[#176637] bg-[#FFF6DB]/40 text-center shadow-lg">
-                            <div className="absolute inset-x-10 top-10 h-40 rounded-full bg-[#72AD43]/12 blur-3xl" />
-                            <div className="relative z-10 mb-0 -translate-y-[72px] flex h-[480px] w-[380px] items-end justify-center">
-                                <img
-                                    src="/minum2.png"
-                                    alt="Minuman Sagara Lattea"
-                                    className="h-full w-full scale-[1.3] transform object-contain object-bottom bg-transparent mix-blend-normal drop-shadow-[0_28px_48px_rgba(23,102,55,0.22)]"
-                                />
-                            </div>
-                            <div className="absolute bottom-0 left-0 h-[120px] w-[200%] animate-[waveFlow_6s_linear_infinite] opacity-60">
-                                <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="h-full w-full fill-[#72AD43]">
-                                    <path d="M0,60 C150,100 300,20 450,60 C600,100 750,20 900,60 C1050,100 1200,20 1200,60 L1200,120 L0,120 Z" />
-                                </svg>
-                            </div>
-                            <div className="absolute bottom-0 left-0 h-[100px] w-[200%] animate-[waveFlow_8s_linear_infinite] opacity-90" style={{ animationDirection: 'reverse' }}>
-                                <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="h-full w-full fill-[#176637]">
-                                    <path d="M0,40 C150,80 300,0 450,40 C600,80 750,0 900,40 C1050,80 1200,0 1200,40 L1200,120 L0,120 Z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div className="hidden min-h-[560px] lg:block" />
             </div>
         </section>
     );
@@ -265,10 +245,89 @@ function PromoSection({ promos = [] }) {
 }
 
 function ProductSection({ items }) {
+    const [activeCategory, setActiveCategory] = useState('Semua Menu');
     const fallback = [
-        { id: 1, name: 'Matcha Lattea Signature', desc: 'Paduan matcha Jepang dan susu creamy.', price: '25.000', color: '#72AD43' },
-        { id: 2, name: 'Houjicha Roasted Calm', desc: 'Teh panggang yang kaya rasa dengan sentuhan karamel.', price: '28.000', color: '#FF901A' },
-        { id: 3, name: 'Earl Grey Citrus Splash', desc: 'Kesegaran earl grey klasik berpadu creamy milk.', price: '26.000', color: '#176637' },
+        {
+            id: 1,
+            name: 'Matcha Lattea Signature',
+            desc: 'Paduan matcha Jepang dan susu creamy.',
+            price: '25.000',
+            color: '#72AD43',
+            image: '/minum2.png',
+            category: 'Signature',
+        },
+        {
+            id: 2,
+            name: 'Houjicha Roasted Calm',
+            desc: 'Teh panggang yang kaya rasa dengan sentuhan karamel.',
+            price: '28.000',
+            color: '#FF901A',
+            image: '/minum2.png',
+            category: 'Signature',
+        },
+        {
+            id: 3,
+            name: 'Earl Grey Citrus Splash',
+            desc: 'Kesegaran earl grey klasik berpadu creamy milk.',
+            price: '26.000',
+            color: '#176637',
+            image: '/minum2.png',
+            category: 'Tea Series',
+        },
+        {
+            id: 4,
+            name: 'Jasmine Glow',
+            desc: 'Jasmine tea yang ringan dan bersih.',
+            price: '27.000',
+            color: '#72AD43',
+            image: '/minum2.png',
+            category: 'Tea Series',
+        },
+        {
+            id: 5,
+            name: 'Oolong Breeze',
+            desc: 'Oolong halus dengan aftertaste lembut.',
+            price: '30.000',
+            color: '#176637',
+            image: '/minum2.png',
+            category: 'Tea Series',
+        },
+        {
+            id: 6,
+            name: 'Honey Milk Tea',
+            desc: 'Teh susu hangat dengan sentuhan madu.',
+            price: '31.000',
+            color: '#FF901A',
+            image: '/minum2.png',
+            category: 'Milk Tea',
+        },
+        {
+            id: 7,
+            name: 'Caramel Foam',
+            desc: 'Lembut, manis, dan creamy di satu tegukan.',
+            price: '33.000',
+            color: '#a56a3a',
+            image: '/minum2.png',
+            category: 'Signature',
+        },
+        {
+            id: 8,
+            name: 'Citrus Tea Spark',
+            desc: 'Segar, ringan, dan cocok diminum siang hari.',
+            price: '28.000',
+            color: '#5f8f2d',
+            image: '/minum2.png',
+            category: 'Fresh Pick',
+        },
+        {
+            id: 9,
+            name: 'Aren Cloud',
+            desc: 'Espresso, palm sugar, dan silky milk seimbang.',
+            price: '29.000',
+            color: '#8b5e34',
+            image: '/minum2.png',
+            category: 'Best Seller',
+        },
     ];
     const products = items?.length
         ? items.map((item, index) => ({
@@ -277,8 +336,12 @@ function ProductSection({ items }) {
               desc: item.tagline ?? item.description ?? '',
               price: Number(item.price).toLocaleString('id-ID'),
               color: item.accent_color ?? fallback[index % fallback.length].color,
+              image: item.image ?? fallback[index % fallback.length].image,
+              category: item.category ?? fallback[index % fallback.length].category,
           }))
         : fallback;
+    const categories = ['Semua Menu', ...new Set(products.map((item) => item.category).filter(Boolean))];
+    const visibleProducts = activeCategory === 'Semua Menu' ? products : products.filter((item) => item.category === activeCategory);
 
     return (
         <section className="mx-auto max-w-7xl px-6 py-16 md:px-8" id="varian">
@@ -286,24 +349,52 @@ function ProductSection({ items }) {
                 <SectionTitle eyebrow="Pilihan Rasa" title="Diramu dengan daun teh pilihan dan susu segar." align="center" />
             </div>
 
-            <div className="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
-                {products.map((item) => (
-                    <article key={item.id} className="group relative overflow-hidden rounded-tl-[40px] rounded-br-[40px] border-2 border-[#176637]/10 bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#72AD43] hover:shadow-xl">
-                        <div className="absolute right-0 top-0 h-16 w-16 rounded-bl-[40px] bg-[#72AD43]/10" />
-                        <LeafArt className="left-[-30px] top-[-20px] h-24 w-24" crop="left" opacityClass="opacity-[0.08]" />
-                        <div className="relative z-10 mb-6 flex h-56 items-center justify-center overflow-hidden rounded-tl-2xl rounded-br-2xl border border-[#176637]/5 bg-[#FFF6DB]/50">
-                            <span className="text-xs font-medium tracking-wide text-[#176637]/40">
-                                FOTO PRODUK
-                                <br />
-                                (Transparan)
-                            </span>
-                            <div className="absolute inset-x-8 bottom-0 h-16 rounded-t-full opacity-40" style={{ background: item.color }} />
+            <div className="mt-8 flex flex-wrap justify-center gap-2">
+                {categories.map((category) => (
+                    <button
+                        key={category}
+                        onClick={() => setActiveCategory(category)}
+                        className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                            activeCategory === category
+                                ? 'bg-[#176637] text-[#FFF6DB] shadow-[3px_3px_0px_#0f3f22]'
+                                : 'border border-[#176637]/10 bg-[#FFF6DB] text-[#176637] hover:border-[#72AD43]'
+                        }`}
+                    >
+                        {category}
+                    </button>
+                ))}
+            </div>
+
+            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6">
+                {visibleProducts.map((item) => (
+                    <article
+                        key={item.id}
+                        className="group relative overflow-hidden rounded-[20px] border border-[#176637]/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#72AD43] hover:shadow-lg"
+                    >
+                        <div className="absolute right-0 top-0 h-9 w-9 rounded-bl-[20px] bg-[#72AD43]/10" />
+                        <LeafArt className="left-[-20px] top-[-14px] h-14 w-14" crop="left" opacityClass="opacity-[0.05]" />
+                        <div className="relative z-10 mb-2.5 flex h-28 items-center justify-center overflow-hidden rounded-[16px] border border-[#176637]/5 bg-[#FFF6DB]/55">
+                            <img
+                                src={item.image ?? '/minum2.png'}
+                                alt={item.name}
+                                className="h-full w-full object-contain object-bottom p-1.5 drop-shadow-[0_10px_16px_rgba(23,102,55,0.14)] transition duration-300 group-hover:scale-[1.03]"
+                            />
+                            <div className="absolute inset-x-8 bottom-2 h-7 rounded-full opacity-20 blur-xl" style={{ background: item.color }} />
                         </div>
-                        <h3 className="relative z-10 text-xl font-bold text-[#176637]">{item.name}</h3>
-                        <p className="relative z-10 mt-2 text-sm text-[#176637]/70">{item.desc}</p>
-                        <div className="relative z-10 mt-6 flex items-center justify-between border-t border-[#176637]/10 pt-4">
-                            <span className="font-bold tabular-nums text-[#FF901A]">Rp {item.price}</span>
-                            <button className="rounded-full bg-[#176637] p-2.5 text-[#FFF6DB] shadow-md transition hover:bg-[#72AD43]">+</button>
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                                <h3 className="truncate text-[14px] font-bold leading-4 text-[#176637]">{item.name}</h3>
+                                <p className="mt-1 h-9 overflow-hidden text-[10px] leading-4 text-[#176637]/68">{item.desc}</p>
+                            </div>
+                            <div className="shrink-0 rounded-full bg-[#176637]/8 px-2 py-0.5 text-[9px] font-bold text-[#176637]">
+                                Menu
+                            </div>
+                        </div>
+                        <div className="relative z-10 mt-2.5 flex items-center justify-between border-t border-[#176637]/10 pt-2">
+                            <span className="text-[13px] font-bold tabular-nums text-[#FF901A]">Rp {item.price}</span>
+                            <button className="rounded-full bg-[#176637] px-2 py-0.5 text-[10px] font-semibold text-[#FFF6DB] shadow-sm transition hover:bg-[#72AD43]">
+                                Pesan
+                            </button>
                         </div>
                     </article>
                 ))}
@@ -369,7 +460,7 @@ function Footer() {
             <div className="mx-auto grid max-w-7xl gap-12 px-6 md:grid-cols-12 md:px-8">
                 <div className="md:col-span-5">
                     <div className="mb-6">
-                        <img src="/logosagaralattea.png" alt="Sagara Lattea" className="h-20 w-auto object-contain" />
+                        <img src="/logofooter.png" alt="Sagara Lattea" className="h-20 w-auto object-contain" />
                         <div className="mt-2 text-[10px] font-semibold uppercase tracking-[0.38em] text-[#FFF6DB]/80">Special fresh latte tea</div>
                     </div>
                     <p className="max-w-sm text-sm leading-relaxed opacity-90">
@@ -416,6 +507,14 @@ export default function HomePage({ data = {} }) {
     const menuItems = data.menuItems ?? [];
     const testimonials = data.testimonials ?? [];
     const promos = data.promos ?? [];
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const updateScroll = () => setScrolled(window.scrollY > 20);
+        updateScroll();
+        window.addEventListener('scroll', updateScroll, { passive: true });
+        return () => window.removeEventListener('scroll', updateScroll);
+    }, []);
 
     return (
         <div className="min-h-screen bg-[#FFF6DB] text-[#176637]">
@@ -479,7 +578,7 @@ export default function HomePage({ data = {} }) {
                     animation: fadeUp 0.6s ease both;
                 }
             `}</style>
-            <Navbar />
+            <Navbar scrolled={scrolled} />
             <main>
                 <Hero brand={data.brand} />
                 <SproutDivider />

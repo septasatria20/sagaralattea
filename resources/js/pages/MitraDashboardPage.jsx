@@ -53,9 +53,9 @@ const salesData = [
 ];
 
 const teamMembers = [
-    { nik: '32019920192', name: 'Samantha W.', role: 'Kasir Utama', perf: 'Rp 12.500.000', status: 'Aktif' },
-    { nik: '32019920193', name: 'Muadz H.', role: 'Barista', perf: 'Rp 10.200.000', status: 'Aktif' },
-    { nik: '32019920194', name: 'Dianita S.', role: 'Kasir Shift 2', perf: 'Rp 8.100.000', status: 'Tidak Aktif' },
+    { nik: '32019920192', name: 'Samantha W.', phone: '6281234567890', role: 'Kasir Utama', perf: 'Rp 12.500.000', status: 'Aktif' },
+    { nik: '32019920193', name: 'Muadz H.', phone: '6281234567891', role: 'Barista', perf: 'Rp 10.200.000', status: 'Aktif' },
+    { nik: '32019920194', name: 'Dianita S.', phone: '6281234567892', role: 'Kasir Shift 2', perf: 'Rp 8.100.000', status: 'Tidak Aktif' },
 ];
 
 const stockItems = [
@@ -99,6 +99,86 @@ const complaints = [
     { id: 'TKT-090', outlet: 'Harmoni Pusat', issue: 'Poin member tidak bertambah', status: 'Diproses', date: 'Hari ini, 11:15' },
     { id: 'TKT-088', outlet: 'Senja Kopi', issue: 'Karyawan kurang ramah', status: 'Selesai', date: 'Kemarin' },
 ];
+
+const tableSessions = [
+    { id: 'M-01', seats: 2, status: 'Tersedia' },
+    { id: 'M-02', seats: 4, status: 'Dipakai' },
+    { id: 'M-03', seats: 2, status: 'Reserved' },
+    { id: 'M-04', seats: 6, status: 'Tersedia' },
+    { id: 'M-05', seats: 4, status: 'Bayar' },
+    { id: 'M-06', seats: 2, status: 'Tersedia' },
+];
+
+function hashString(value) {
+    let hash = 0;
+    for (let index = 0; index < value.length; index += 1) {
+        hash = (hash << 5) - hash + value.charCodeAt(index);
+        hash |= 0;
+    }
+    return Math.abs(hash) || 1;
+}
+
+function TableQr({ value }) {
+    const size = 25;
+    const scale = 8;
+    const padding = 4;
+    let state = hashString(value);
+    const cells = Array.from({ length: size }, () => Array.from({ length: size }, () => false));
+
+    const nextRandom = () => {
+        state ^= state << 13;
+        state ^= state >>> 17;
+        state ^= state << 5;
+        return Math.abs(state % 1000) / 1000;
+    };
+
+    const markFinder = (row, col) => {
+        for (let y = 0; y < 7; y += 1) {
+            for (let x = 0; x < 7; x += 1) {
+                const border = x === 0 || y === 0 || x === 6 || y === 6;
+                const center = x >= 2 && x <= 4 && y >= 2 && y <= 4;
+                cells[row + y][col + x] = border || center;
+            }
+        }
+    };
+
+    markFinder(0, 0);
+    markFinder(0, size - 7);
+    markFinder(size - 7, 0);
+
+    for (let row = 0; row < size; row += 1) {
+        for (let col = 0; col < size; col += 1) {
+            const finderArea = (row < 7 && col < 7) || (row < 7 && col >= size - 7) || (row >= size - 7 && col < 7);
+            if (!finderArea && row !== 6 && col !== 6) {
+                cells[row][col] = nextRandom() > 0.58;
+            }
+        }
+    }
+
+    const viewSize = size * scale + padding * 2;
+
+    return (
+        <svg viewBox={`0 0 ${viewSize} ${viewSize}`} className="h-full w-full" aria-label={`QR ${value}`}>
+            <rect width={viewSize} height={viewSize} rx="18" fill="#FFF6DB" />
+            <rect x={padding} y={padding} width={size * scale} height={size * scale} rx="12" fill="#fff" stroke="#176637" strokeOpacity="0.15" />
+            {cells.map((row, rowIndex) =>
+                row.map((filled, colIndex) =>
+                    filled ? (
+                        <rect
+                            key={`${rowIndex}-${colIndex}`}
+                            x={padding + colIndex * scale}
+                            y={padding + rowIndex * scale}
+                            width={scale}
+                            height={scale}
+                            rx="1"
+                            fill="#176637"
+                        />
+                    ) : null,
+                ),
+            )}
+        </svg>
+    );
+}
 
 function Icon({ name, className = 'h-5 w-5', stroke = false }) {
     const path = iconPaths[name];
@@ -388,8 +468,10 @@ function POSView() {
     const [memberNumber, setMemberNumber] = useState('');
     const [isMember, setIsMember] = useState(false);
     const [orderType, setOrderType] = useState('Dine In');
+    const [selectedTableId, setSelectedTableId] = useState(tableSessions[0].id);
 
     const filteredProducts = useMemo(() => products.filter((item) => item.category === activeCategory), [activeCategory]);
+    const selectedTable = tableSessions.find((table) => table.id === selectedTableId) ?? tableSessions[0];
 
     const addToCart = (product) => {
         setCart((prev) => {
@@ -439,6 +521,49 @@ function POSView() {
                             <input type="text" placeholder="Cari menu (⌘K)" className="w-full rounded-full border-2 border-[#176637]/10 bg-white py-2 pl-12 pr-4 text-sm text-[#176637] transition-colors focus:border-[#72AD43] focus:outline-none sm:w-64" />
                         </div>
                     </header>
+
+                    <section className="mb-6 mr-6 rounded-[28px] border border-[#176637]/10 bg-white p-5 shadow-sm">
+                        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                            <div>
+                                <h3 className="font-gabriela text-2xl text-[#176637]">Meja Order</h3>
+                                <p className="text-sm text-[#176637]/60">Pilih meja untuk membuat QR menu dan pembayaran.</p>
+                            </div>
+                            <button className="rounded-full bg-[#176637] px-4 py-2 text-xs font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A]">
+                                Generate QR
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 xl:grid-cols-3 2xl:grid-cols-6">
+                            {tableSessions.map((table) => {
+                                const active = selectedTableId === table.id;
+                                const statusClass =
+                                    table.status === 'Tersedia'
+                                        ? 'bg-[#72AD43]/15 text-[#176637]'
+                                        : table.status === 'Dipakai'
+                                            ? 'bg-[#FF901A]/15 text-[#FF901A]'
+                                            : table.status === 'Bayar'
+                                                ? 'bg-[#176637]/12 text-[#176637]'
+                                                : 'bg-gray-100 text-gray-600';
+
+                                return (
+                                    <button
+                                        key={table.id}
+                                        onClick={() => setSelectedTableId(table.id)}
+                                        className={`rounded-[22px] border p-4 text-left transition ${
+                                            active ? 'border-[#176637] bg-[#FFF6DB] shadow-[3px_3px_0px_#176637]' : 'border-[#176637]/10 bg-white hover:border-[#72AD43]'
+                                        }`}
+                                    >
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div>
+                                                <div className="text-lg font-bold text-[#176637]">{table.id}</div>
+                                                <div className="mt-1 text-xs text-[#176637]/60">{table.seats} kursi</div>
+                                            </div>
+                                            <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${statusClass}`}>{table.status}</span>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </section>
 
                     <div className="mb-6 flex gap-4 overflow-x-auto pb-2 pr-6 hide-scroll">
                         {categories.map((category) => {
@@ -529,6 +654,31 @@ function POSView() {
                             </button>
                         </div>
 
+                        {orderType === 'Dine In' && (
+                            <div className="mb-5 rounded-[22px] border border-[#176637]/10 bg-[#FFF6DB]/35 p-4">
+                                <div className="mb-3 flex items-center justify-between">
+                                    <div>
+                                        <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">QR Meja</div>
+                                        <div className="mt-1 font-gabriela text-2xl text-[#176637]">{selectedTable.id}</div>
+                                    </div>
+                                    <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{selectedTable.seats} kursi</span>
+                                </div>
+                                <div className="grid gap-4 md:grid-cols-[160px_1fr]">
+                                    <div className="overflow-hidden rounded-[20px] border border-[#176637]/10 bg-white p-3">
+                                        <TableQr value={`${selectedTable.id}-${memberNumber || 'guest'}-${orderType}`} />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <p className="text-sm leading-7 text-[#176637]/70">
+                                            QR ini mengarah ke menu meja, pelanggan memilih pesanan, lalu lanjut ke pembayaran.
+                                        </p>
+                                        <div className="rounded-2xl border border-dashed border-[#176637]/15 bg-white px-4 py-3 text-sm text-[#176637]">
+                                            Link meja: <span className="font-semibold">{`/meja/${selectedTable.id.toLowerCase()}`}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="mb-6 flex-1 overflow-y-auto hide-scroll">
                             {cart.length === 0 ? (
                                 <div className="flex h-full flex-col items-center justify-center text-[#176637]/30">
@@ -580,6 +730,14 @@ function POSView() {
                                 <div className="mt-2 flex justify-between border-t border-[#176637]/10 pt-2 text-lg font-bold text-[#176637]">
                                     <span>Total</span>
                                     <span>Rp {total.toLocaleString('id-ID')}</span>
+                                </div>
+                            </div>
+                            <div className="mb-4 rounded-2xl border border-[#176637]/10 bg-[#FFF6DB]/35 p-4">
+                                <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Payment Gateway</div>
+                                <div className="grid grid-cols-3 gap-2">
+                                    <button className="rounded-xl bg-[#176637] px-3 py-2 text-xs font-bold text-[#FFF6DB]">QRIS</button>
+                                    <button className="rounded-xl border border-[#176637]/15 px-3 py-2 text-xs font-bold text-[#176637]">Kartu</button>
+                                    <button className="rounded-xl border border-[#176637]/15 px-3 py-2 text-xs font-bold text-[#176637]">Cash</button>
                                 </div>
                             </div>
                             <button
