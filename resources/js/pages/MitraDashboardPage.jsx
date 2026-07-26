@@ -101,12 +101,12 @@ const complaints = [
 ];
 
 const tableSessions = [
-    { id: 'M-01', seats: 2, status: 'Tersedia' },
-    { id: 'M-02', seats: 4, status: 'Dipakai' },
-    { id: 'M-03', seats: 2, status: 'Reserved' },
-    { id: 'M-04', seats: 6, status: 'Tersedia' },
-    { id: 'M-05', seats: 4, status: 'Bayar' },
-    { id: 'M-06', seats: 2, status: 'Tersedia' },
+    { id: 'M-01', seats: 2, status: 'Tersedia', cart: [] },
+    { id: 'M-02', seats: 4, status: 'Memesan', cart: [{ id: 1, name: 'Matcha Lattea Signature', price: 25000, category: 'latte', image: '/minum2.png', qty: 2 }] },
+    { id: 'M-03', seats: 2, status: 'Tersedia', cart: [] },
+    { id: 'M-04', seats: 6, status: 'Tersedia', cart: [] },
+    { id: 'M-05', seats: 4, status: 'Menunggu Pembayaran', cart: [{ id: 5, name: 'Oolong Clear Tea', price: 18000, category: 'pure', image: '/minum2.png', qty: 1 }, { id: 7, name: 'Butter Croissant', price: 15000, category: 'pastry', image: '/minum2.png', qty: 1 }] },
+    { id: 'M-06', seats: 2, status: 'Tersedia', cart: [] },
 ];
 
 function hashString(value) {
@@ -177,6 +177,52 @@ function TableQr({ value }) {
                 ),
             )}
         </svg>
+    );
+}
+
+function QrGeneratorModal({ isOpen, onClose }) {
+    const [selectedTable, setSelectedTable] = useState('M-01');
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#176637]/40 px-4 backdrop-blur-sm" onClick={onClose}>
+            <div className="reveal relative w-full max-w-sm overflow-hidden rounded-[32px] border border-[#72AD43]/20 bg-white text-center shadow-2xl" onClick={e => e.stopPropagation()}>
+                <div className="bg-[#176637] p-6 text-[#FFF6DB]">
+                    <h3 className="font-gabriela text-2xl">Cetak QR Meja</h3>
+                    <p className="mt-1 text-sm opacity-80">Pilih meja untuk membuat QR permanen</p>
+                </div>
+                
+                <div className="p-8">
+                    <select 
+                        value={selectedTable}
+                        onChange={(e) => setSelectedTable(e.target.value)}
+                        className="mb-6 w-full rounded-xl border-2 border-[#176637]/10 bg-[#FFF6DB]/30 p-3 text-center text-lg font-bold text-[#176637] focus:border-[#72AD43] focus:outline-none"
+                    >
+                        {tableSessions.map(t => (
+                            <option key={t.id} value={t.id}>Meja {t.id} ({t.seats} kursi)</option>
+                        ))}
+                    </select>
+
+                    <div className="mx-auto mb-6 h-48 w-48 overflow-hidden rounded-[20px] border-4 border-[#FF901A] bg-white p-2 shadow-lg">
+                        <TableQr value={`https://sagaralattea.com/meja/${selectedTable.toLowerCase()}`} />
+                    </div>
+
+                    <div className="rounded-xl border border-dashed border-[#176637]/20 bg-[#FFF6DB]/20 p-3 text-xs text-[#176637]/70">
+                        Link permanen: <strong>sagaralattea.com/meja/{selectedTable.toLowerCase()}</strong>
+                    </div>
+
+                    <div className="mt-6 flex gap-3">
+                        <button onClick={onClose} className="flex-1 rounded-full border-2 border-[#176637]/20 py-3 text-sm font-bold text-[#176637] transition hover:bg-[#176637]/5">
+                            Tutup
+                        </button>
+                        <button onClick={() => alert('Download template dipicu (Prototype)')} className="flex-1 rounded-full bg-[#FF901A] py-3 text-sm font-bold text-[#176637] shadow-[3px_3px_0px_#176637] transition hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_#176637]">
+                            Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
 
@@ -321,7 +367,7 @@ function StatCard({ stat }) {
     );
 }
 
-function Sidebar({ activeTab, setActiveTab, logoUrl }) {
+function Sidebar({ activeTab, setActiveTab, logoUrl, user }) {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const items = [
         { id: 'dashboard', icon: 'dashboard', label: 'Dashboard' },
@@ -371,10 +417,10 @@ function Sidebar({ activeTab, setActiveTab, logoUrl }) {
                     onClick={() => setUserMenuOpen((value) => !value)}
                     className="flex w-full items-center gap-3 rounded-2xl bg-[#FFF6DB] px-3 py-3 text-left text-[#176637] shadow-[2px_2px_12px_rgba(23,102,55,0.12)] transition hover:-translate-y-0.5"
                 >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-tl-xl rounded-br-xl bg-[#72AD43] font-bold text-white">MH</div>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-tl-xl rounded-br-xl bg-[#72AD43] font-bold text-white">{user?.initial ?? 'U'}</div>
                     <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold">Mitra Harmoni</p>
-                        <p className="text-xs text-[#176637]/60">Operator</p>
+                        <p className="truncate text-sm font-bold">{user?.name ?? 'User'}</p>
+                        <p className="text-xs text-[#176637]/60">{user?.role ?? 'Role'}</p>
                     </div>
                     <Icon name="chevronRight" className={`h-4 w-4 transition-transform ${userMenuOpen ? 'rotate-90' : 'rotate-90'}`} stroke />
                 </button>
@@ -462,13 +508,21 @@ function DashboardView() {
     );
 }
 
-function POSView() {
+function POSView({ user }) {
     const [activeCategory, setActiveCategory] = useState('latte');
     const [cart, setCart] = useState([]);
     const [memberNumber, setMemberNumber] = useState('');
     const [isMember, setIsMember] = useState(false);
     const [orderType, setOrderType] = useState('Dine In');
     const [selectedTableId, setSelectedTableId] = useState(tableSessions[0].id);
+    const [qrModalOpen, setQrModalOpen] = useState(false);
+
+    React.useEffect(() => {
+        const table = tableSessions.find((t) => t.id === selectedTableId);
+        if (table) {
+            setCart([...(table.cart || [])]);
+        }
+    }, [selectedTableId]);
 
     const filteredProducts = useMemo(() => products.filter((item) => item.category === activeCategory), [activeCategory]);
     const selectedTable = tableSessions.find((table) => table.id === selectedTableId) ?? tableSessions[0];
@@ -509,6 +563,7 @@ function POSView() {
 
     return (
         <div className="animate-slide-up flex-1 overflow-hidden">
+            <QrGeneratorModal isOpen={qrModalOpen} onClose={() => setQrModalOpen(false)} />
             <div className="flex h-full flex-col overflow-hidden bg-transparent xl:flex-row">
                 <main className="flex min-w-0 flex-1 flex-col overflow-hidden p-6 pr-0 lg:p-8 lg:pr-0">
                     <header className="mb-8 flex flex-col gap-4 pr-6 sm:flex-row sm:items-center sm:justify-between">
@@ -516,9 +571,18 @@ function POSView() {
                             <h1 className="font-gabriela mb-1 text-2xl text-[#176637]">Kasir Sagara</h1>
                             <p className="text-sm font-medium text-[#72AD43]">{today}</p>
                         </div>
-                        <div className="relative w-full sm:w-auto">
-                            <Icon name="search" className="absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[#176637]/40" stroke />
-                            <input type="text" placeholder="Cari menu (⌘K)" className="w-full rounded-full border-2 border-[#176637]/10 bg-white py-2 pl-12 pr-4 text-sm text-[#176637] transition-colors focus:border-[#72AD43] focus:outline-none sm:w-64" />
+                        <div className="flex items-center gap-4">
+                            <div className="relative w-full sm:w-auto">
+                                <Icon name="search" className="absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[#176637]/40" stroke />
+                                <input type="text" placeholder="Cari menu (⌘K)" className="w-full rounded-full border-2 border-[#176637]/10 bg-white py-2 pl-12 pr-4 text-sm text-[#176637] transition-colors focus:border-[#72AD43] focus:outline-none sm:w-64" />
+                            </div>
+                            <form action="/logout" method="POST" className="inline">
+                                <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
+                                <button type="submit" className="flex items-center gap-2 rounded-full border-2 border-[#176637]/10 bg-white px-4 py-1.5 text-sm font-bold text-[#176637] transition-colors hover:border-[#FF901A] hover:text-[#FF901A]">
+                                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#176637] text-[10px] text-white">{user?.initial ?? 'U'}</div>
+                                    <span className="hidden sm:inline">{user?.name ?? 'Karyawan'}</span>
+                                </button>
+                            </form>
                         </div>
                     </header>
 
@@ -526,9 +590,9 @@ function POSView() {
                         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                             <div>
                                 <h3 className="font-gabriela text-2xl text-[#176637]">Meja Order</h3>
-                                <p className="text-sm text-[#176637]/60">Pilih meja untuk membuat QR menu dan pembayaran.</p>
+                                <p className="text-sm text-[#176637]/60">Pilih meja untuk mengatur pesanan dan pembayaran.</p>
                             </div>
-                            <button className="rounded-full bg-[#176637] px-4 py-2 text-xs font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A]">
+                            <button onClick={() => setQrModalOpen(true)} className="rounded-full bg-[#176637] px-4 py-2 text-xs font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A]">
                                 Generate QR
                             </button>
                         </div>
@@ -552,12 +616,18 @@ function POSView() {
                                             active ? 'border-[#176637] bg-[#FFF6DB] shadow-[3px_3px_0px_#176637]' : 'border-[#176637]/10 bg-white hover:border-[#72AD43]'
                                         }`}
                                     >
-                                        <div className="flex items-start justify-between gap-3">
+                                        <div className="relative flex items-start justify-between gap-3">
                                             <div>
                                                 <div className="text-lg font-bold text-[#176637]">{table.id}</div>
                                                 <div className="mt-1 text-xs text-[#176637]/60">{table.seats} kursi</div>
                                             </div>
                                             <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${statusClass}`}>{table.status}</span>
+                                            {table.status === 'Memesan' && (
+                                                <span className="absolute -right-2 -top-2 flex h-3 w-3">
+                                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                                                    <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
+                                                </span>
+                                            )}
                                         </div>
                                     </button>
                                 );
@@ -656,26 +726,25 @@ function POSView() {
 
                         {orderType === 'Dine In' && (
                             <div className="mb-5 rounded-[22px] border border-[#176637]/10 bg-[#FFF6DB]/35 p-4">
-                                <div className="mb-3 flex items-center justify-between">
+                                <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">QR Meja</div>
+                                        <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Meja Aktif</div>
                                         <div className="mt-1 font-gabriela text-2xl text-[#176637]">{selectedTable.id}</div>
                                     </div>
                                     <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{selectedTable.seats} kursi</span>
                                 </div>
-                                <div className="grid gap-4 md:grid-cols-[160px_1fr]">
-                                    <div className="overflow-hidden rounded-[20px] border border-[#176637]/10 bg-white p-3">
-                                        <TableQr value={`${selectedTable.id}-${memberNumber || 'guest'}-${orderType}`} />
+                                {selectedTable.status === 'Memesan' && (
+                                    <div className="mt-4 rounded-xl border border-red-400/30 bg-red-50 p-3 text-sm text-red-700">
+                                        <strong className="block">Menunggu Konfirmasi!</strong>
+                                        Pesanan baru masuk dari pelanggan via HP. Segera siapkan pesanan.
                                     </div>
-                                    <div className="space-y-3">
-                                        <p className="text-sm leading-7 text-[#176637]/70">
-                                            QR ini mengarah ke menu meja, pelanggan memilih pesanan, lalu lanjut ke pembayaran.
-                                        </p>
-                                        <div className="rounded-2xl border border-dashed border-[#176637]/15 bg-white px-4 py-3 text-sm text-[#176637]">
-                                            Link meja: <span className="font-semibold">{`/meja/${selectedTable.id.toLowerCase()}`}</span>
-                                        </div>
+                                )}
+                                {selectedTable.status === 'Menunggu Pembayaran' && (
+                                    <div className="mt-4 rounded-xl border border-[#FF901A]/30 bg-[#FF901A]/10 p-3 text-sm text-[#176637]">
+                                        <strong className="block">Belum Lunas</strong>
+                                        Pelanggan siap melakukan pembayaran.
                                     </div>
-                                </div>
+                                )}
                             </div>
                         )}
 
@@ -746,7 +815,7 @@ function POSView() {
                                 }`}
                                 disabled={cart.length === 0}
                             >
-                                <span>Bayar</span>
+                                <span>{selectedTable.status === 'Memesan' ? 'Terima & Proses Pesanan' : 'Selesaikan Pembayaran'}</span>
                                 <span className="rounded-lg bg-[#FFF6DB]/20 px-2 py-1 text-sm">Rp {total.toLocaleString('id-ID')}</span>
                             </button>
                         </div>
@@ -1170,22 +1239,28 @@ function ReportView() {
     );
 }
 
-export default function MitraDashboardPage({ data }) {
+export default function MitraDashboardPage({ data = {} }) {
     const pageData = usePageData(data);
-    const [activeTab, setActiveTab] = useState('pos');
+    const isPos = pageData.page === 'pos-dashboard';
+    const [activeTab, setActiveTab] = useState(isPos ? 'pos' : 'dashboard');
     const logoUrl = pageData?.brand?.logoUrl ?? '/logosagaralattea.png';
+
+    const renderView = () => {
+        if (activeTab === 'dashboard') return <DashboardView />;
+        if (activeTab === 'pos') return <POSView user={pageData.user} />;
+        if (activeTab === 'employees') return <EmployeesView />;
+        if (activeTab === 'supply') return <SupplyView />;
+        if (activeTab === 'report') return <ReportView />;
+        return <DashboardView />;
+    };
 
     return (
         <>
             <GlobalStyles />
             <div className="flex h-screen overflow-hidden bg-[#FFF6DB]">
-                <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} logoUrl={logoUrl} />
+                {!isPos && <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} logoUrl={logoUrl} user={pageData.user} />}
                 <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-                    {activeTab === 'dashboard' && <DashboardView />}
-                    {activeTab === 'pos' && <POSView />}
-                    {activeTab === 'employees' && <EmployeesView />}
-                    {activeTab === 'supply' && <SupplyView />}
-                    {activeTab === 'report' && <ReportView />}
+                    {renderView()}
                 </div>
             </div>
         </>

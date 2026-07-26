@@ -64,12 +64,21 @@ export default function LoginPage({ data = {} }) {
                                 </a>
                             </div>
 
-                            <form className="mt-10 space-y-4">
+                            {data.errors && data.errors.login && (
+                                <div className="mt-6 rounded-xl bg-red-50 p-4 text-sm text-red-600 border border-red-200">
+                                    {data.errors.login[0]}
+                                </div>
+                            )}
+
+                            <form action="/login" method="POST" className="mt-10 space-y-4">
+                                <input type="hidden" name="_token" value={data.csrfToken ?? ''} />
                                 <label className="block">
                                     <span className="mb-2 block text-sm font-semibold text-[#176637]">Email atau username</span>
                                     <input
                                         type="text"
-                                        placeholder="nama@domain.com"
+                                        name="login"
+                                        placeholder="nama@domain.com atau username"
+                                        required
                                         className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3.5 text-sm text-[#176637] placeholder:text-[#176637]/35 outline-none transition focus:border-[#72AD43] focus:ring-4 focus:ring-[#72AD43]/10"
                                     />
                                 </label>
@@ -78,7 +87,9 @@ export default function LoginPage({ data = {} }) {
                                     <span className="mb-2 block text-sm font-semibold text-[#176637]">Password</span>
                                     <input
                                         type="password"
+                                        name="password"
                                         placeholder="Masukkan password"
+                                        required
                                         className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3.5 text-sm text-[#176637] placeholder:text-[#176637]/35 outline-none transition focus:border-[#72AD43] focus:ring-4 focus:ring-[#72AD43]/10"
                                     />
                                 </label>
@@ -90,7 +101,7 @@ export default function LoginPage({ data = {} }) {
                                 </div>
 
                                 <button
-                                    type="button"
+                                    type="submit"
                                     className="mt-4 w-full rounded-full bg-[#176637] px-6 py-3.5 font-semibold text-[#FFF6DB] shadow-[4px_4px_0px_#0f3f22] transition hover:-translate-y-0.5 hover:bg-[#1c7340]"
                                 >
                                     Login ke sistem
@@ -101,22 +112,28 @@ export default function LoginPage({ data = {} }) {
                                 <p className="text-center text-xs font-semibold uppercase tracking-[0.3em] text-[#176637]/55">
                                     Proses developing akun
                                 </p>
-                                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                                <div className="mt-4 grid gap-3 sm:grid-cols-2">
                                     <a
-                                        href="/admin"
-                                        className="inline-flex items-center justify-center rounded-full border-2 border-[#176637] bg-[#FFF6DB] px-4 py-3 text-sm font-semibold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]"
+                                        href="/dev/login/admin"
+                                        className="inline-flex items-center justify-center rounded-full border-2 border-[#176637] bg-[#FFF6DB] px-4 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]"
                                     >
                                         Masuk Admin
                                     </a>
                                     <a
-                                        href="/mitra"
-                                        className="inline-flex items-center justify-center rounded-full border-2 border-[#176637] bg-[#FFF6DB] px-4 py-3 text-sm font-semibold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]"
+                                        href="/dev/login/mitra"
+                                        className="inline-flex items-center justify-center rounded-full border-2 border-[#176637] bg-[#FFF6DB] px-4 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]"
                                     >
                                         Masuk Mitra
                                     </a>
                                     <a
-                                        href="/investor"
-                                        className="inline-flex items-center justify-center rounded-full border-2 border-[#176637] bg-[#FFF6DB] px-4 py-3 text-sm font-semibold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]"
+                                        href="/dev/login/pos"
+                                        className="inline-flex items-center justify-center rounded-full border-2 border-[#176637] bg-[#FFF6DB] px-4 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]"
+                                    >
+                                        Masuk POS (Karyawan)
+                                    </a>
+                                    <a
+                                        href="/dev/login/investor"
+                                        className="inline-flex items-center justify-center rounded-full border-2 border-[#176637] bg-[#FFF6DB] px-4 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]"
                                     >
                                         Masuk Investor
                                     </a>

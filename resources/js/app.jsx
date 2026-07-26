@@ -13,7 +13,7 @@ const PageComponent = page === 'admin-dashboard'
     ? AdminDashboardPage
     : page === 'login'
         ? LoginPage
-    : page === 'mitra-dashboard'
+    : (page === 'mitra-dashboard' || page === 'pos-dashboard')
         ? MitraDashboardPage
         : page === 'investor-dashboard'
             ? InvestorDashboardPage

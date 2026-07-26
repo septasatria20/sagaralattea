@@ -17,11 +17,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::firstOrCreate([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ], [
-            'password' => 'password',
+        $this->call([
+            RoleSeeder::class,
+            UserSeeder::class,
         ]);
 
         MenuItem::upsert([

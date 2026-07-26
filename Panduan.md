@@ -142,12 +142,13 @@ Supaya hasil desain AI tidak terasa generik/template:
 ### C. Role: Mitra (Outlet)
 1. **Dashboard Outlet** — penjualan, laba, riwayat transaksi khusus outlet sendiri.
 2. **POS (Point of Sale)**
-   - Login terpisah per karyawan/kasir di tiap outlet (sub-akun di bawah mitra).
+   - **Sistem Login:** Karyawan login melalui halaman "Login" utama website (sama seperti role lain). Akun (username/password) dibuat dan diatur oleh Mitra atau Admin Pusat.
+   - **Tracking Performa:** Setiap transaksi terekam atas nama karyawan yang login (kasir). Seluruh transaksi ini masuk dan terakumulasi ke dashboard penjualan/laba Mitra, sehingga karyawan A otomatis terdeteksi berada di bawah Mitra A.
    - Jual produk & varian, cetak/tampilkan nota digital — nota berisi: nama produk, harga, nama kasir/karyawan, alamat outlet, (jika member: nama member tersamar + poin didapat).
    - Cek poin member langsung di POS.
 3. **Manajemen Karyawan**
-   - Tambah karyawan: **NIK (primary key, unik)**, nama, no. WhatsApp, email, alamat, jam kerja.
-   - Lihat progres karyawan: jumlah terjual, kontribusi laba, jam kerja/absensi.
+   - Tambah karyawan: **NIK (primary key, unik)**, nama, username & password login, no. WhatsApp, email, alamat, jam kerja.
+   - Lihat progres karyawan: Mitra dan Admin Pusat dapat memantau analitik masing-masing karyawan (berapa jumlah cup terjual, kontribusi laba, jam kerja/absensi).
 4. **Manajemen Membership**
    - Daftarkan member baru: nama lengkap, no. WhatsApp, alamat.
    - Member berlaku lintas outlet (bukan hanya outlet pendaftar).
@@ -189,7 +190,7 @@ Supaya hasil desain AI tidak terasa generik/template:
 | Buat promo umum | ✅ | ❌ (lihat saja) | ❌ | ❌ |
 | Buat promo membership | ✅ | ✅ | ❌ | ❌ |
 | POS (transaksi) | ❌ | ✅ (kelola) | ✅ (operasikan) | ❌ |
-| Tambah karyawan | ❌ | ✅ | ❌ | ❌ |
+| Tambah karyawan | ✅ | ❌ | ❌ | ❌ |
 | Lihat semua karyawan | ✅ | ❌ (outlet sendiri) | ❌ | ❌ |
 | Blacklist karyawan (NIK) | ✅ | ❌ | ❌ | ❌ |
 | Daftar member | ❌ | ✅ | ✅ | ❌ |

@@ -11,8 +11,20 @@ class HomeController extends Controller
 {
     public function __invoke()
     {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $dashboardUrl = '/login';
+        
+        if ($user) {
+            if ($user->hasRole('Admin')) $dashboardUrl = '/admin';
+            elseif ($user->hasRole('Mitra')) $dashboardUrl = '/mitra';
+            elseif ($user->hasRole('Investor')) $dashboardUrl = '/investor';
+            elseif ($user->hasRole('Karyawan')) $dashboardUrl = '/pos';
+            else $dashboardUrl = '/';
+        }
+
         return view('app', [
             'pageData' => [
+                'user' => $user ? ['name' => $user->name, 'dashboardUrl' => $dashboardUrl] : null,
                 'brand' => [
                     'name' => 'Sagara Lattea',
                     'tagline' => 'Special fresh latte tea',
