@@ -268,13 +268,52 @@ function SalesChart({ data }) {
     );
 }
 
-function OverviewTab({ stats, salesData, recentComplaints }) {
+function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentComplaints }) {
+    const [startDate, setStartDate] = React.useState('');
+    const [endDate, setEndDate] = React.useState('');
+    const [stats, setStats] = React.useState(initialStats);
+    const [salesData, setSalesData] = React.useState(initialSalesData);
+    const [isLoading, setIsLoading] = React.useState(false);
+
+    React.useEffect(() => {
+        if (!startDate || !endDate) return;
+        setIsLoading(true);
+        fetch(`/api/admin/dashboard/stats?start=${startDate}&end=${endDate}`)
+            .then(res => res.json())
+            .then(data => {
+                setStats(data.stats);
+                setSalesData(data.salesData);
+            })
+            .finally(() => setIsLoading(false));
+    }, [startDate, endDate]);
+
     return (
         <div className="animate-slide-up">
-            <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className={`mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
                 {stats.map((stat, index) => (
                     <StatCard key={index} stat={stat} />
                 ))}
+            </div>
+
+            <div className="mb-8 overflow-hidden rounded-[40px] border border-[#176637]/5 bg-white shadow-sm">
+                <div className="flex flex-col gap-6 md:flex-row p-6 items-center justify-between border-b border-[#176637]/10">
+                    <div>
+                        <h3 className="font-gabriela text-xl text-[#176637]">Peta Lokasi Mitra</h3>
+                        <p className="text-sm text-[#176637]/60">Pantau sebaran lokasi outlet secara real-time.</p>
+                    </div>
+                </div>
+                <div className="h-[300px] w-full bg-[#FFF6DB]">
+                    <iframe
+                        title="Outlet Map"
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        loading="lazy"
+                        allowFullScreen
+                        referrerPolicy="no-referrer-when-downgrade"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126920.24040924976!2d106.7570498!3d-6.2297419!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e945e34b9d%3A0x100c5e82dd4b820!2sJakarta!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid"
+                    ></iframe>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -290,16 +329,26 @@ function OverviewTab({ stats, salesData, recentComplaints }) {
                             <path d="M20,30 C20,15 10,10 0,15 C5,5 15,5 20,15 C25,5 35,5 40,15 C30,10 20,15 20,30 Z" />
                         </svg>
                     </div>
-                    <div className="relative z-10 mb-6 flex items-end justify-between">
+                    <div className="relative z-10 mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
                         <div>
-                            <h3 className="font-gabriela text-xl text-[#176637]">Grafik Penjualan 7 Hari Terakhir</h3>
+                            <h3 className="font-gabriela text-xl text-[#176637]">Grafik Penjualan & Laba</h3>
                             <p className="text-sm text-[#176637]/60">Semua Outlet (Konsolidasi)</p>
                         </div>
-                        <select className="cursor-pointer rounded-xl border-none bg-[#FFF6DB] px-4 py-2 text-sm font-medium text-[#176637] focus:outline-none">
-                            <option>7 Hari Terakhir</option>
-                            <option>Bulan Ini</option>
-                            <option>Tahun Ini</option>
-                        </select>
+                        <div className="flex items-center gap-2 rounded-xl bg-[#FFF6DB] p-2">
+                            <input 
+                                type="date" 
+                                value={startDate}
+                                onChange={e => setStartDate(e.target.value)}
+                                className="cursor-pointer rounded-lg border-none bg-transparent px-2 py-1 text-sm font-medium text-[#176637] outline-none" 
+                            />
+                            <span className="text-xs text-[#176637]/50">-</span>
+                            <input 
+                                type="date" 
+                                value={endDate}
+                                onChange={e => setEndDate(e.target.value)}
+                                className="cursor-pointer rounded-lg border-none bg-transparent px-2 py-1 text-sm font-medium text-[#176637] outline-none" 
+                            />
+                        </div>
                     </div>
                     <SalesChart data={salesData} />
                 </div>
