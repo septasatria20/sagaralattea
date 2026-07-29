@@ -163,14 +163,13 @@ function Header({ title }) {
                                         <Icon name="settings" className="h-4 w-4" stroke />
                                         Pengaturan
                                     </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => window.location.assign('/logout')}
-                                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]"
-                                    >
-                                        <Icon name="logout" className="h-4 w-4" stroke />
-                                        Logout
-                                    </button>
+                                    <form action="/logout" method="POST" className="w-full">
+                                        <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
+                                        <button type="submit" className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]">
+                                            <Icon name="logout" className="h-4 w-4" stroke />
+                                            Logout
+                                        </button>
+                                    </form>
                                 </div>
                             )}
                         </div>
