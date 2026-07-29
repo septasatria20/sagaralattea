@@ -324,7 +324,7 @@ function DashboardChart({ data }) {
 
     return (
         <div className="h-[300px] w-full overflow-hidden">
-            <svg viewBox={`0 0 ${width} ${height}`} className="h-full w-full">
+            <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="h-full w-full">
                 <defs>
                     <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#72AD43" stopOpacity="0.35" />
@@ -452,6 +452,24 @@ function Sidebar({ activeTab, setActiveTab, logoUrl, user }) {
 }
 
 function DashboardView() {
+    const [startDate, setStartDate] = React.useState('');
+    const [endDate, setEndDate] = React.useState('');
+    const [stats, setStats] = React.useState([]);
+    const [dynamicSales, setDynamicSales] = React.useState(salesData);
+    const [isLoading, setIsLoading] = React.useState(false);
+
+    React.useEffect(() => {
+        if (!startDate || !endDate) return;
+        setIsLoading(true);
+        fetch(`/api/admin/dashboard/stats?start=${startDate}&end=${endDate}`)
+            .then(res => res.json())
+            .then(data => {
+                setStats(data.stats);
+                setDynamicSales(data.salesData);
+            })
+            .finally(() => setIsLoading(false));
+    }, [startDate, endDate]);
+
     return (
         <div className="animate-slide-up flex-1 overflow-y-auto p-6 pr-6 lg:p-8 lg:pr-10">
             <header className="mb-8">
@@ -461,8 +479,10 @@ function DashboardView() {
                 </div>
             </header>
 
-            <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-                {[
+            <div className={`mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
+                {stats.length > 0 ? stats.map((stat) => (
+                    <StatCard key={stat.title} stat={stat} />
+                )) : [
                     { title: 'Pendapatan Hari Ini', value: 'Rp 4.250.000', icon: 'dashboard', accent: 'forest' },
                     { title: 'Total Pesanan', value: '142', sub: 'Minuman & Pastry', icon: 'store', accent: 'greenLight' },
                     { title: 'Member Baru', value: '18', sub: '+5% dari kemarin', icon: 'userCheck', accent: 'orange' },
@@ -481,16 +501,26 @@ function DashboardView() {
                     </div>
                     <div className="relative z-10 mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div>
-                            <h3 className="font-gabriela text-xl text-[#176637]">Grafik Penjualan 7 Hari Terakhir</h3>
-                            <p className="text-sm text-[#176637]/60">Semua Outlet (Konsolidasi)</p>
+                            <h3 className="font-gabriela text-xl text-[#176637]">Grafik Penjualan</h3>
+                            <p className="text-sm text-[#176637]/60">Berdasarkan Periode yang Dipilih</p>
                         </div>
-                        <select className="cursor-pointer rounded-xl border-none bg-[#FFF6DB] px-4 py-2 text-sm font-medium text-[#176637] focus:outline-none">
-                            <option>7 Hari Terakhir</option>
-                            <option>Bulan Ini</option>
-                            <option>Tahun Ini</option>
-                        </select>
+                        <div className="flex items-center gap-2 rounded-xl bg-[#FFF6DB] p-2">
+                            <input 
+                                type="date" 
+                                value={startDate}
+                                onChange={e => setStartDate(e.target.value)}
+                                className="cursor-pointer rounded-lg border-none bg-transparent px-2 py-1 text-sm font-medium text-[#176637] outline-none" 
+                            />
+                            <span className="text-xs text-[#176637]/50">-</span>
+                            <input 
+                                type="date" 
+                                value={endDate}
+                                onChange={e => setEndDate(e.target.value)}
+                                className="cursor-pointer rounded-lg border-none bg-transparent px-2 py-1 text-sm font-medium text-[#176637] outline-none" 
+                            />
+                        </div>
                     </div>
-                    <DashboardChart data={salesData} />
+                    <DashboardChart data={dynamicSales} />
                 </section>
 
                 <aside className="flex flex-col rounded-tr-[40px] rounded-bl-[40px] border border-[#176637]/5 bg-white p-6 shadow-sm">

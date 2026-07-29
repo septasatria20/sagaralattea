@@ -214,7 +214,7 @@ function StatCard({ metric }) {
     );
 }
 
-function MonthlyChart() {
+function MonthlyChart({ data = performanceData }) {
     const width = 760;
     const height = 300;
     const padding = { top: 20, right: 20, bottom: 30, left: 55 };
@@ -236,7 +236,7 @@ function MonthlyChart() {
 
     return (
         <div className="h-[300px] w-full">
-            <svg viewBox={`0 0 ${width} ${height}`} className="h-full w-full">
+            <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="h-full w-full">
                 <defs>
                     <linearGradient id="omzetGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#176637" stopOpacity="0.3" />
@@ -255,7 +255,7 @@ function MonthlyChart() {
                 <path d={pathFor('omzet')} fill="none" stroke="#176637" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
                 <path d={areaFor('laba')} fill="url(#labaGradient)" />
                 <path d={pathFor('laba')} fill="none" stroke="#FF901A" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
-                {performanceData.map((item, index) => {
+                {data.map((item, index) => {
                     const x = padding.left + index * xStep;
                     const omzetY = padding.top + innerHeight - (item.omzet / maxValue) * innerHeight;
                     const labaY = padding.top + innerHeight - (item.laba / maxValue) * innerHeight;
@@ -266,7 +266,7 @@ function MonthlyChart() {
                         </g>
                     );
                 })}
-                {performanceData.map((item, index) => (
+                {data.map((item, index) => (
                     <text key={item.name} x={padding.left + index * xStep} y={height - 6} textAnchor="middle" fill="#176637" opacity="0.7" fontSize="12">
                         {item.name}
                     </text>
@@ -278,6 +278,28 @@ function MonthlyChart() {
 
 function Overview() {
     const [selectedOutlet, setSelectedOutlet] = useState(outletStats[0]?.name ?? '');
+    const [startDate, setStartDate] = React.useState('');
+    const [endDate, setEndDate] = React.useState('');
+    const [dynamicPerformance, setDynamicPerformance] = React.useState(performanceData);
+    const [isLoading, setIsLoading] = React.useState(false);
+
+    React.useEffect(() => {
+        if (!startDate || !endDate) return;
+        setIsLoading(true);
+        fetch(`/api/admin/dashboard/stats?start=${startDate}&end=${endDate}`)
+            .then(res => res.json())
+            .then(data => {
+                // we can map data.salesData to performanceData format
+                const mapped = data.salesData.map(d => ({
+                    name: d.name,
+                    omzet: d.omzet,
+                    laba: d.laba
+                }));
+                setDynamicPerformance(mapped);
+            })
+            .finally(() => setIsLoading(false));
+    }, [startDate, endDate]);
+
     const activeOutlet = outletStats.find((item) => item.name === selectedOutlet) ?? outletStats[0];
 
     return (
@@ -294,7 +316,7 @@ function Overview() {
                         <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Dashboard Investor</h1>
                         <p className="text-sm font-medium text-[#72AD43]">Pantau performa bisnis dan ROI Sagara Lattea</p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
                         <span className="text-sm font-semibold text-[#176637]/70">Filter:</span>
                         <div className="relative">
                             <select className="cursor-pointer appearance-none rounded-full border-2 border-[#176637]/20 bg-white py-2 pl-4 pr-10 font-bold text-[#176637] shadow-[2px_2px_0px_rgba(23,102,55,0.1)] focus:border-[#72AD43] focus:outline-none">
@@ -304,6 +326,23 @@ function Overview() {
                                 <option>Outlet Senayan</option>
                             </select>
                             <Icon name="chevronRight" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-[#176637]" stroke />
+                        </div>
+
+                        <span className="ml-4 text-sm font-semibold text-[#176637]/70">Periode:</span>
+                        <div className="flex items-center gap-2 rounded-xl border-2 border-[#176637]/20 bg-white p-2 shadow-[2px_2px_0px_rgba(23,102,55,0.1)] focus-within:border-[#72AD43]">
+                            <input 
+                                type="date" 
+                                value={startDate}
+                                onChange={e => setStartDate(e.target.value)}
+                                className="cursor-pointer border-none bg-transparent px-2 py-1 text-sm font-bold text-[#176637] outline-none" 
+                            />
+                            <span className="text-xs text-[#176637]/50">-</span>
+                            <input 
+                                type="date" 
+                                value={endDate}
+                                onChange={e => setEndDate(e.target.value)}
+                                className="cursor-pointer border-none bg-transparent px-2 py-1 text-sm font-bold text-[#176637] outline-none" 
+                            />
                         </div>
                     </div>
                 </header>
@@ -326,7 +365,7 @@ function Overview() {
                                 <div className="flex items-center gap-1"><span className="h-3 w-3 rounded-full bg-[#FF901A]" /> Laba</div>
                             </div>
                         </div>
-                        <MonthlyChart />
+                        <MonthlyChart data={dynamicPerformance} />
                     </section>
 
                     <aside className="flex flex-col rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white p-6">

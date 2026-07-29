@@ -68,6 +68,7 @@ const iconPaths = {
     logout: 'M10 17v2a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v2M3 12h11m-4-4 4 4-4 4',
     menu: 'M4 7h16M4 12h16M4 17h16',
     alert: 'M12 3 2.5 20h19L12 3Zm0 5.5 1 5.5h-2l1-5.5Zm0 9.5a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z',
+    report: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z',
 };
 
 function Icon({ name, className = 'h-5 w-5', stroke = false }) {
@@ -221,7 +222,7 @@ function SalesChart({ data }) {
 
     return (
         <div className="relative h-[300px] w-full overflow-hidden">
-            <svg viewBox={`0 0 ${width} ${height}`} className="h-full w-full">
+            <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="h-full w-full">
                 <defs>
                     <linearGradient id="omzetGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#72AD43" stopOpacity={0.4} />
@@ -598,10 +599,14 @@ function PromoTab() {
         const url = editingId ? `/api/admin/promos/${editingId}` : '/api/admin/promos';
         const method = editingId ? 'PUT' : 'POST';
         
+        const payload = { ...formData };
+        if (!payload.start_date) payload.start_date = null;
+        if (!payload.end_date) payload.end_date = null;
+
         fetch(url, {
             method,
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify(formData)
+            body: JSON.stringify(payload)
         }).then(r => r.json()).then(() => {
             setIsModalOpen(false);
             fetchPromos();
@@ -884,7 +889,7 @@ function EmployeeTab() {
                 </div>
             </div>
 
-            <div className={`grid gap-6 xl:grid-cols-[1.35fr_0.65fr] transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
+            <div className={`grid gap-6 ${selectedId ? 'xl:grid-cols-[1.35fr_0.65fr]' : 'xl:grid-cols-1'} transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
                 <div className="overflow-hidden rounded-[26px] border border-[#176637]/10 bg-white shadow-sm">
                     <div className="overflow-x-auto">
                         <table className="min-w-full border-collapse text-left">
