@@ -23,7 +23,7 @@ function LogoMark({ variant = 'light' }) {
     );
 }
 
-function PrototypeModal({ isOpen, message, onClose }) {
+function NotificationModal({ isOpen, title = 'Pemberitahuan', message, onClose }) {
     if (!isOpen) return null;
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#176637]/40 px-4 backdrop-blur-sm" onClick={onClose}>
@@ -33,9 +33,9 @@ function PrototypeModal({ isOpen, message, onClose }) {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <h3 className="font-gabriela text-2xl text-[#176637]">Informasi Prototipe</h3>
+                <h3 className="font-gabriela text-2xl text-[#176637]">{title}</h3>
                 <p className="mt-2 text-sm text-[#176637]/80">{message}</p>
-                <button onClick={onClose} className="mt-6 w-full rounded-full bg-[#176637] py-3 text-sm font-semibold text-[#FFF6DB] transition hover:bg-[#72AD43]">
+                <button onClick={onClose} className="mt-6 w-full rounded-full bg-[#176637] py-3 text-sm font-semibold text-[#FFF6DB] transition hover:bg-[#72AD43] shadow-[4px_4px_0px_#FF901A] hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#FF901A]">
                     Mengerti
                 </button>
             </div>
@@ -43,7 +43,7 @@ function PrototypeModal({ isOpen, message, onClose }) {
     );
 }
 
-function Navbar({ scrolled = false, onPrototypeAction, data = {} }) {
+function Navbar({ scrolled = false, onNotificationAction, data = {} }) {
     const navClass = scrolled
         ? 'bg-[#FFF6DB]/92 text-[#176637] shadow-[0_10px_30px_rgba(23,102,55,0.08)] backdrop-blur-md'
         : 'bg-transparent text-[#FFF6DB]';
@@ -78,7 +78,7 @@ function Navbar({ scrolled = false, onPrototypeAction, data = {} }) {
                             Login
                         </a>
                     )}
-                    <button onClick={() => onPrototypeAction('Formulir pendaftaran kemitraan sedang dalam tahap pengembangan.')} className="rounded-full bg-[#FF901A] px-6 py-2 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#176637]">
+                    <button onClick={() => onNotificationAction('Formulir pendaftaran kemitraan sedang dalam tahap pengembangan.')} className="rounded-full bg-[#FF901A] px-6 py-2 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#176637]">
                         Join Us
                     </button>
                 </div>
@@ -211,7 +211,7 @@ function Hero({ brand }) {
     );
 }
 
-function PromoSection({ promos = [], onPrototypeAction }) {
+function PromoSection({ promos = [], onNotificationAction }) {
     const fallbackPromos = [
         {
             title: 'Bundling Hangat & Tenang',
@@ -253,7 +253,7 @@ function PromoSection({ promos = [], onPrototypeAction }) {
                             <span className="rounded-full bg-[#FFF6DB]/20 px-3 py-1 font-semibold text-[#FFF6DB]">{featured?.period ?? 'Periode promo'}</span>
                         </div>
                     </div>
-                    <button onClick={() => onPrototypeAction('Fitur klaim promo digital akan terhubung ke sistem akun. Untuk saat ini, silakan tunjukkan kode promo ke kasir.')} className="rounded-full bg-[#FFF6DB] px-8 py-3 font-bold text-[#176637] shadow-[4px_4px_0px_#176637] transition hover:-translate-y-0.5">
+                    <button onClick={() => onNotificationAction('Fitur klaim promo digital akan terhubung ke sistem akun. Untuk saat ini, silakan tunjukkan kode promo ke kasir.')} className="rounded-full bg-[#FFF6DB] px-8 py-3 font-bold text-[#176637] shadow-[4px_4px_0px_#176637] transition hover:-translate-y-0.5">
                         {featured?.cta ?? 'Klaim Promo'}
                     </button>
                 </div>
@@ -278,7 +278,7 @@ function PromoSection({ promos = [], onPrototypeAction }) {
     );
 }
 
-function ProductSection({ items, onPrototypeAction }) {
+function ProductSection({ items, onNotificationAction }) {
     const [activeCategory, setActiveCategory] = useState('Semua Menu');
     const fallback = [
         {
@@ -426,7 +426,7 @@ function ProductSection({ items, onPrototypeAction }) {
                         </div>
                         <div className="relative z-10 mt-2.5 flex items-center justify-between border-t border-[#176637]/10 pt-2">
                             <span className="text-[13px] font-bold tabular-nums text-[#FF901A]">Rp {item.price}</span>
-                            <button onClick={() => onPrototypeAction('Integrasi keranjang belanja & pemesanan online sedang dalam tahap pengembangan.')} className="rounded-full bg-[#176637] px-2 py-0.5 text-[10px] font-semibold text-[#FFF6DB] shadow-sm transition hover:bg-[#72AD43]">
+                            <button onClick={() => onNotificationAction('Integrasi keranjang belanja & pemesanan online sedang dalam tahap pengembangan.')} className="rounded-full bg-[#176637] px-2 py-0.5 text-[10px] font-semibold text-[#FFF6DB] shadow-sm transition hover:bg-[#72AD43]">
                                 Pesan
                             </button>
                         </div>
@@ -437,7 +437,7 @@ function ProductSection({ items, onPrototypeAction }) {
     );
 }
 
-function OutletSection({ onPrototypeAction }) {
+function OutletSection({ onNotificationAction }) {
     return (
         <section id="outlet" className="mx-auto grid max-w-7xl gap-16 px-6 py-20 md:px-8 lg:grid-cols-2">
             <div>
@@ -453,8 +453,17 @@ function OutletSection({ onPrototypeAction }) {
                             <p className="mt-1 text-sm text-[#176637]/80">Buka: 09.00 - 22.00</p>
                         </div>
                     </div>
-                    <div className="mt-6 flex h-48 items-center justify-center rounded-tr-2xl rounded-bl-2xl border-2 border-dashed border-[#176637]/20 bg-[#FFF6DB]">
-                        <span className="text-xs font-medium text-[#176637]/50">[Embed Google Maps API]</span>
+                    <div className="mt-6 flex h-48 items-center justify-center rounded-tr-2xl rounded-bl-2xl border border-[#176637]/20 bg-[#FFF6DB]">
+                        <iframe
+                            src="https://maps.google.com/maps?q=Jakarta%20Pusat&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                            width="100%"
+                            height="100%"
+                            style={{ border: 0, borderTopRightRadius: '1rem', borderBottomLeftRadius: '1rem' }}
+                            allowFullScreen=""
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            title="Lokasi Sagara Lattea"
+                        ></iframe>
                     </div>
                 </div>
             </div>
@@ -467,10 +476,10 @@ function OutletSection({ onPrototypeAction }) {
                     <div className="flex flex-col gap-5 rounded-r-xl border-l-4 border-[#FF901A] bg-white p-6 shadow-md">
                         <span className="font-bold text-[#176637]">3. Pilih metode pengambilan / pengiriman:</span>
                         <div className="flex flex-col gap-4 sm:flex-row">
-                            <button onClick={() => onPrototypeAction('Fitur pemesanan pick-up mandiri (Self Pick-up) akan segera hadir.')} className="flex-1 rounded-xl border-2 border-[#176637] py-3 font-bold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]">
+                            <button onClick={() => onNotificationAction('Fitur pemesanan pick-up mandiri (Self Pick-up) akan segera hadir.')} className="flex-1 rounded-xl border-2 border-[#176637] py-3 font-bold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]">
                                 Ambil di Outlet
                             </button>
-                            <button onClick={() => onPrototypeAction('Integrasi langsung dengan aplikasi Ojek Online pihak ketiga masih dalam proses penyesuaian API.')} className="flex-1 rounded-xl bg-[#72AD43] py-3 font-bold text-white shadow-[3px_3px_0px_#176637] transition hover:-translate-y-1">
+                            <button onClick={() => onNotificationAction('Integrasi langsung dengan aplikasi Ojek Online pihak ketiga masih dalam proses penyesuaian API.')} className="flex-1 rounded-xl bg-[#72AD43] py-3 font-bold text-white shadow-[3px_3px_0px_#176637] transition hover:-translate-y-1">
                                 Pesan via Grab / GoFood
                             </button>
                         </div>
@@ -481,7 +490,7 @@ function OutletSection({ onPrototypeAction }) {
     );
 }
 
-function Footer({ onPrototypeAction }) {
+function Footer({ onNotificationAction }) {
     return (
         <footer id="sosial-media" className="relative mt-10 overflow-hidden bg-[#176637] pt-20 pb-8 text-[#FFF6DB]">
             <div className="absolute left-0 top-0 h-12 w-full opacity-30">
@@ -515,7 +524,7 @@ function Footer({ onPrototypeAction }) {
                 </div>
                 <div className="md:col-span-4">
                     <h4 className="mb-6 font-gabriela text-xl text-[#FF901A]">Saran & Komplain</h4>
-                    <form className="flex flex-col gap-3" onSubmit={(e) => { e.preventDefault(); onPrototypeAction('Terima kasih! Pesan Anda telah tersimpan secara lokal (Simulasi form submission).'); }}>
+                    <form className="flex flex-col gap-3" onSubmit={(e) => { e.preventDefault(); onNotificationAction('Terima kasih! Pesan Anda telah tersimpan secara lokal (Simulasi form submission).'); }}>
                         <input required className="w-full rounded-lg border border-[#FFF6DB]/20 bg-[#FFF6DB]/5 px-4 py-3 text-sm text-[#FFF6DB] placeholder:text-[#FFF6DB]/40 focus:border-[#FF901A] focus:outline-none" placeholder="Nama Anda" />
                         <textarea required className="w-full resize-none rounded-lg border border-[#FFF6DB]/20 bg-[#FFF6DB]/5 px-4 py-3 text-sm text-[#FFF6DB] placeholder:text-[#FFF6DB]/40 focus:border-[#FF901A] focus:outline-none" placeholder="Pesan, saran, atau komplain..." rows={3} />
                         <button type="submit" className="mt-1 rounded-lg bg-[#FF901A] py-3 font-bold text-[#176637] transition hover:bg-[#FFF6DB]">
@@ -544,7 +553,7 @@ export default function HomePage({ data = {} }) {
     const [scrolled, setScrolled] = useState(false);
     const [modalState, setModalState] = useState({ isOpen: false, message: '' });
 
-    const handlePrototypeAction = (message) => {
+    const handleNotificationAction = (message) => {
         setModalState({ isOpen: true, message });
     };
 
@@ -617,14 +626,31 @@ export default function HomePage({ data = {} }) {
                     animation: fadeUp 0.6s ease both;
                 }
             `}</style>
-            <PrototypeModal isOpen={modalState.isOpen} message={modalState.message} onClose={() => setModalState({ isOpen: false, message: '' })} />
-            <Navbar scrolled={scrolled} onPrototypeAction={handlePrototypeAction} data={data} />
+            
+            {/* Quick Dev Login Panel - Only visible for development */}
+            <div className="fixed bottom-4 right-4 z-[9999] rounded-2xl border-2 border-[#176637]/20 bg-white/90 p-4 shadow-2xl backdrop-blur-md">
+                <div className="mb-2 text-xs font-bold uppercase tracking-wider text-[#176637]">Dev Quick Login</div>
+                <div className="flex gap-2">
+                    {['admin', 'mitra', 'pos', 'investor'].map(role => (
+                        <a 
+                            key={role} 
+                            href={`/dev/login/${role}`}
+                            className="rounded-lg bg-[#FF901A] px-3 py-1.5 text-xs font-bold text-[#FFF6DB] shadow-[2px_2px_0px_#176637] transition hover:-translate-y-0.5 hover:shadow-[1px_1px_0px_#176637]"
+                        >
+                            {role.toUpperCase()}
+                        </a>
+                    ))}
+                </div>
+            </div>
+
+            <NotificationModal isOpen={modalState.isOpen} message={modalState.message} onClose={() => setModalState({ isOpen: false, message: '' })} />
+            <Navbar scrolled={scrolled} onNotificationAction={handleNotificationAction} data={data} />
             <main>
                 <Hero brand={data.brand} />
                 <SproutDivider />
-                <PromoSection promos={promos} onPrototypeAction={handlePrototypeAction} />
-                <ProductSection items={menuItems} onPrototypeAction={handlePrototypeAction} />
-                <OutletSection onPrototypeAction={handlePrototypeAction} />
+                <PromoSection promos={promos} onNotificationAction={handleNotificationAction} />
+                <ProductSection items={menuItems} onNotificationAction={handleNotificationAction} />
+                <OutletSection onNotificationAction={handleNotificationAction} />
                 <section className="mx-auto max-w-7xl px-6 py-10 md:px-8">
                     <SectionTitle eyebrow="Testimoni" title="Cerita dari pelanggan" align="center" />
                     <div className="mt-10 grid gap-6 md:grid-cols-3">
@@ -641,7 +667,7 @@ export default function HomePage({ data = {} }) {
                     </div>
                 </section>
             </main>
-            <Footer onPrototypeAction={handlePrototypeAction} />
+            <Footer onNotificationAction={handleNotificationAction} />
         </div>
     );
 }

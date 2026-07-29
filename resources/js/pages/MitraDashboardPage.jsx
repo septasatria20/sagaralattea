@@ -180,8 +180,14 @@ function TableQr({ value }) {
     );
 }
 
-function QrGeneratorModal({ isOpen, onClose }) {
-    const [selectedTable, setSelectedTable] = useState('M-01');
+function QrGeneratorModal({ isOpen, onClose, tables = [] }) {
+    const [selectedTable, setSelectedTable] = useState('');
+
+    React.useEffect(() => {
+        if (isOpen && tables.length > 0 && !selectedTable) {
+            setSelectedTable(tables[0].table_number);
+        }
+    }, [isOpen, tables]);
 
     if (!isOpen) return null;
 
@@ -199,8 +205,8 @@ function QrGeneratorModal({ isOpen, onClose }) {
                         onChange={(e) => setSelectedTable(e.target.value)}
                         className="mb-6 w-full rounded-xl border-2 border-[#176637]/10 bg-[#FFF6DB]/30 p-3 text-center text-lg font-bold text-[#176637] focus:border-[#72AD43] focus:outline-none"
                     >
-                        {tableSessions.map(t => (
-                            <option key={t.id} value={t.id}>Meja {t.id} ({t.seats} kursi)</option>
+                        {tables.map(t => (
+                            <option key={t.id} value={t.table_number}>Meja {t.table_number}</option>
                         ))}
                     </select>
 
@@ -509,61 +515,112 @@ function DashboardView() {
 }
 
 function POSView({ user }) {
-    const [activeCategory, setActiveCategory] = useState('latte');
+    const [menus, setMenus] = useState([]);
+    const [tables, setTables] = useState([]);
+    const [activeCategory, setActiveCategory] = useState('Semua');
     const [cart, setCart] = useState([]);
-    const [memberNumber, setMemberNumber] = useState('');
-    const [isMember, setIsMember] = useState(false);
+    const [customerName, setCustomerName] = useState('');
     const [orderType, setOrderType] = useState('Dine In');
-    const [selectedTableId, setSelectedTableId] = useState(tableSessions[0].id);
+    const [selectedTableId, setSelectedTableId] = useState(null);
     const [qrModalOpen, setQrModalOpen] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState('QRIS');
+    const [isProcessing, setIsProcessing] = useState(false);
 
     React.useEffect(() => {
-        const table = tableSessions.find((t) => t.id === selectedTableId);
-        if (table) {
-            setCart([...(table.cart || [])]);
-        }
-    }, [selectedTableId]);
+        fetch('/api/pos/menus').then(r => r.json()).then(setMenus);
+        const fetchTables = () => {
+            fetch('/api/pos/tables').then(r => r.json()).then(data => {
+                setTables(data);
+                if (data.length > 0 && !selectedTableId) setSelectedTableId(data[0].id);
+            });
+        };
+        fetchTables();
+        const interval = setInterval(fetchTables, 10000);
+        return () => clearInterval(interval);
+    }, []);
 
-    const filteredProducts = useMemo(() => products.filter((item) => item.category === activeCategory), [activeCategory]);
-    const selectedTable = tableSessions.find((table) => table.id === selectedTableId) ?? tableSessions[0];
+    React.useEffect(() => {
+        if (!selectedTableId) return;
+        const table = tables.find((t) => t.id === selectedTableId);
+        if (table && table.active_order) {
+            setCart(table.active_order.items.map(item => ({
+                id: item.menu.id,
+                menu_item_id: item.menu_item_id,
+                name: item.menu.name,
+                price: parseFloat(item.price),
+                image: item.menu.image_path ? `/storage/${item.menu.image_path}` : '/minum2.png',
+                qty: item.quantity
+            })));
+        } else {
+            setCart([]);
+        }
+    }, [selectedTableId, tables]);
+
+    const categories = ['Semua', ...new Set(menus.map((item) => item.category).filter(Boolean))];
+    const filteredProducts = useMemo(() => activeCategory === 'Semua' ? menus : menus.filter((item) => item.category === activeCategory), [menus, activeCategory]);
+    const selectedTable = tables.find((table) => table.id === selectedTableId) || { id: '-', table_number: '-', status: 'Kosong' };
 
     const addToCart = (product) => {
         setCart((prev) => {
             const existing = prev.find((item) => item.id === product.id);
-
             if (existing) {
                 return prev.map((item) => (item.id === product.id ? { ...item, qty: item.qty + 1 } : item));
             }
-
-            return [...prev, { ...product, qty: 1 }];
+            return [...prev, { ...product, menu_item_id: product.id, qty: 1 }];
         });
     };
 
     const updateQty = (id, delta) => {
-        setCart((prev) =>
-            prev
-                .map((item) => {
-                    if (item.id === id) {
-                        const nextQty = item.qty + delta;
-                        return nextQty > 0 ? { ...item, qty: nextQty } : item;
-                    }
-
-                    return item;
-                })
-                .filter((item) => item.qty > 0),
-        );
+        setCart((prev) => prev.map((item) => {
+            if (item.id === id) {
+                const nextQty = item.qty + delta;
+                return nextQty > 0 ? { ...item, qty: nextQty } : item;
+            }
+            return item;
+        }).filter((item) => item.qty > 0));
     };
 
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
     const tax = subtotal * 0.11;
     const total = subtotal + tax;
     const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-
     const orderTypes = ['Dine In', 'Take Away', 'Delivery'];
+
+    const handleCheckout = async () => {
+        setIsProcessing(true);
+        try {
+            const res = await fetch('/api/pos/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content },
+                body: JSON.stringify({
+                    table_id: selectedTable.id,
+                    customer_name: customerName,
+                    payment_method: paymentMethod,
+                    type: orderType,
+                    items: cart.map(item => ({
+                        menu_item_id: item.menu_item_id,
+                        qty: item.qty,
+                        price: item.price
+                    }))
+                })
+            });
+            if (res.ok) {
+                setCart([]);
+                fetch('/api/pos/tables').then(r => r.json()).then(setTables);
+                alert('Pesanan berhasil diselesaikan!');
+            } else {
+                const err = await res.json();
+                alert('Gagal checkout: ' + (err.error || err.message));
+            }
+        } catch (e) {
+            alert('Terjadi kesalahan.');
+        }
+        setIsProcessing(false);
+    };
 
     return (
         <div className="animate-slide-up flex-1 overflow-hidden">
-            <QrGeneratorModal isOpen={qrModalOpen} onClose={() => setQrModalOpen(false)} />
+            <QrGeneratorModal isOpen={qrModalOpen} onClose={() => setQrModalOpen(false)} tables={tables} />
             <div className="flex h-full flex-col overflow-hidden bg-transparent xl:flex-row">
                 <main className="flex min-w-0 flex-1 flex-col overflow-hidden p-6 pr-0 lg:p-8 lg:pr-0">
                     <header className="mb-8 flex flex-col gap-4 pr-6 sm:flex-row sm:items-center sm:justify-between">
@@ -593,41 +650,33 @@ function POSView({ user }) {
                                 <p className="text-sm text-[#176637]/60">Pilih meja untuk mengatur pesanan dan pembayaran.</p>
                             </div>
                             <button onClick={() => setQrModalOpen(true)} className="rounded-full bg-[#176637] px-4 py-2 text-xs font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A]">
-                                Generate QR
+                                Generate QR Meja
                             </button>
                         </div>
                         <div className="grid grid-cols-2 gap-3 xl:grid-cols-3 2xl:grid-cols-6">
-                            {tableSessions.map((table) => {
-                                const active = selectedTableId === table.id;
-                                const statusClass =
-                                    table.status === 'Tersedia'
-                                        ? 'bg-[#72AD43]/15 text-[#176637]'
-                                        : table.status === 'Dipakai'
-                                            ? 'bg-[#FF901A]/15 text-[#FF901A]'
-                                            : table.status === 'Bayar'
-                                                ? 'bg-[#176637]/12 text-[#176637]'
-                                                : 'bg-gray-100 text-gray-600';
+                            {tables.map((table) => {
+                                const isSelected = selectedTableId === table.id;
+                                const isKosong = table.status === 'Kosong';
+                                const isOrdering = table.status === 'Sedang Pesan';
 
                                 return (
                                     <button
                                         key={table.id}
                                         onClick={() => setSelectedTableId(table.id)}
-                                        className={`rounded-[22px] border p-4 text-left transition ${
-                                            active ? 'border-[#176637] bg-[#FFF6DB] shadow-[3px_3px_0px_#176637]' : 'border-[#176637]/10 bg-white hover:border-[#72AD43]'
+                                        className={`flex flex-col items-center justify-center rounded-2xl border-2 p-4 transition-all ${
+                                            isSelected
+                                                ? 'scale-105 border-[#176637] bg-[#176637] text-white shadow-lg'
+                                                : isKosong
+                                                ? 'border-[#176637]/10 bg-white text-[#176637] hover:border-[#176637]/30 hover:bg-[#FFF6DB]/50'
+                                                : isOrdering
+                                                ? 'border-[#FF901A]/30 bg-[#FF901A]/10 text-[#176637]'
+                                                : 'border-[#72AD43]/30 bg-[#72AD43]/10 text-[#176637]'
                                         }`}
                                     >
-                                        <div className="relative flex items-start justify-between gap-3">
-                                            <div>
-                                                <div className="text-lg font-bold text-[#176637]">{table.id}</div>
-                                                <div className="mt-1 text-xs text-[#176637]/60">{table.seats} kursi</div>
-                                            </div>
-                                            <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${statusClass}`}>{table.status}</span>
-                                            {table.status === 'Memesan' && (
-                                                <span className="absolute -right-2 -top-2 flex h-3 w-3">
-                                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                                                    <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
-                                                </span>
-                                            )}
+                                        <span className="font-gabriela text-2xl font-bold">{table.table_number}</span>
+                                        <div className="mt-1 flex items-center gap-1 opacity-80">
+                                            <Icon name="users" className="h-3 w-3" stroke />
+                                            <span className="text-[10px] uppercase tracking-wider">{table.status}</span>
                                         </div>
                                     </button>
                                 );
@@ -635,63 +684,50 @@ function POSView({ user }) {
                         </div>
                     </section>
 
-                    <div className="mb-6 flex gap-4 overflow-x-auto pb-2 pr-6 hide-scroll">
-                        {categories.map((category) => {
-                            const active = activeCategory === category.id;
-
-                            return (
+                    <section className="flex flex-1 flex-col overflow-hidden pr-6">
+                        <div className="mb-4 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                            {categories.map((category) => (
                                 <button
-                                    key={category.id}
-                                    onClick={() => setActiveCategory(category.id)}
-                                    className={`relative flex h-24 w-44 flex-shrink-0 flex-col justify-between overflow-hidden p-5 text-left transition-all duration-300 ${
-                                        active
-                                            ? 'rounded-tr-[30px] rounded-bl-[30px] rounded-tl-xl rounded-br-xl bg-[#176637] text-[#FFF6DB] shadow-[4px_4px_0px_#72AD43]'
-                                            : 'rounded-tr-[30px] rounded-bl-[30px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white text-[#176637] hover:border-[#72AD43]'
+                                    key={category}
+                                    onClick={() => setActiveCategory(category)}
+                                    className={`flex items-center gap-2 whitespace-nowrap rounded-full border-2 px-4 py-2 text-sm font-bold transition-all ${
+                                        activeCategory === category ? 'border-[#176637] bg-[#176637] text-white shadow-[2px_2px_0px_#FF901A]' : 'border-[#176637]/10 bg-white text-[#176637] hover:border-[#176637]/30 hover:bg-[#FFF6DB]'
                                     }`}
                                 >
-                                    <div className="relative z-10 flex w-full items-center justify-between">
-                                        <div>
-                                            <h3 className="font-gabriela text-lg leading-tight">{category.name}</h3>
-                                            <p className="text-xs opacity-80">{category.count} items</p>
-                                        </div>
-                                        <Icon name={category.icon} className="h-6 w-6" stroke />
-                                    </div>
-                                    {category.alert && <span className="text-xs font-medium">{category.alert}</span>}
-                                    {active && (
-                                        <svg className="absolute -bottom-2 -right-2 h-20 w-20 opacity-20" viewBox="0 0 100 100" fill="#FFF6DB">
-                                            <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
-                                        </svg>
-                                    )}
+                                    <span className="capitalize">{category}</span>
                                 </button>
-                            );
-                        })}
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto pr-6 pb-6 hide-scroll">
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                            {filteredProducts.map((product) => (
-                                <article key={product.id} className="group flex h-56 flex-col rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg border border-[#176637]/10 bg-white p-4 transition-all duration-300 hover:border-[#72AD43] hover:shadow-[4px_4px_0px_#176637]">
-                                    <div className="mb-3 flex h-24 w-full items-center justify-center overflow-hidden rounded-tl-xl rounded-br-xl bg-[#FFF6DB]/50 transition-transform group-hover:scale-105">
-                                        <img src={product.image} alt={product.name} className="h-full w-full object-contain p-2" />
-                                    </div>
-                                    <h4 className="mb-1 flex-1 text-sm font-semibold leading-tight text-[#176637]">{product.name}</h4>
-                                    <div className="mt-auto flex items-end justify-between">
-                                        <span className="text-sm font-bold text-[#FF901A]">Rp {product.price.toLocaleString('id-ID')}</span>
-                                        <button onClick={() => addToCart(product)} className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#176637] text-[#176637] transition-colors hover:bg-[#176637] hover:text-[#FFF6DB]">
-                                            <Icon name="plus" className="h-3.5 w-3.5" stroke />
-                                        </button>
-                                    </div>
-                                </article>
                             ))}
                         </div>
-                    </div>
+                        <div className="grid flex-1 grid-cols-2 gap-4 overflow-y-auto pb-6 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                            {filteredProducts.map((product) => (
+                                <button
+                                    key={product.id}
+                                    onClick={() => addToCart(product)}
+                                    className="group flex h-48 flex-col justify-between overflow-hidden rounded-[24px] border border-[#176637]/10 bg-white p-3 text-left shadow-sm transition-all hover:-translate-y-1 hover:border-[#FF901A] hover:shadow-md"
+                                >
+                                    <div className="flex h-24 w-full items-center justify-center overflow-hidden rounded-xl bg-[#FFF6DB]/30 transition-colors group-hover:bg-[#FFF6DB]/60">
+                                        <img src={product.image_path ? `/storage/${product.image_path}` : '/minum2.png'} alt={product.name} className="h-full w-full object-contain p-2" />
+                                    </div>
+                                    <div>
+                                        <h3 className="line-clamp-2 text-sm font-bold leading-tight text-[#176637]">{product.name}</h3>
+                                        <div className="mt-1 flex items-center justify-between">
+                                            <p className="text-sm font-medium text-[#72AD43]">Rp {parseFloat(product.price).toLocaleString('id-ID')}</p>
+                                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#176637]/5 text-[#176637] group-hover:bg-[#176637] group-hover:text-white">
+                                                <Icon name="plus" className="h-3 w-3" stroke />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </section>
                 </main>
 
                 <aside className="flex h-full w-full flex-col border-l border-[#176637]/10 bg-white shadow-[-10px_0_30px_rgba(23,102,55,0.05)] xl:w-[380px]">
                     <div className="rounded-tl-[40px] border-b border-[#176637]/5 bg-[#FFF6DB]/30 p-6">
                         <div className="text-center">
                             <h2 className="font-gabriela text-lg font-bold text-[#176637]">Nota Pesanan</h2>
-                            <p className="text-xs text-[#176637]/60">#TRX-88291</p>
+                            <p className="text-xs text-[#176637]/60">Meja {selectedTable.table_number}</p>
                         </div>
                     </div>
 
@@ -708,20 +744,14 @@ function POSView({ user }) {
                             ))}
                         </div>
 
-                        <div className="mb-5 flex gap-2">
+                        <div className="mb-5">
                             <input
                                 type="text"
-                                placeholder="Nomor Member"
-                                value={memberNumber}
-                                onChange={(event) => setMemberNumber(event.target.value)}
-                                className="flex-1 rounded-xl border-2 border-[#176637]/10 px-3 py-2 text-sm text-[#176637] focus:border-[#72AD43] focus:outline-none"
+                                placeholder="Nama Pelanggan"
+                                value={customerName}
+                                onChange={(event) => setCustomerName(event.target.value)}
+                                className="w-full rounded-xl border-2 border-[#176637]/10 px-3 py-2 text-sm text-[#176637] focus:border-[#72AD43] focus:outline-none"
                             />
-                            <button
-                                onClick={() => setIsMember(memberNumber.trim().length > 5)}
-                                className={`rounded-xl border-2 px-3 text-xs font-bold transition-all ${isMember ? 'border-[#72AD43] bg-[#72AD43]/20 text-[#176637]' : 'border-[#FF901A] text-[#FF901A] hover:bg-[#FF901A] hover:text-[#FFF6DB]'}`}
-                            >
-                                {isMember ? '✓ Member' : 'Cek'}
-                            </button>
                         </div>
 
                         {orderType === 'Dine In' && (
@@ -729,30 +759,24 @@ function POSView({ user }) {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Meja Aktif</div>
-                                        <div className="mt-1 font-gabriela text-2xl text-[#176637]">{selectedTable.id}</div>
+                                        <div className="mt-1 font-gabriela text-2xl text-[#176637]">{selectedTable.table_number}</div>
                                     </div>
-                                    <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{selectedTable.seats} kursi</span>
+                                    <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{selectedTable.status}</span>
                                 </div>
-                                {selectedTable.status === 'Memesan' && (
+                                {selectedTable.status === 'Sedang Pesan' && (
                                     <div className="mt-4 rounded-xl border border-red-400/30 bg-red-50 p-3 text-sm text-red-700">
-                                        <strong className="block">Menunggu Konfirmasi!</strong>
-                                        Pesanan baru masuk dari pelanggan via HP. Segera siapkan pesanan.
-                                    </div>
-                                )}
-                                {selectedTable.status === 'Menunggu Pembayaran' && (
-                                    <div className="mt-4 rounded-xl border border-[#FF901A]/30 bg-[#FF901A]/10 p-3 text-sm text-[#176637]">
-                                        <strong className="block">Belum Lunas</strong>
-                                        Pelanggan siap melakukan pembayaran.
+                                        <strong className="block">Pesanan Aktif!</strong>
+                                        Pelanggan sedang/telah memesan.
                                     </div>
                                 )}
                             </div>
                         )}
 
-                        <div className="mb-6 flex-1 overflow-y-auto hide-scroll">
+                        <div className="flex-1 overflow-y-auto pr-2">
                             {cart.length === 0 ? (
-                                <div className="flex h-full flex-col items-center justify-center text-[#176637]/30">
-                                    <Icon name="coffee" className="mb-2 h-8 w-8" stroke />
-                                    <p className="text-sm">Belum ada pesanan</p>
+                                <div className="flex h-full flex-col items-center justify-center text-center opacity-50">
+                                    <Icon name="package" className="mb-3 h-12 w-12 text-[#176637]" stroke />
+                                    <p className="text-sm font-medium text-[#176637]">Keranjang masih kosong</p>
                                 </div>
                             ) : (
                                 <div className="space-y-3">
@@ -781,12 +805,6 @@ function POSView({ user }) {
                         </div>
 
                         <div className="mt-auto border-t-2 border-dashed border-[#176637]/10 pt-4">
-                            {memberNumber && (
-                                <div className="mb-3 flex items-center justify-between rounded-lg border border-[#176637]/10 bg-[#176637]/5 p-2.5">
-                                    <span className="text-xs text-[#176637]/70">Nomor Member:</span>
-                                    <span className="font-gabriela text-sm font-bold text-[#176637]">{memberNumber}</span>
-                                </div>
-                            )}
                             <div className="mb-4 space-y-1.5">
                                 <div className="flex justify-between text-sm text-[#176637]/70">
                                     <span>Subtotal</span>
@@ -802,20 +820,31 @@ function POSView({ user }) {
                                 </div>
                             </div>
                             <div className="mb-4 rounded-2xl border border-[#176637]/10 bg-[#FFF6DB]/35 p-4">
-                                <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Payment Gateway</div>
+                                <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Metode Pembayaran</div>
                                 <div className="grid grid-cols-3 gap-2">
-                                    <button className="rounded-xl bg-[#176637] px-3 py-2 text-xs font-bold text-[#FFF6DB]">QRIS</button>
-                                    <button className="rounded-xl border border-[#176637]/15 px-3 py-2 text-xs font-bold text-[#176637]">Kartu</button>
-                                    <button className="rounded-xl border border-[#176637]/15 px-3 py-2 text-xs font-bold text-[#176637]">Cash</button>
+                                    {['QRIS', 'Kartu', 'Cash'].map(method => (
+                                        <button
+                                            key={method}
+                                            onClick={() => setPaymentMethod(method)}
+                                            className={`rounded-xl px-3 py-2 text-xs font-bold transition-colors ${
+                                                paymentMethod === method 
+                                                ? 'bg-[#176637] text-[#FFF6DB]' 
+                                                : 'border border-[#176637]/15 text-[#176637] hover:bg-[#176637]/5'
+                                            }`}
+                                        >
+                                            {method}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                             <button
+                                onClick={handleCheckout}
                                 className={`flex w-full items-center justify-between rounded-xl px-5 py-3 font-bold shadow-[4px_4px_0px_#72AD43] transition-all ${
-                                    cart.length > 0 ? 'bg-[#176637] text-[#FFF6DB] hover:-translate-y-1' : 'cursor-not-allowed bg-gray-300 text-gray-500 shadow-none'
+                                    cart.length > 0 && !isProcessing ? 'bg-[#176637] text-[#FFF6DB] hover:-translate-y-1' : 'cursor-not-allowed bg-gray-300 text-gray-500 shadow-none'
                                 }`}
-                                disabled={cart.length === 0}
+                                disabled={cart.length === 0 || isProcessing}
                             >
-                                <span>{selectedTable.status === 'Memesan' ? 'Terima & Proses Pesanan' : 'Selesaikan Pembayaran'}</span>
+                                <span>{isProcessing ? 'Memproses...' : (selectedTable.status === 'Sedang Pesan' ? 'Terima & Proses' : 'Selesaikan Pembayaran')}</span>
                                 <span className="rounded-lg bg-[#FFF6DB]/20 px-2 py-1 text-sm">Rp {total.toLocaleString('id-ID')}</span>
                             </button>
                         </div>
@@ -825,7 +854,6 @@ function POSView({ user }) {
         </div>
     );
 }
-
 function EmployeesView() {
     const [members, setMembers] = useState(teamMembers);
     const [editingNik, setEditingNik] = useState(null);

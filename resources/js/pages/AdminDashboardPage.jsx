@@ -295,26 +295,7 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
                 ))}
             </div>
 
-            <div className="mb-8 overflow-hidden rounded-[40px] border border-[#176637]/5 bg-white shadow-sm">
-                <div className="flex flex-col gap-6 md:flex-row p-6 items-center justify-between border-b border-[#176637]/10">
-                    <div>
-                        <h3 className="font-gabriela text-xl text-[#176637]">Peta Lokasi Mitra</h3>
-                        <p className="text-sm text-[#176637]/60">Pantau sebaran lokasi outlet secara real-time.</p>
-                    </div>
-                </div>
-                <div className="h-[300px] w-full bg-[#FFF6DB]">
-                    <iframe
-                        title="Outlet Map"
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0 }}
-                        loading="lazy"
-                        allowFullScreen
-                        referrerPolicy="no-referrer-when-downgrade"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126920.24040924976!2d106.7570498!3d-6.2297419!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e945e34b9d%3A0x100c5e82dd4b820!2sJakarta!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid"
-                    ></iframe>
-                </div>
-            </div>
+
 
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 <div className="relative overflow-hidden rounded-tl-[40px] rounded-br-[40px] border border-[#176637]/5 bg-white p-6 shadow-sm lg:col-span-2">
@@ -389,7 +370,61 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
     );
 }
 
-function OutletTab({ outletData }) {
+function OutletTab() {
+    const [outlets, setOutlets] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const [editingId, setEditingId] = React.useState(null);
+    const [formData, setFormData] = React.useState({
+        name: '', location: '', address: '', status: 'Aktif',
+        mitra_name: '', mitra_email: '', mitra_password: ''
+    });
+
+    const fetchOutlets = () => {
+        setIsLoading(true);
+        fetch('/api/admin/outlets')
+            .then(r => r.json())
+            .then(data => setOutlets(data))
+            .finally(() => setIsLoading(false));
+    };
+
+    React.useEffect(() => {
+        fetchOutlets();
+    }, []);
+
+    const openCreate = () => {
+        setEditingId(null);
+        setFormData({ name: '', location: '', address: '', status: 'Aktif', mitra_name: '', mitra_email: '', mitra_password: ''});
+        setIsModalOpen(true);
+    };
+
+    const openEdit = (outlet) => {
+        setEditingId(outlet.id);
+        setFormData({ name: outlet.name, location: outlet.location || '', address: outlet.address || '', status: outlet.status, mitra_name: '', mitra_email: '', mitra_password: ''});
+        setIsModalOpen(true);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const url = editingId ? `/api/admin/outlets/${editingId}` : '/api/admin/outlets';
+        const method = editingId ? 'PUT' : 'POST';
+        
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(formData)
+        }).then(r => r.json()).then(() => {
+            setIsModalOpen(false);
+            fetchOutlets();
+        });
+    };
+
+    const handleDelete = (id) => {
+        if (confirm('Yakin ingin menghapus outlet ini?')) {
+            fetch(`/api/admin/outlets/${id}`, { method: 'DELETE' })
+                .then(() => fetchOutlets());
+        }
+    };
     return (
         <div className="animate-slide-up">
             <div className="mb-6 flex items-center justify-between">
@@ -397,7 +432,7 @@ function OutletTab({ outletData }) {
                     <h2 className="mb-1 font-gabriela text-2xl text-[#176637]">Daftar Mitra / Outlet</h2>
                     <p className="text-sm text-[#176637]/70">Setiap outlet baru otomatis menyiapkan akun mitra.</p>
                 </div>
-                <button className="flex items-center gap-2 rounded-xl bg-[#FF901A] px-5 py-2.5 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-1 hover:shadow-[1px_1px_0px_#176637]">
+                <button onClick={openCreate} className="flex items-center gap-2 rounded-xl bg-[#FF901A] px-5 py-2.5 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-1 hover:shadow-[1px_1px_0px_#176637]">
                     <Icon name="plus" className="h-4 w-4" stroke />
                     Tambah Mitra / Outlet
                 </button>
@@ -415,8 +450,8 @@ function OutletTab({ outletData }) {
                             <th className="p-4 pr-6 text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {outletData.map((outlet) => (
+                    <tbody className={isLoading ? 'opacity-50' : 'opacity-100'}>
+                        {outlets.map((outlet) => (
                             <tr key={outlet.id} className="group border-b border-[#176637]/5 transition-colors hover:bg-[#FFF6DB]/20">
                                 <td className="p-4 pl-6 font-medium text-[#176637]">
                                     <div className="flex items-center gap-3">
@@ -425,111 +460,365 @@ function OutletTab({ outletData }) {
                                         </div>
                                         <div>
                                             <div className="font-semibold text-[#176637]">{outlet.name}</div>
-                                            <div className="text-xs text-[#176637]/55">Akun mitra otomatis saat outlet dibuat</div>
+                                            <div className="text-xs text-[#176637]/55">ID: {outlet.id}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td className="p-4 text-sm text-[#176637]/80">
                                     <span className="inline-flex items-center gap-1">
                                         <Icon name="mapPin" className="h-3.5 w-3.5 text-[#FF901A]" stroke />
-                                        {outlet.location}
+                                        {outlet.location || '-'}
                                     </span>
                                 </td>
                                 <td className="p-4 text-sm text-[#176637]/70">{outlet.account}</td>
                                 <td className="p-4 font-bold tabular-nums text-[#176637]">{outlet.omzet}</td>
                                 <td className="p-4">
-                                    <span className="rounded-full bg-[#72AD43]/10 px-3 py-1.5 text-xs font-bold text-[#72AD43]">{outlet.status}</span>
+                                    <span className={`rounded-full px-3 py-1.5 text-xs font-bold ${outlet.status === 'Aktif' ? 'bg-[#72AD43]/10 text-[#72AD43]' : 'bg-red-100 text-red-600'}`}>{outlet.status}</span>
                                 </td>
                                 <td className="p-4 pr-6 text-center">
-                                    <button className="rounded-lg p-2 text-[#176637]/40 transition-colors hover:bg-[#FFF6DB] hover:text-[#FF901A]">
-                                        <Icon name="more" className="h-[18px] w-[18px]" stroke />
-                                    </button>
+                                    <div className="flex justify-center gap-2">
+                                        <button onClick={() => openEdit(outlet)} className="rounded-lg p-2 text-[#176637]/60 transition-colors hover:bg-[#FFF6DB] hover:text-[#FF901A]">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                        </button>
+                                        <button onClick={() => handleDelete(outlet.id)} className="rounded-lg p-2 text-[#176637]/60 transition-colors hover:bg-[#FFF6DB] hover:text-red-500">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                    <div className="w-full max-w-lg rounded-3xl bg-white p-6 sm:p-8 shadow-xl max-h-[90vh] overflow-y-auto">
+                        <div className="mb-6 flex items-center justify-between">
+                            <h3 className="font-gabriela text-xl text-[#176637]">{editingId ? 'Edit Outlet' : 'Tambah Mitra / Outlet Baru'}</h3>
+                            <button onClick={() => setIsModalOpen(false)} className="rounded-full p-2 text-[#176637]/50 hover:bg-[#FFF6DB] hover:text-[#176637]">
+                                <Icon name="close" className="h-5 w-5" stroke />
+                            </button>
+                        </div>
+                        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Nama Outlet</label>
+                                <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Lokasi (Kota)</label>
+                                <input value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Alamat Lengkap</label>
+                                <textarea value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows="3" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
+                                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]">
+                                    <option value="Aktif">Aktif</option>
+                                    <option value="Tidak Aktif">Tidak Aktif</option>
+                                </select>
+                            </div>
+                            
+                            {!editingId && (
+                                <div className="mt-4 border-t-2 border-dashed border-[#176637]/20 pt-4">
+                                    <h4 className="mb-3 font-gabriela text-lg text-[#176637]">Informasi Akun Mitra</h4>
+                                    <div className="flex flex-col gap-4">
+                                        <div>
+                                            <label className="mb-1 block text-sm font-bold text-[#176637]">Nama PIC Mitra</label>
+                                            <input required value={formData.mitra_name} onChange={e => setFormData({...formData, mitra_name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-[#FFF6DB]/30 px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                                        </div>
+                                        <div>
+                                            <label className="mb-1 block text-sm font-bold text-[#176637]">Email Akun Mitra</label>
+                                            <input required type="email" value={formData.mitra_email} onChange={e => setFormData({...formData, mitra_email: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-[#FFF6DB]/30 px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                                        </div>
+                                        <div>
+                                            <label className="mb-1 block text-sm font-bold text-[#176637]">Password</label>
+                                            <input required type="password" value={formData.mitra_password} onChange={e => setFormData({...formData, mitra_password: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-[#FFF6DB]/30 px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="mt-4 flex gap-3">
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-xl bg-gray-100 py-3 font-bold text-gray-500 transition-colors hover:bg-gray-200">Batal</button>
+                                <button type="submit" className="flex-1 rounded-xl bg-[#FF901A] py-3 font-bold text-[#FFF6DB] transition-transform hover:-translate-y-0.5">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
 
-function PromoTab({ promoData }) {
+function PromoTab() {
+    const [promos, setPromos] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const [editingId, setEditingId] = React.useState(null);
+    const [formData, setFormData] = React.useState({
+        title: '', code: '', summary: '', start_date: '', end_date: '', target: '', status: 'Aktif'
+    });
+
+    const fetchPromos = () => {
+        setIsLoading(true);
+        fetch('/api/admin/promos')
+            .then(r => r.json())
+            .then(data => setPromos(data))
+            .finally(() => setIsLoading(false));
+    };
+
+    React.useEffect(() => {
+        fetchPromos();
+    }, []);
+
+    const openCreate = () => {
+        setEditingId(null);
+        setFormData({ title: '', code: '', summary: '', start_date: '', end_date: '', target: '', status: 'Aktif' });
+        setIsModalOpen(true);
+    };
+
+    const openEdit = (promo) => {
+        setEditingId(promo.id);
+        setFormData({ 
+            title: promo.title, 
+            code: promo.code || '', 
+            summary: promo.summary || '', 
+            start_date: promo.start_date || '', 
+            end_date: promo.end_date || '', 
+            target: promo.target || '', 
+            status: promo.status 
+        });
+        setIsModalOpen(true);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const url = editingId ? `/api/admin/promos/${editingId}` : '/api/admin/promos';
+        const method = editingId ? 'PUT' : 'POST';
+        
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(formData)
+        }).then(r => r.json()).then(() => {
+            setIsModalOpen(false);
+            fetchPromos();
+        });
+    };
+
+    const handleDelete = (id) => {
+        if (confirm('Yakin ingin menghapus promo ini?')) {
+            fetch(`/api/admin/promos/${id}`, { method: 'DELETE' }).then(() => fetchPromos());
+        }
+    };
+
     return (
         <div className="animate-slide-up">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
                     <h2 className="mb-1 font-gabriela text-xl text-[#176637]">Manajemen Promo</h2>
                     <p className="text-sm text-[#176637]/70">Promo yang dibuat di sini akan tampil di landing page.</p>
                 </div>
-                <button className="flex items-center gap-2 rounded-xl bg-[#FF901A] px-5 py-2.5 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-1 hover:shadow-[1px_1px_0px_#176637]">
+                <button onClick={openCreate} className="flex items-center gap-2 rounded-xl bg-[#FF901A] px-5 py-2.5 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-1 hover:shadow-[1px_1px_0px_#176637]">
                     <Icon name="plus" className="h-4 w-4" stroke />
                     Tambah Promo
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                {promoData.map((promo) => (
+            <div className={`grid grid-cols-1 gap-6 lg:grid-cols-3 transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
+                {promos.map((promo) => (
                     <article key={promo.id} className="rounded-tr-[36px] rounded-bl-[36px] rounded-tl-xl rounded-br-xl border border-[#176637]/10 bg-white p-5 shadow-sm">
                         <div className="mb-4 flex items-start justify-between gap-4">
                             <div>
                                 <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${promo.status === 'Aktif' ? 'bg-[#72AD43]/20 text-[#176637]' : 'bg-[#FF901A]/20 text-[#FF901A]'}`}>{promo.status}</span>
                                 <h3 className="mt-3 font-gabriela text-xl text-[#176637]">{promo.title}</h3>
                             </div>
-                            <span className="rounded-xl bg-[#176637]/10 px-3 py-2 text-xs font-bold text-[#176637]">{promo.code}</span>
+                            <span className="rounded-xl bg-[#176637]/10 px-3 py-2 text-xs font-bold text-[#176637]">{promo.code || '-'}</span>
                         </div>
                         <p className="text-sm leading-7 text-[#176637]/75">{promo.summary}</p>
                         <div className="mt-5 space-y-2 text-sm">
                             <div className="flex justify-between gap-4">
                                 <span className="text-[#176637]/60">Periode</span>
-                                <span className="text-right font-semibold text-[#176637]">{promo.period}</span>
+                                <span className="text-right font-semibold text-[#176637]">{(promo.start_date && promo.end_date) ? `${promo.start_date} - ${promo.end_date}` : 'Tidak ditentukan'}</span>
                             </div>
                             <div className="flex justify-between gap-4">
                                 <span className="text-[#176637]/60">Target</span>
-                                <span className="text-right font-semibold text-[#176637]">{promo.target}</span>
+                                <span className="text-right font-semibold text-[#176637]">{promo.target || '-'}</span>
                             </div>
                         </div>
                         <div className="mt-6 flex gap-3">
-                            <button className="flex-1 rounded-xl border-2 border-[#176637] py-2.5 text-sm font-bold text-[#176637] transition-colors hover:bg-[#176637] hover:text-[#FFF6DB]">
+                            <button onClick={() => openEdit(promo)} className="flex-1 rounded-xl border-2 border-[#176637] py-2.5 text-sm font-bold text-[#176637] transition-colors hover:bg-[#176637] hover:text-[#FFF6DB]">
                                 Edit
                             </button>
-                            <button className="flex-1 rounded-xl bg-[#FF901A] py-2.5 text-sm font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-0.5">
-                                Tampilkan di Landing
+                            <button onClick={() => handleDelete(promo.id)} className="flex-1 rounded-xl bg-red-100 py-2.5 text-sm font-bold text-red-600 shadow-[3px_3px_0px_#F87171] transition-all hover:translate-y-0.5">
+                                Hapus
                             </button>
                         </div>
                     </article>
                 ))}
             </div>
+
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                    <div className="w-full max-w-lg rounded-3xl bg-white p-6 sm:p-8 shadow-xl max-h-[90vh] overflow-y-auto">
+                        <div className="mb-6 flex items-center justify-between">
+                            <h3 className="font-gabriela text-xl text-[#176637]">{editingId ? 'Edit Promo' : 'Tambah Promo Baru'}</h3>
+                            <button onClick={() => setIsModalOpen(false)} className="rounded-full p-2 text-[#176637]/50 hover:bg-[#FFF6DB] hover:text-[#176637]">
+                                <Icon name="close" className="h-5 w-5" stroke />
+                            </button>
+                        </div>
+                        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Judul Promo</label>
+                                <input required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Kode Promo</label>
+                                <input value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Ringkasan</label>
+                                <textarea required value={formData.summary} onChange={e => setFormData({...formData, summary: e.target.value})} rows="3" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <label className="mb-1 block text-sm font-bold text-[#176637]">Tgl Mulai</label>
+                                    <input type="date" value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="mb-1 block text-sm font-bold text-[#176637]">Tgl Selesai</label>
+                                    <input type="date" value={formData.end_date} onChange={e => setFormData({...formData, end_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Target Audiens</label>
+                                <input value={formData.target} onChange={e => setFormData({...formData, target: e.target.value})} placeholder="Cth: Semua Outlet" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
+                                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]">
+                                    <option value="Aktif">Aktif</option>
+                                    <option value="Jadwal">Jadwal</option>
+                                    <option value="Selesai">Selesai</option>
+                                </select>
+                            </div>
+                            
+                            <div className="mt-4 flex gap-3">
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-xl bg-gray-100 py-3 font-bold text-gray-500 transition-colors hover:bg-gray-200">Batal</button>
+                                <button type="submit" className="flex-1 rounded-xl bg-[#FF901A] py-3 font-bold text-[#FFF6DB] transition-transform hover:-translate-y-0.5">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
 
-function EmployeeTab({ employees }) {
+function EmployeeTab() {
+    const [employees, setEmployees] = React.useState([]);
+    const [outletsData, setOutletsData] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(true);
     const [search, setSearch] = useState('');
     const [roleFilter, setRoleFilter] = useState('Semua Peran');
     const [outletFilter, setOutletFilter] = useState('Semua Outlet');
     const [showBlacklistOnly, setShowBlacklistOnly] = useState(false);
-    const [selectedEmployee, setSelectedEmployee] = useState(employees[0] ?? null);
-    const [blacklistedIds, setBlacklistedIds] = useState(() => employees.filter((employee) => employee.blacklisted).map((employee) => employee.id));
+    const [selectedId, setSelectedId] = useState(null);
+    const [formData, setFormData] = useState({
+        name: '', email: '', phone: '', nik: '', password: '', outlet_id: '', job_title: 'Barista', employee_status: 'Aktif'
+    });
 
-    const roles = ['Semua Peran', ...new Set(employees.map((employee) => employee.role))];
-    const outlets = ['Semua Outlet', ...new Set(employees.map((employee) => employee.outlet))];
+    const fetchData = () => {
+        setIsLoading(true);
+        Promise.all([
+            fetch('/api/admin/employees').then(r => r.json()),
+            fetch('/api/admin/outlets').then(r => r.json())
+        ]).then(([empData, outData]) => {
+            setEmployees(empData);
+            setOutletsData(outData);
+        }).finally(() => setIsLoading(false));
+    };
+
+    React.useEffect(() => {
+        fetchData();
+    }, []);
+
+    const selectedEmployee = selectedId === 'new' ? null : (employees.find((e) => e.id === selectedId) ?? null);
+
+    const roles = ['Semua Peran', ...new Set(employees.map((e) => e.roles?.[0]?.name ?? e.job_title))];
+    const outletsList = ['Semua Outlet', ...new Set(employees.map((e) => e.outlet?.name))];
 
     const filteredEmployees = employees.filter((employee) => {
         const q = search.trim().toLowerCase();
-        const matchesSearch = !q || employee.name.toLowerCase().includes(q) || employee.nik.toLowerCase().includes(q);
-        const matchesRole = roleFilter === 'Semua Peran' || employee.role === roleFilter;
-        const matchesOutlet = outletFilter === 'Semua Outlet' || employee.outlet === outletFilter;
-        const isBlacklisted = blacklistedIds.includes(employee.id);
+        const matchesSearch = !q || employee.name.toLowerCase().includes(q) || (employee.nik || '').toLowerCase().includes(q);
+        const empRole = employee.roles?.[0]?.name ?? employee.job_title;
+        const matchesRole = roleFilter === 'Semua Peran' || empRole === roleFilter;
+        const empOutlet = employee.outlet?.name;
+        const matchesOutlet = outletFilter === 'Semua Outlet' || empOutlet === outletFilter;
+        const isBlacklisted = employee.employee_status === 'Blacklist';
         const matchesBlacklist = !showBlacklistOnly || isBlacklisted;
 
         return matchesSearch && matchesRole && matchesOutlet && matchesBlacklist;
     });
 
-    const blacklistCount = blacklistedIds.length;
+    const blacklistCount = employees.filter(e => e.employee_status === 'Blacklist').length;
 
-    const toggleBlacklist = (id) => {
-        setBlacklistedIds((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
+    const openCreate = () => {
+        setSelectedId('new');
+        setFormData({ name: '', email: '', phone: '', nik: '', password: '', outlet_id: '', job_title: 'Barista', employee_status: 'Aktif' });
+    };
+
+    const openEdit = (emp) => {
+        setSelectedId(emp.id);
+        setFormData({ 
+            name: emp.name, 
+            email: emp.email, 
+            phone: emp.phone || '', 
+            nik: emp.nik || '', 
+            password: '', 
+            outlet_id: emp.outlet_id || '', 
+            job_title: emp.job_title || 'Barista', 
+            employee_status: emp.employee_status || 'Aktif' 
+        });
+    };
+
+    const toggleBlacklist = (emp) => {
+        const newStatus = emp.employee_status === 'Blacklist' ? 'Aktif' : 'Blacklist';
+        if (confirm(`Yakin ingin mengubah status blacklist karyawan ini?`)) {
+            fetch(`/api/admin/employees/${emp.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ ...emp, employee_status: newStatus })
+            }).then(() => fetchData());
+        }
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const isEditing = selectedId !== 'new';
+        const url = isEditing ? `/api/admin/employees/${selectedId}` : '/api/admin/employees';
+        const method = isEditing ? 'PUT' : 'POST';
+        
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(formData)
+        }).then(r => r.json()).then(() => {
+            fetchData();
+            setSelectedId(null);
+        });
+    };
+
+    const handleDelete = (id) => {
+        if (confirm('Yakin ingin menghapus karyawan ini?')) {
+            fetch(`/api/admin/employees/${id}`, { method: 'DELETE' }).then(() => {
+                fetchData();
+                setSelectedId(null);
+            });
+        }
     };
 
     return (
@@ -550,7 +839,7 @@ function EmployeeTab({ employees }) {
                         Cek Blacklist
                         <span className={`rounded-full px-2 py-0.5 text-xs ${showBlacklistOnly ? 'bg-[#FFF6DB]/20' : 'bg-[#176637]/10'}`}>{blacklistCount}</span>
                     </button>
-                    <button className="flex items-center gap-2 rounded-xl bg-[#176637] px-5 py-3 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A] transition-all hover:translate-y-1">
+                    <button onClick={openCreate} className="flex items-center gap-2 rounded-xl bg-[#176637] px-5 py-3 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A] transition-all hover:translate-y-1">
                         <Icon name="plus" className="h-4 w-4" stroke />
                         Tambah Karyawan
                     </button>
@@ -576,7 +865,7 @@ function EmployeeTab({ employees }) {
                             className="w-full appearance-none rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] py-3 pl-4 pr-10 text-[13px] font-medium text-[#176637] outline-none transition-colors focus:border-[#72AD43]"
                         >
                             {roles.map((role) => (
-                                <option key={role}>{role}</option>
+                                <option key={role}>{role || '-'}</option>
                             ))}
                         </select>
                         <Icon name="chevronDown" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#176637]/50" stroke />
@@ -587,8 +876,8 @@ function EmployeeTab({ employees }) {
                             onChange={(event) => setOutletFilter(event.target.value)}
                             className="w-full appearance-none rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] py-3 pl-4 pr-10 text-[13px] font-medium text-[#176637] outline-none transition-colors focus:border-[#72AD43]"
                         >
-                            {outlets.map((outlet) => (
-                                <option key={outlet}>{outlet}</option>
+                            {outletsList.map((outlet) => (
+                                <option key={outlet}>{outlet || '-'}</option>
                             ))}
                         </select>
                         <Icon name="chevronDown" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#176637]/50" stroke />
@@ -596,7 +885,7 @@ function EmployeeTab({ employees }) {
                 </div>
             </div>
 
-            <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+            <div className={`grid gap-6 xl:grid-cols-[1.35fr_0.65fr] transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
                 <div className="overflow-hidden rounded-[26px] border border-[#176637]/10 bg-white shadow-sm">
                     <div className="overflow-x-auto">
                         <table className="min-w-full border-collapse text-left">
@@ -613,16 +902,17 @@ function EmployeeTab({ employees }) {
                             </thead>
                             <tbody>
                                 {filteredEmployees.map((employee) => {
-                                    const isBlacklisted = blacklistedIds.includes(employee.id);
-                                    const statusLabel = isBlacklisted ? 'Blacklist' : employee.status;
+                                    const isBlacklisted = employee.employee_status === 'Blacklist';
+                                    const statusLabel = employee.employee_status || 'Aktif';
                                     const statusClass = isBlacklisted
                                         ? 'bg-red-100 text-red-600'
-                                        : employee.status === 'Aktif'
+                                        : statusLabel === 'Aktif'
                                           ? 'bg-[#72AD43]/15 text-[#176637]'
                                           : 'bg-[#176637]/10 text-[#176637]/75';
+                                    const role = employee.roles?.[0]?.name ?? employee.job_title ?? 'Karyawan';
 
                                     return (
-                                        <tr key={employee.id} className="border-t border-[#176637]/8 transition-colors hover:bg-[#FFF6DB]/25">
+                                        <tr key={employee.id} className={`border-t border-[#176637]/8 transition-colors hover:bg-[#FFF6DB]/25 ${selectedId === employee.id ? 'bg-[#FFF6DB]/50' : ''}`}>
                                             <td className="p-4 pl-6">
                                                 <div className="flex items-center gap-3">
                                                     <div>
@@ -631,14 +921,14 @@ function EmployeeTab({ employees }) {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="p-4 text-[13px] font-medium tracking-wide text-[#176637]/65">{employee.nik}</td>
+                                            <td className="p-4 text-[13px] font-medium tracking-wide text-[#176637]/65">{employee.nik || '-'}</td>
                                             <td className="p-4">
-                                                <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-bold ${employee.role === 'Manager' ? 'bg-[#72AD43]/20 text-[#176637]' : employee.role === 'Barista' ? 'bg-[#72AD43]/15 text-[#176637]' : 'bg-[#FFF1C9] text-[#8b6a2f]'}`}>
-                                                    {employee.role.toUpperCase()}
+                                                <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-bold ${role === 'Manager' ? 'bg-[#72AD43]/20 text-[#176637]' : role === 'Barista' ? 'bg-[#72AD43]/15 text-[#176637]' : 'bg-[#FFF1C9] text-[#8b6a2f]'}`}>
+                                                    {role.toUpperCase()}
                                                 </span>
                                             </td>
-                                            <td className="p-4 text-[13px] text-[#176637]">{employee.outlet}</td>
-                                            <td className="p-4 text-[13px] text-[#176637]/70">{employee.joined}</td>
+                                            <td className="p-4 text-[13px] text-[#176637]">{employee.outlet?.name || '-'}</td>
+                                            <td className="p-4 text-[13px] text-[#176637]/70">{new Date(employee.created_at).toLocaleDateString()}</td>
                                             <td className="p-4">
                                                 <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold ${statusClass}`}>
                                                     <span className={`h-2 w-2 rounded-full ${isBlacklisted ? 'bg-red-500' : 'bg-[#176637]'}`} />
@@ -647,17 +937,17 @@ function EmployeeTab({ employees }) {
                                             </td>
                                             <td className="p-4 pr-6">
                                                 <div className="flex items-center justify-center gap-2">
-                                                    <button onClick={() => setSelectedEmployee(employee)} className="rounded-lg p-2 text-[#176637]/55 transition-colors hover:bg-[#FFF6DB] hover:text-[#176637]">
+                                                    <button onClick={() => openEdit(employee)} className="rounded-lg p-2 text-[#176637]/55 transition-colors hover:bg-[#FFF6DB] hover:text-[#176637]">
                                                         <Icon name="edit" className="h-4 w-4" stroke />
                                                     </button>
                                                     <button
-                                                        onClick={() => toggleBlacklist(employee.id)}
+                                                        onClick={() => toggleBlacklist(employee)}
                                                         className={`rounded-lg p-2 transition-colors ${isBlacklisted ? 'text-red-600 hover:bg-red-50' : 'text-[#176637]/55 hover:bg-[#FFF6DB] hover:text-red-600'}`}
                                                         title={isBlacklisted ? 'Hapus dari blacklist' : 'Masukkan blacklist'}
                                                     >
                                                         <Icon name="alert" className="h-4 w-4" stroke />
                                                     </button>
-                                                    <button className="rounded-lg p-2 text-[#176637]/55 transition-colors hover:bg-[#FFF6DB] hover:text-red-500">
+                                                    <button onClick={() => handleDelete(employee.id)} className="rounded-lg p-2 text-[#176637]/55 transition-colors hover:bg-[#FFF6DB] hover:text-red-500">
                                                         <Icon name="trash" className="h-4 w-4" stroke />
                                                     </button>
                                                 </div>
@@ -671,55 +961,73 @@ function EmployeeTab({ employees }) {
 
                     <div className="flex flex-col gap-4 border-t border-[#176637]/10 bg-[#FFF6DB]/60 px-6 py-4 text-sm text-[#176637]/70 md:flex-row md:items-center md:justify-between">
                         <p>Menampilkan {filteredEmployees.length} dari {employees.length} Karyawan</p>
-                        <div className="flex items-center gap-3">
-                            <button className="rounded-lg border border-[#176637]/10 bg-white p-2 text-[#176637]">
-                                <Icon name="chevronLeft" className="h-4 w-4" stroke />
-                            </button>
-                            {[1, 2, 3].map((page) => (
-                                <button key={page} className={`min-w-10 rounded-lg px-3 py-2 font-bold ${page === 1 ? 'bg-[#176637] text-[#FFF6DB]' : 'text-[#176637]/70 hover:bg-white'}`}>
-                                    {page}
-                                </button>
-                            ))}
-                            <button className="rounded-lg border border-[#176637]/10 bg-white p-2 text-[#176637]">
-                                <Icon name="chevronRight" className="h-4 w-4" stroke />
-                            </button>
-                        </div>
                     </div>
                 </div>
 
-                <aside className="rounded-[26px] border border-[#176637]/10 bg-white p-5 shadow-sm">
-                    <div className="mb-4">
-                        <h3 className="font-gabriela text-2xl text-[#176637]">Edit Karyawan</h3>
-                        <p className="mt-1 text-sm text-[#176637]/65">Ubah nama, peran, penempatan, dan status aktif/nonaktif.</p>
-                    </div>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Nama</label>
-                            <input defaultValue={selectedEmployee?.name ?? ''} className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]" />
+                {selectedId && (
+                    <aside className="rounded-[26px] border border-[#176637]/10 bg-white p-5 shadow-sm">
+                        <div className="mb-4 flex items-center justify-between">
+                            <div>
+                                <h3 className="font-gabriela text-2xl text-[#176637]">{selectedId === 'new' ? 'Tambah Karyawan' : 'Edit Karyawan'}</h3>
+                                <p className="mt-1 text-sm text-[#176637]/65">{selectedId === 'new' ? 'Masukkan data karyawan baru.' : 'Ubah data karyawan.'}</p>
+                            </div>
+                            <button onClick={() => setSelectedId(null)} className="rounded-full p-2 text-[#176637]/50 hover:bg-[#FFF6DB] hover:text-[#176637]">
+                                <Icon name="close" className="h-5 w-5" stroke />
+                            </button>
                         </div>
-                        <div>
-                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Peran</label>
-                            <select defaultValue={selectedEmployee?.role ?? 'Barista'} className="w-full rounded-2xl border border-[#176637]/15 bg-white px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]">
-                                <option>Manager</option>
-                                <option>Barista</option>
-                                <option>Kasir</option>
-                                <option>Waiter</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Penempatan</label>
-                            <input defaultValue={selectedEmployee?.outlet ?? ''} className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]" />
-                        </div>
-                        <div>
-                            <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Status</label>
-                            <select defaultValue={selectedEmployee?.status ?? 'Aktif'} className="w-full rounded-2xl border border-[#176637]/15 bg-white px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]">
-                                <option>Aktif</option>
-                                <option>Tidak Aktif</option>
-                            </select>
-                        </div>
-                        <button className="w-full rounded-xl bg-[#176637] px-5 py-3 font-bold text-[#FFF6DB] transition hover:bg-[#FF901A]">Simpan Perubahan</button>
-                    </div>
-                </aside>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Nama</label>
+                                <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Email</label>
+                                <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]" />
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Phone</label>
+                                    <input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]" />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">NIK</label>
+                                    <input value={formData.nik} onChange={e => setFormData({...formData, nik: e.target.value})} className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Password {selectedId !== 'new' && '(Kosongkan jika tidak diubah)'}</label>
+                                <input type="password" required={selectedId === 'new'} value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Peran</label>
+                                <select value={formData.job_title} onChange={e => setFormData({...formData, job_title: e.target.value})} className="w-full rounded-2xl border border-[#176637]/15 bg-white px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]">
+                                    <option value="Manager">Manager</option>
+                                    <option value="Barista">Barista</option>
+                                    <option value="Kasir">Kasir</option>
+                                    <option value="Waiter">Waiter</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Penempatan</label>
+                                <select value={formData.outlet_id} onChange={e => setFormData({...formData, outlet_id: e.target.value})} className="w-full rounded-2xl border border-[#176637]/15 bg-white px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]">
+                                    <option value="">Pilih Outlet</option>
+                                    {outletsData.map(o => (
+                                        <option key={o.id} value={o.id}>{o.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Status</label>
+                                <select value={formData.employee_status} onChange={e => setFormData({...formData, employee_status: e.target.value})} className="w-full rounded-2xl border border-[#176637]/15 bg-white px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]">
+                                    <option value="Aktif">Aktif</option>
+                                    <option value="Tidak Aktif">Tidak Aktif</option>
+                                    <option value="Blacklist">Blacklist</option>
+                                </select>
+                            </div>
+                            <button type="submit" className="w-full rounded-xl bg-[#176637] px-5 py-3 font-bold text-[#FFF6DB] transition hover:bg-[#FF901A]">Simpan Perubahan</button>
+                        </form>
+                    </aside>
+                )}
             </div>
         </div>
     );
@@ -1004,19 +1312,76 @@ function ComplaintTab({ complaints }) {
     );
 }
 
-function MenuTab({ menuItems }) {
-    const [selectedId, setSelectedId] = useState(null);
+function MenuTab() {
+    const [menus, setMenus] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(true);
     const [search, setSearch] = useState('');
-    const selectedItem = menuItems.find((item) => item.id === selectedId) ?? null;
     const [activeCategory, setActiveCategory] = useState('Semua Menu');
-    const categories = ['Semua Menu', ...new Set(menuItems.map((item) => item.category))];
+    const [selectedId, setSelectedId] = useState(null);
+    const [formData, setFormData] = useState({
+        name: '', category: 'Signature', price: 0, summary: '', status: 'Aktif'
+    });
 
-    const filteredItems = menuItems.filter((item) => {
+    const fetchMenus = () => {
+        setIsLoading(true);
+        fetch('/api/admin/menus')
+            .then(r => r.json())
+            .then(data => setMenus(data))
+            .finally(() => setIsLoading(false));
+    };
+
+    React.useEffect(() => {
+        fetchMenus();
+    }, []);
+
+    const categories = ['Semua Menu', 'Signature', 'Comfort', 'Seasonal', ...new Set(menus.map((item) => item.category))].filter((v, i, a) => a.indexOf(v) === i);
+
+    const filteredItems = menus.filter((item) => {
         const q = search.trim().toLowerCase();
         const matchesCategory = activeCategory === 'Semua Menu' || item.category === activeCategory;
-        const matchesQuery = !q || [item.name, item.category, item.summary].some((value) => value.toLowerCase().includes(q));
+        const matchesQuery = !q || [item.name, item.category, item.description || ''].some((value) => value.toLowerCase().includes(q));
         return matchesCategory && matchesQuery;
     });
+
+    const selectedItem = selectedId === 'new' ? { name: 'Menu Baru', status: 'Aktif', category: 'Signature' } : (menus.find((item) => item.id === selectedId) ?? null);
+
+    const openCreate = () => {
+        setSelectedId('new');
+        setFormData({ name: '', category: 'Signature', price: 0, summary: '', status: 'Aktif' });
+    };
+
+    const openEdit = (item) => {
+        setSelectedId(item.id);
+        setFormData({ name: item.name, category: item.category, price: item.price, summary: item.description || '', status: item.status });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const isEditing = selectedId !== 'new';
+        const url = isEditing ? `/api/admin/menus/${selectedId}` : '/api/admin/menus';
+        const method = isEditing ? 'PUT' : 'POST';
+        
+        // Map summary to description for backend
+        const payload = { ...formData, description: formData.summary, is_featured: false };
+
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(payload)
+        }).then(r => r.json()).then(() => {
+            fetchMenus();
+            setSelectedId(null);
+        });
+    };
+
+    const handleDelete = (id) => {
+        if (confirm('Yakin ingin menghapus menu ini?')) {
+            fetch(`/api/admin/menus/${id}`, { method: 'DELETE' }).then(() => {
+                fetchMenus();
+                setSelectedId(null);
+            });
+        }
+    };
 
     return (
         <div className="animate-slide-up space-y-6">
@@ -1053,16 +1418,21 @@ function MenuTab({ menuItems }) {
                             <h2 className="font-gabriela text-3xl text-[#176637]">Daftar Menu</h2>
                             <p className="mt-1 text-sm text-[#176637]/65">Pilih item untuk membuka detail produk.</p>
                         </div>
-                        <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{filteredItems.length} item</span>
+                        <div className="flex gap-2">
+                            <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{filteredItems.length} item</span>
+                            <button onClick={openCreate} className="rounded-full bg-[#FF901A] px-3 py-1 text-xs font-bold text-[#FFF6DB] shadow-[1px_1px_0px_#176637] transition hover:translate-y-0.5">
+                                + Tambah
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    <div className={`grid gap-3 sm:grid-cols-2 xl:grid-cols-3 transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
                         {filteredItems.map((item) => {
                             const active = selectedItem?.id === item.id;
                             return (
                                 <button
                                     key={item.id}
-                                    onClick={() => setSelectedId(item.id)}
+                                    onClick={() => openEdit(item)}
                                     className={`group flex min-h-[220px] flex-col justify-between rounded-[26px] border p-4 text-left transition ${
                                         active ? 'border-[#176637] bg-[#FFF6DB] shadow-[3px_3px_0px_#176637]' : 'border-[#176637]/10 bg-white hover:border-[#72AD43] hover:shadow-sm'
                                     }`}
@@ -1088,14 +1458,14 @@ function MenuTab({ menuItems }) {
 
                 <div className="rounded-[28px] border border-[#176637]/10 bg-white p-6 shadow-sm">
                     {selectedItem ? (
-                        <>
+                        <form onSubmit={handleSubmit}>
                             <div className="mb-6 overflow-hidden rounded-[28px] border border-[#176637]/10 bg-[#FFF6DB] shadow-sm">
                                 <div className="flex items-center gap-4 p-4">
                                     <div className="h-24 w-24 flex-none rounded-[22px] bg-white p-3 shadow-[3px_3px_0px_#176637]">
                                         <img src={selectedItem?.image ?? '/minum2.png'} alt={selectedItem?.name ?? 'Preview menu'} className="h-full w-full object-contain" />
                                     </div>
                                     <div className="min-w-0">
-                                        <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#176637]/55">Menu dipilih</div>
+                                        <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#176637]/55">{selectedId === 'new' ? 'Menu Baru' : 'Menu dipilih'}</div>
                                         <h3 className="mt-1 truncate font-gabriela text-2xl text-[#176637]">{selectedItem.name}</h3>
                                         <div className="mt-2 flex flex-wrap gap-2">
                                             <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{selectedItem.category}</span>
@@ -1112,7 +1482,9 @@ function MenuTab({ menuItems }) {
                                     <h3 className="font-gabriela text-2xl text-[#176637]">Detail Produk</h3>
                                     <p className="text-sm text-[#176637]/65">Ubah nama, kategori, harga, deskripsi, status, dan foto transparan.</p>
                                 </div>
-                                <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{selectedItem.status ?? 'Aktif'}</span>
+                                {selectedId !== 'new' && (
+                                    <button type="button" onClick={() => handleDelete(selectedId)} className="rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-600 transition hover:bg-red-200">Hapus Menu</button>
+                                )}
                             </div>
 
                             <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
@@ -1120,39 +1492,44 @@ function MenuTab({ menuItems }) {
                                     <div>
                                         <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Nama Produk</label>
                                         <input
-                                            defaultValue={selectedItem?.name ?? ''}
+                                            required
+                                            value={formData.name}
+                                            onChange={e => setFormData({...formData, name: e.target.value})}
                                             className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
                                         />
                                     </div>
                                     <div>
                                         <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Kategori</label>
-                                        <select className="w-full rounded-2xl border border-[#176637]/15 bg-white px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]">
-                                            <option>Signature</option>
-                                            <option>Comfort</option>
-                                            <option>Seasonal</option>
-                                        </select>
+                                        <input 
+                                            required
+                                            value={formData.category}
+                                            onChange={e => setFormData({...formData, category: e.target.value})}
+                                            className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
+                                        />
                                     </div>
                                     <div>
                                         <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Status Landing</label>
                                         <select
-                                            defaultValue={selectedItem?.status ?? 'Aktif'}
-                                            className="w-full rounded-2xl border border-[#176637]/15 bg-white px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
+                                            value={formData.status}
+                                            onChange={e => setFormData({...formData, status: e.target.value})}
+                                            className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
                                         >
-                                            <option>Aktif</option>
-                                            <option>Tidak Aktif</option>
+                                            <option value="Aktif">Aktif</option>
+                                            <option value="Tidak Aktif">Tidak Aktif</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Harga Jual</label>
                                         <div className="flex items-center gap-2 rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3">
                                             <span className="text-[13px] font-bold text-[#176637]">Rp</span>
-                                            <input defaultValue={selectedItem?.price ?? 0} className="w-full bg-transparent text-[13px] text-[#176637] outline-none" />
+                                            <input required type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="w-full bg-transparent text-[13px] text-[#176637] outline-none" />
                                         </div>
                                     </div>
                                     <div>
                                         <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Deskripsi</label>
                                         <textarea
-                                            defaultValue={selectedItem?.summary ?? ''}
+                                            value={formData.summary}
+                                            onChange={e => setFormData({...formData, summary: e.target.value})}
                                             rows={6}
                                             className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] leading-7 text-[#176637] outline-none focus:border-[#72AD43]"
                                         />
@@ -1168,7 +1545,16 @@ function MenuTab({ menuItems }) {
                                     </div>
                                 </div>
                             </div>
-                        </>
+                            
+                            <div className="mt-8 flex items-center justify-end gap-4 border-t border-[#176637]/10 pt-6">
+                                <button type="button" onClick={() => setSelectedId(null)} className="rounded-full px-5 py-2.5 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]">
+                                    Batal
+                                </button>
+                                <button type="submit" className="rounded-full bg-[#FF901A] px-8 py-3 text-sm font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition hover:translate-y-0.5">
+                                    Simpan Menu
+                                </button>
+                            </div>
+                        </form>
                     ) : (
                         <div className="flex min-h-[520px] flex-col items-center justify-center rounded-[26px] border border-dashed border-[#176637]/15 bg-[#FFF6DB]/35 text-center">
                             <div className="mb-4 rounded-full bg-[#176637]/10 p-4 text-[#176637]">
@@ -1178,17 +1564,6 @@ function MenuTab({ menuItems }) {
                             <p className="mt-2 max-w-md text-sm leading-7 text-[#176637]/70">
                                 Klik salah satu item di daftar sebelah kiri untuk membuka kartu pilihan dan detail produk.
                             </p>
-                        </div>
-                    )}
-
-                    {selectedItem && (
-                        <div className="mt-8 flex items-center justify-end gap-4 border-t border-[#176637]/10 pt-6">
-                            <button type="button" onClick={() => setSelectedId(null)} className="rounded-full px-5 py-2.5 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]">
-                                Kembali ke Daftar
-                            </button>
-                            <button className="rounded-full bg-[#FF901A] px-8 py-3 text-sm font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition hover:translate-y-0.5">
-                                Save Changes
-                            </button>
                         </div>
                     )}
                 </div>
