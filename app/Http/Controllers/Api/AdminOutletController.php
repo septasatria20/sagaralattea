@@ -24,8 +24,13 @@ class AdminOutletController extends Controller
                 'id' => $outlet->id,
                 'name' => $outlet->name,
                 'location' => $outlet->location,
+                'address' => $outlet->address,
+                'maps_url' => $outlet->maps_url,
                 'status' => $outlet->status,
                 'account' => $mitra ? $mitra->email : '-',
+                'mitra_name' => $mitra ? $mitra->name : '',
+                'mitra_email' => $mitra ? $mitra->email : '',
+                'mitra_id' => $mitra ? $mitra->id : null,
                 'omzet' => 'Rp 0', // Placeholder
             ];
         });
@@ -77,9 +82,31 @@ class AdminOutletController extends Controller
             'address' => 'nullable|string',
             'maps_url' => 'nullable|url',
             'status' => 'required|string|in:Aktif,Tidak Aktif',
+            'mitra_name' => 'nullable|string|max:255',
+            'mitra_email' => 'nullable|email|max:255',
+            'mitra_password' => 'nullable|string|min:6',
         ]);
 
-        $outlet->update($validated);
+        $outlet->update([
+            'name' => $validated['name'],
+            'location' => $validated['location'],
+            'address' => $validated['address'],
+            'maps_url' => $validated['maps_url'] ?? null,
+            'status' => $validated['status'],
+        ]);
+
+        $mitra = User::where('outlet_id', $outlet->id)->whereHas('roles', function($q) {
+            $q->where('name', 'Mitra');
+        })->first();
+
+        if ($mitra && !empty($validated['mitra_name']) && !empty($validated['mitra_email'])) {
+            $mitra->name = $validated['mitra_name'];
+            $mitra->email = $validated['mitra_email'];
+            if (!empty($validated['mitra_password'])) {
+                $mitra->password = Hash::make($validated['mitra_password']);
+            }
+            $mitra->save();
+        }
 
         return response()->json(['message' => 'Outlet updated successfully', 'outlet' => $outlet]);
     }

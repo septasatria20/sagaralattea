@@ -34,6 +34,8 @@
         <script>
             window.__INITIAL_PAGE_DATA__ = <?php echo json_encode($pageData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
         </script>
+        <!-- SweetAlert2 for Validation Modals -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     </head>
     <body class="bg-cream text-forest-deep">
         <div id="app">

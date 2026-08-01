@@ -57,6 +57,9 @@ Route::middleware('auth')->group(function () {
             Route::apiResource('/admin/promos', \App\Http\Controllers\Api\AdminPromoController::class);
             Route::apiResource('/admin/employees', \App\Http\Controllers\Api\AdminEmployeeController::class);
             Route::apiResource('/admin/menus', \App\Http\Controllers\Api\AdminMenuController::class);
+            Route::apiResource('/admin/members', \App\Http\Controllers\Api\AdminMemberController::class);
+            Route::apiResource('/admin/complaints', \App\Http\Controllers\Api\AdminComplaintController::class);
+            Route::apiResource('/admin/investors', \App\Http\Controllers\Api\AdminInvestorController::class);
         });
         
         Route::middleware('role:Karyawan|Mitra')->group(function () {
