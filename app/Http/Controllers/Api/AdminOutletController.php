@@ -39,6 +39,7 @@ class AdminOutletController extends Controller
             'name' => 'required|string|max:255',
             'location' => 'nullable|string|max:255',
             'address' => 'nullable|string',
+            'maps_url' => 'nullable|url',
             'status' => 'required|string|in:Aktif,Tidak Aktif',
             // Mitra account details
             'mitra_name' => 'required|string|max:255',
@@ -50,6 +51,7 @@ class AdminOutletController extends Controller
             'name' => $validated['name'],
             'location' => $validated['location'],
             'address' => $validated['address'],
+            'maps_url' => $validated['maps_url'] ?? null,
             'status' => $validated['status'],
         ]);
 
@@ -73,6 +75,7 @@ class AdminOutletController extends Controller
             'name' => 'required|string|max:255',
             'location' => 'nullable|string|max:255',
             'address' => 'nullable|string',
+            'maps_url' => 'nullable|url',
             'status' => 'required|string|in:Aktif,Tidak Aktif',
         ]);
 

@@ -1,5 +1,14 @@
 import React, { useMemo, useState } from 'react';
 
+const apiFetch = (url, options = {}) => {
+    if (options.method && ['POST', 'PUT', 'DELETE'].includes(options.method.toUpperCase())) {
+        options.headers = {
+            ...options.headers,
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+        };
+    }
+    return window.fetch(url, options);
+};
 const navigation = [
     { id: 'overview', label: 'Overview', icon: 'dashboard' },
     { id: 'outlet', label: 'Manajemen Mitra / Outlet', icon: 'store' },
@@ -312,7 +321,7 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
     React.useEffect(() => {
         if (!startDate || !endDate) return;
         setIsLoading(true);
-        fetch(`/api/admin/dashboard/stats?start=${startDate}&end=${endDate}`)
+        apiFetch(`/api/admin/dashboard/stats?start=${startDate}&end=${endDate}`)
             .then(res => res.json())
             .then(data => {
                 setStats(data.stats);
@@ -412,13 +421,13 @@ function OutletTab() {
     const [viewMode, setViewMode] = React.useState('list');
     const [editingId, setEditingId] = React.useState(null);
     const [formData, setFormData] = React.useState({
-        name: '', location: '', address: '', status: 'Aktif',
+        name: '', location: '', address: '', maps_url: '', status: 'Aktif',
         mitra_name: '', mitra_email: '', mitra_password: ''
     });
 
     const fetchOutlets = () => {
         setIsLoading(true);
-        fetch('/api/admin/outlets')
+        apiFetch('/api/admin/outlets')
             .then(r => r.json())
             .then(data => setOutlets(data))
             .finally(() => setIsLoading(false));
@@ -430,13 +439,13 @@ function OutletTab() {
 
     const openCreate = () => {
         setEditingId(null);
-        setFormData({ name: '', location: '', address: '', status: 'Aktif', mitra_name: '', mitra_email: '', mitra_password: '' });
+        setFormData({ name: '', location: '', address: '', maps_url: '', status: 'Aktif', mitra_name: '', mitra_email: '', mitra_password: '' });
         setViewMode('form');
     };
 
     const openEdit = (outlet) => {
         setEditingId(outlet.id);
-        setFormData({ name: outlet.name, location: outlet.location || '', address: outlet.address || '', status: outlet.status, mitra_name: '', mitra_email: '', mitra_password: '' });
+        setFormData({ name: outlet.name, location: outlet.location || '', address: outlet.address || '', maps_url: outlet.maps_url || '', status: outlet.status, mitra_name: '', mitra_email: '', mitra_password: '' });
         setViewMode('form');
     };
 
@@ -449,7 +458,7 @@ function OutletTab() {
         const url = editingId ? `/api/admin/outlets/${editingId}` : '/api/admin/outlets';
         const method = editingId ? 'PUT' : 'POST';
 
-        fetch(url, {
+        apiFetch(url, {
             method,
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify(formData)
@@ -461,7 +470,7 @@ function OutletTab() {
 
     const handleDelete = (id) => {
         if (confirm('Yakin ingin menghapus outlet ini?')) {
-            fetch(`/api/admin/outlets/${id}`, { method: 'DELETE' }).then(() => fetchOutlets());
+            apiFetch(`/api/admin/outlets/${id}`, { method: 'DELETE' }).then(() => fetchOutlets());
         }
     };
 
@@ -479,56 +488,65 @@ function OutletTab() {
                     </div>
                 </div>
 
-                <div className="grid gap-6 p-5 lg:grid-cols-[1.15fr_0.85fr] lg:p-6">
-                    <form id="outletForm" onSubmit={handleSubmit} className="flex flex-col gap-5">
-                        <div>
-                            <label className="mb-1 block text-sm font-bold text-[#176637]">Nama Outlet</label>
-                            <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
-                        </div>
-                        <div>
-                            <label className="mb-1 block text-sm font-bold text-[#176637]">Lokasi (Kota)</label>
-                            <input value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
-                        </div>
-                        <div>
-                            <label className="mb-1 block text-sm font-bold text-[#176637]">Alamat Lengkap</label>
-                            <textarea value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows="5" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
-                        </div>
-                        <div>
-                            <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
-                            <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
-                                <option value="Aktif">Aktif</option>
-                                <option value="Tidak Aktif">Tidak Aktif</option>
-                            </select>
+                <form id="outletForm" onSubmit={handleSubmit} className="p-5 lg:p-6">
+                    <div className="grid gap-6 lg:grid-cols-2">
+                        <div className="flex flex-col gap-5">
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Nama Outlet</label>
+                                <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Lokasi (Kota)</label>
+                                <input value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Alamat Lengkap</label>
+                                <textarea value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows="5" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Link Google Maps</label>
+                                <input value={formData.maps_url} onChange={e => setFormData({...formData, maps_url: e.target.value})} placeholder="https://maps.google.com/..." className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
+                                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                    <option value="Aktif">Aktif</option>
+                                    <option value="Tidak Aktif">Tidak Aktif</option>
+                                </select>
+                            </div>
                         </div>
 
-                        {!editingId && (
-                            <div className="rounded-2xl border border-[#176637]/10 bg-[#FFF6DB]/30 p-5">
-                                <h4 className="mb-4 font-gabriela text-lg text-[#176637]">Informasi Akun Mitra</h4>
-                                <div className="flex flex-col gap-4">
-                                    <div>
-                                        <label className="mb-1 block text-sm font-bold text-[#176637]">Nama PIC Mitra</label>
-                                        <input required value={formData.mitra_name} onChange={e => setFormData({...formData, mitra_name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
-                                    </div>
-                                    <div>
-                                        <label className="mb-1 block text-sm font-bold text-[#176637]">Email Akun Mitra</label>
-                                        <input required type="email" value={formData.mitra_email} onChange={e => setFormData({...formData, mitra_email: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
-                                    </div>
-                                    <div>
-                                        <label className="mb-1 block text-sm font-bold text-[#176637]">Password</label>
-                                        <input required type="password" value={formData.mitra_password} onChange={e => setFormData({...formData, mitra_password: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                        <div>
+                            {!editingId && (
+                                <div className="rounded-2xl border border-[#176637]/10 bg-[#FFF6DB]/30 p-5">
+                                    <h4 className="mb-4 font-gabriela text-lg text-[#176637]">Informasi Akun Mitra</h4>
+                                    <div className="flex flex-col gap-4">
+                                        <div>
+                                            <label className="mb-1 block text-sm font-bold text-[#176637]">Nama PIC Mitra</label>
+                                            <input required value={formData.mitra_name} onChange={e => setFormData({...formData, mitra_name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                        </div>
+                                        <div>
+                                            <label className="mb-1 block text-sm font-bold text-[#176637]">Email Akun Mitra</label>
+                                            <input required type="email" value={formData.mitra_email} onChange={e => setFormData({...formData, mitra_email: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                        </div>
+                                        <div>
+                                            <label className="mb-1 block text-sm font-bold text-[#176637]">Password</label>
+                                            <input required type="password" value={formData.mitra_password} onChange={e => setFormData({...formData, mitra_password: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </form>
-
-                    <aside className="rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB]/35 p-5">
-                        <h4 className="font-gabriela text-xl text-[#176637]">Catatan</h4>
-                        <p className="mt-3 text-sm leading-7 text-[#176637]/70">
-                            Setiap outlet baru otomatis menyiapkan akun mitra.
-                        </p>
-                    </aside>
-                </div>
+                            )}
+                            {editingId && (
+                                <div className="rounded-2xl border border-dashed border-[#176637]/15 bg-[#FFF6DB]/35 p-5">
+                                    <h4 className="font-gabriela text-xl text-[#176637]">Informasi Akun Mitra</h4>
+                                    <p className="mt-3 text-sm leading-7 text-[#176637]/70">
+                                        Akun mitra telah dibuat saat penambahan outlet. Untuk mereset kredensial atau email, harap hubungi Superadmin.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </form>
 
                 <div className="border-t border-[#176637]/10 bg-[#FFF6DB]/30 px-5 py-4 sm:px-6">
                     <div className="flex flex-col gap-3 sm:flex-row">
@@ -611,19 +629,23 @@ function OutletTab() {
 
 function PromoTab() {
     const [promos, setPromos] = React.useState([]);
+    const [menus, setMenus] = React.useState([]);
     const [isLoading, setIsLoading] = React.useState(true);
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [editingId, setEditingId] = React.useState(null);
     const [formData, setFormData] = React.useState({
-        title: '', code: '', summary: '', start_date: '', end_date: '', target: '', status: 'Aktif'
+        title: '', code: '', summary: '', start_date: '', end_date: '', target: 'Semua Orang', applicable_products: [], status: 'Aktif'
     });
 
     const fetchPromos = () => {
         setIsLoading(true);
-        fetch('/api/admin/promos')
-            .then(r => r.json())
-            .then(data => setPromos(data))
-            .finally(() => setIsLoading(false));
+        Promise.all([
+            window.fetch('/api/admin/promos').then(r => r.json()),
+            window.fetch('/api/admin/menus').then(r => r.json())
+        ]).then(([promoData, menuData]) => {
+            setPromos(promoData);
+            setMenus(menuData);
+        }).finally(() => setIsLoading(false));
     };
 
     React.useEffect(() => {
@@ -632,7 +654,7 @@ function PromoTab() {
 
     const openCreate = () => {
         setEditingId(null);
-        setFormData({ title: '', code: '', summary: '', start_date: '', end_date: '', target: '', status: 'Aktif' });
+        setFormData({ title: '', code: '', summary: '', start_date: '', end_date: '', target: 'Semua Orang', applicable_products: [], status: 'Aktif' });
         setIsModalOpen(true);
     };
 
@@ -644,7 +666,8 @@ function PromoTab() {
             summary: promo.summary || '', 
             start_date: promo.start_date || '', 
             end_date: promo.end_date || '', 
-            target: promo.target || '', 
+            target: promo.target || 'Semua Orang', 
+            applicable_products: promo.applicable_products || [],
             status: promo.status 
         });
         setIsModalOpen(true);
@@ -659,7 +682,7 @@ function PromoTab() {
         if (!payload.start_date) payload.start_date = null;
         if (!payload.end_date) payload.end_date = null;
 
-        fetch(url, {
+        apiFetch(url, {
             method,
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify(payload)
@@ -671,7 +694,7 @@ function PromoTab() {
 
     const handleDelete = (id) => {
         if (confirm('Yakin ingin menghapus promo ini?')) {
-            fetch(`/api/admin/promos/${id}`, { method: 'DELETE' }).then(() => fetchPromos());
+            apiFetch(`/api/admin/promos/${id}`, { method: 'DELETE' }).then(() => fetchPromos());
         }
     };
 
@@ -713,33 +736,60 @@ function PromoTab() {
                                 <input type="date" value={formData.end_date} onChange={e => setFormData({...formData, end_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                         </div>
-                        <div>
-                            <label className="mb-1 block text-sm font-bold text-[#176637]">Target Audiens</label>
-                            <input value={formData.target} onChange={e => setFormData({...formData, target: e.target.value})} placeholder="Cth: Semua Outlet" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Target Audiens</label>
+                                <select value={formData.target} onChange={e => setFormData({...formData, target: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                    <option value="Semua Orang">Semua Orang</option>
+                                    <option value="Khusus Member">Khusus Member</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
+                                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                    <option value="Aktif">Aktif</option>
+                                    <option value="Jadwal">Jadwal</option>
+                                    <option value="Selesai">Selesai</option>
+                                </select>
+                            </div>
                         </div>
                         <div>
-                            <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
-                            <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
-                                <option value="Aktif">Aktif</option>
-                                <option value="Jadwal">Jadwal</option>
-                                <option value="Selesai">Selesai</option>
-                            </select>
+                            <label className="mb-2 block text-sm font-bold text-[#176637]">Produk yang Promo</label>
+                            <div className="max-h-48 overflow-y-auto rounded-xl border-2 border-[#176637]/20 bg-white p-3">
+                                {menus.length === 0 ? (
+                                    <div className="text-center text-sm text-[#176637]/50">Belum ada menu.</div>
+                                ) : (
+                                    <div className="grid gap-2 sm:grid-cols-2">
+                                        {menus.map(menu => (
+                                            <label key={menu.id} className="flex cursor-pointer items-start gap-2 rounded-lg p-2 transition hover:bg-[#FFF6DB]/50">
+                                                <input 
+                                                    type="checkbox" 
+                                                    className="mt-1 h-4 w-4 rounded border-gray-300 text-[#72AD43] focus:ring-[#72AD43]"
+                                                    checked={(formData.applicable_products || []).includes(menu.id) || (formData.applicable_products || []).includes(String(menu.id))}
+                                                    onChange={e => {
+                                                        const isChecked = e.target.checked;
+                                                        setFormData(prev => {
+                                                            const current = prev.applicable_products || [];
+                                                            if (isChecked) {
+                                                                return { ...prev, applicable_products: [...current, menu.id] };
+                                                            } else {
+                                                                return { ...prev, applicable_products: current.filter(id => String(id) !== String(menu.id)) };
+                                                            }
+                                                        });
+                                                    }}
+                                                />
+                                                <div>
+                                                    <div className="text-sm font-medium text-[#176637]">{menu.name}</div>
+                                                    <div className="text-xs text-[#176637]/60">Rp {menu.price?.toLocaleString('id-ID')}</div>
+                                                </div>
+                                            </label>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </form>
 
-                    <aside className="rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB]/35 p-5">
-                        <h4 className="font-gabriela text-xl text-[#176637]">Preview Singkat</h4>
-                        <div className="mt-4 rounded-2xl border border-[#176637]/10 bg-white p-4">
-                            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${formData.status === 'Aktif' ? 'bg-[#72AD43]/20 text-[#176637]' : 'bg-[#FF901A]/20 text-[#FF901A]'}`}>
-                                {formData.status || 'Status'}
-                            </span>
-                            <h5 className="mt-4 font-gabriela text-2xl text-[#176637]">{formData.title || 'Judul promo'}</h5>
-                            <p className="mt-2 text-sm leading-7 text-[#176637]/70">{formData.summary || 'Ringkasan promo akan tampil di sini.'}</p>
-                            <div className="mt-4 text-sm text-[#176637]/65">
-                                {formData.start_date || 'mulai'} - {formData.end_date || 'selesai'}
-                            </div>
-                        </div>
-                    </aside>
                 </div>
 
                 <div className="border-t border-[#176637]/10 bg-[#FFF6DB]/30 px-5 py-4 sm:px-6">
@@ -894,8 +944,8 @@ function EmployeeTab() {
     const fetchData = () => {
         setIsLoading(true);
         Promise.all([
-            fetch('/api/admin/employees').then(r => r.json()),
-            fetch('/api/admin/outlets').then(r => r.json())
+            apiFetch('/api/admin/employees').then(r => r.json()),
+            apiFetch('/api/admin/outlets').then(r => r.json())
         ]).then(([empData, outData]) => {
             setEmployees(empData);
             setOutletsData(outData);
@@ -948,7 +998,7 @@ function EmployeeTab() {
     const toggleBlacklist = (emp) => {
         const newStatus = emp.employee_status === 'Blacklist' ? 'Aktif' : 'Blacklist';
         if (confirm(`Yakin ingin mengubah status blacklist karyawan ini?`)) {
-            fetch(`/api/admin/employees/${emp.id}`, {
+            apiFetch(`/api/admin/employees/${emp.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({ ...emp, employee_status: newStatus })
@@ -962,7 +1012,7 @@ function EmployeeTab() {
         const url = isEditing ? `/api/admin/employees/${selectedId}` : '/api/admin/employees';
         const method = isEditing ? 'PUT' : 'POST';
         
-        fetch(url, {
+        apiFetch(url, {
             method,
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify(formData)
@@ -974,7 +1024,7 @@ function EmployeeTab() {
 
     const handleDelete = (id) => {
         if (confirm('Yakin ingin menghapus karyawan ini?')) {
-            fetch(`/api/admin/employees/${id}`, { method: 'DELETE' }).then(() => {
+            apiFetch(`/api/admin/employees/${id}`, { method: 'DELETE' }).then(() => {
                 fetchData();
                 setSelectedId(null);
             });
@@ -1484,7 +1534,7 @@ function MenuTab() {
 
     const fetchMenus = () => {
         setIsLoading(true);
-        fetch('/api/admin/menus')
+        apiFetch('/api/admin/menus')
             .then(r => r.json())
             .then(data => setMenus(data))
             .finally(() => setIsLoading(false));
@@ -1524,7 +1574,7 @@ function MenuTab() {
         // Map summary to description for backend
         const payload = { ...formData, description: formData.summary, is_featured: false };
 
-        fetch(url, {
+        apiFetch(url, {
             method,
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify(payload)
@@ -1536,7 +1586,7 @@ function MenuTab() {
 
     const handleDelete = (id) => {
         if (confirm('Yakin ingin menghapus menu ini?')) {
-            fetch(`/api/admin/menus/${id}`, { method: 'DELETE' }).then(() => {
+            apiFetch(`/api/admin/menus/${id}`, { method: 'DELETE' }).then(() => {
                 fetchMenus();
                 setSelectedId(null);
             });

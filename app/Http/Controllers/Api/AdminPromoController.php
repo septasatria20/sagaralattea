@@ -21,7 +21,8 @@ class AdminPromoController extends Controller
             'summary' => 'nullable|string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-            'target' => 'nullable|string|max:255',
+            'target' => 'nullable|string|in:Semua Orang,Khusus Member',
+            'applicable_products' => 'nullable|array',
             'status' => 'required|string|in:Aktif,Jadwal,Selesai',
         ]);
 
@@ -38,7 +39,8 @@ class AdminPromoController extends Controller
             'summary' => 'nullable|string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-            'target' => 'nullable|string|max:255',
+            'target' => 'nullable|string|in:Semua Orang,Khusus Member',
+            'applicable_products' => 'nullable|array',
             'status' => 'required|string|in:Aktif,Jadwal,Selesai',
         ]);
 

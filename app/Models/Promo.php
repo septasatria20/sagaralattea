@@ -7,4 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Promo extends Model
 {
     protected $guarded = [];
+
+    protected $casts = [
+        'applicable_products' => 'array',
+    ];
 }
