@@ -192,14 +192,14 @@ function QrGeneratorModal({ isOpen, onClose, tables = [] }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#176637]/40 px-4 backdrop-blur-sm" onClick={onClose}>
-            <div className="reveal relative w-full max-w-sm overflow-hidden rounded-[32px] border border-[#72AD43]/20 bg-white text-center shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-[#176637]/40 px-4 py-4 backdrop-blur-sm sm:items-center sm:py-6" onClick={onClose}>
+            <div className="reveal relative w-full max-w-sm max-h-[calc(100vh-2rem)] overflow-hidden rounded-[32px] border border-[#72AD43]/20 bg-white text-center shadow-2xl sm:max-h-[calc(100vh-3rem)]" onClick={e => e.stopPropagation()}>
                 <div className="bg-[#176637] p-6 text-[#FFF6DB]">
                     <h3 className="font-gabriela text-2xl">Cetak QR Meja</h3>
                     <p className="mt-1 text-sm opacity-80">Pilih meja untuk membuat QR permanen</p>
                 </div>
                 
-                <div className="p-8">
+                <div className="max-h-[calc(100vh-12rem)] overflow-y-auto p-6 sm:max-h-[calc(100vh-14rem)] sm:p-8">
                     <select 
                         value={selectedTable}
                         onChange={(e) => setSelectedTable(e.target.value)}
@@ -384,7 +384,7 @@ function Sidebar({ activeTab, setActiveTab, logoUrl, user }) {
     ];
 
     return (
-        <aside className="relative flex min-h-screen w-64 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl">
+        <aside className="relative flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl">
             <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
                 <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
             </svg>
@@ -889,23 +889,6 @@ function POSView({ user }) {
 }
 function EmployeesView() {
     const [members, setMembers] = useState(teamMembers);
-    const [editingNik, setEditingNik] = useState(null);
-    const [editForm, setEditForm] = useState({ name: '', phone: '', role: '', status: 'Aktif' });
-
-    const beginEdit = (member) => {
-        setEditingNik(member.nik);
-        setEditForm({
-            name: member.name,
-            phone: member.phone,
-            role: member.role,
-            status: member.status,
-        });
-    };
-
-    const saveEdit = () => {
-        setMembers((current) => current.map((member) => (member.nik === editingNik ? { ...member, ...editForm } : member)));
-        setEditingNik(null);
-    };
 
     return (
         <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
@@ -914,39 +897,7 @@ function EmployeesView() {
                     <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Manajemen Tim</h1>
                     <p className="text-sm font-medium text-[#72AD43]">Daftar Karyawan Outlet Harmoni</p>
                 </div>
-                <button className="flex items-center gap-2 rounded-full bg-[#FF901A] px-6 py-2 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition-all hover:translate-y-1 hover:shadow-[2px_2px_0px_#176637]">
-                    <Icon name="plus" className="h-[18px] w-[18px]" stroke />
-                    Tambah Karyawan
-                </button>
             </header>
-
-            {editingNik && (
-                <section className="mb-8 rounded-[28px] border border-[#176637]/10 bg-white p-5 shadow-sm">
-                    <div className="mb-4 flex items-center justify-between">
-                        <div>
-                            <h2 className="font-gabriela text-2xl text-[#176637]">Edit Karyawan</h2>
-                            <p className="text-sm text-[#176637]/60">Ubah nama, nomor HP, posisi, dan status.</p>
-                        </div>
-                        <button onClick={() => setEditingNik(null)} className="text-sm font-semibold text-[#176637]/60 hover:text-[#FF901A]">
-                            Tutup
-                        </button>
-                    </div>
-                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                        <input value={editForm.name} onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm outline-none" placeholder="Nama" />
-                        <input value={editForm.phone} onChange={(event) => setEditForm((current) => ({ ...current, phone: event.target.value }))} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm outline-none" placeholder="No HP" />
-                        <input value={editForm.role} onChange={(event) => setEditForm((current) => ({ ...current, role: event.target.value }))} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm outline-none" placeholder="Posisi" />
-                        <select value={editForm.status} onChange={(event) => setEditForm((current) => ({ ...current, status: event.target.value }))} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm outline-none">
-                            <option>Aktif</option>
-                            <option>Tidak Aktif</option>
-                        </select>
-                    </div>
-                    <div className="mt-4 flex justify-end">
-                        <button onClick={saveEdit} className="rounded-full bg-[#176637] px-6 py-2 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A]">
-                            Simpan Perubahan
-                        </button>
-                    </div>
-                </section>
-            )}
 
             <div className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
                 <div className="overflow-x-auto">
@@ -975,23 +926,19 @@ function EmployeesView() {
                                     </td>
                                     <td className="p-4">
                                         <div className="flex items-center gap-2">
-                                            <a
-                                                href={`https://wa.me/${member.phone}`}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="inline-flex items-center gap-2 rounded-full bg-[#176637] px-3 py-2 text-xs font-bold text-[#FFF6DB] transition hover:bg-[#0f4b28]"
-                                            >
-                                                <Icon name="whatsapp" className="h-3.5 w-3.5" stroke />
-                                                WA
-                                            </a>
-                                            <button
-                                                type="button"
-                                                onClick={() => beginEdit(member)}
-                                                className="inline-flex items-center gap-2 rounded-full border border-[#176637]/15 px-3 py-2 text-xs font-bold text-[#176637] transition hover:bg-[#FFF6DB]"
-                                            >
+                                        <a
+                                            href={`https://wa.me/${member.phone}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="inline-flex items-center gap-2 rounded-full bg-[#176637] px-3 py-2 text-xs font-bold text-[#FFF6DB] transition hover:bg-[#0f4b28]"
+                                        >
+                                            <Icon name="whatsapp" className="h-3.5 w-3.5" stroke />
+                                            WA
+                                        </a>
+                                            <span className="inline-flex items-center gap-2 rounded-full border border-[#176637]/15 px-3 py-2 text-xs font-bold text-[#176637]/45">
                                                 <Icon name="pencil" className="h-3.5 w-3.5" stroke />
-                                                Edit
-                                            </button>
+                                                Edit via Admin
+                                            </span>
                                         </div>
                                     </td>
                                 </tr>
@@ -1189,79 +1136,85 @@ function ReportView() {
                         <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
                             <h2 className="font-gabriela text-2xl text-[#176637]">Rekap Finance</h2>
                         </div>
-                        <table className="min-w-full text-left">
-                            <thead>
-                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                    <th className="p-4 pl-6">Periode</th>
-                                    <th className="p-4">Nilai</th>
-                                    <th className="p-4">Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {financeReports.map((item) => (
-                                    <tr key={item.key} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
-                                        <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
-                                        <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full min-w-max text-left">
+                                <thead>
+                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                        <th className="p-4 pl-6">Periode</th>
+                                        <th className="p-4">Nilai</th>
+                                        <th className="p-4">Keterangan</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {financeReports.map((item) => (
+                                        <tr key={item.key} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
+                                            <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
+                                            <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
                         <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
                             <h2 className="font-gabriela text-2xl text-[#176637]">Riwayat Pesanan</h2>
                         </div>
-                        <table className="min-w-full text-left">
-                            <thead>
-                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                    <th className="p-4 pl-6">No</th>
-                                    <th className="p-4">Item</th>
-                                    <th className="p-4">Tipe</th>
-                                    <th className="p-4">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {orderReports.map((item) => (
-                                    <tr key={item.id} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
-                                        <td className="p-4 text-sm text-[#176637]">
-                                            <div className="font-semibold">{item.item}</div>
-                                            <div className="text-xs text-[#176637]/55">{item.time}</div>
-                                        </td>
-                                        <td className="p-4 text-sm text-[#176637]/70">{item.type}</td>
-                                        <td className="p-4 text-sm font-bold text-[#176637]">{item.total}</td>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full min-w-max text-left">
+                                <thead>
+                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                        <th className="p-4 pl-6">No</th>
+                                        <th className="p-4">Item</th>
+                                        <th className="p-4">Tipe</th>
+                                        <th className="p-4">Total</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {orderReports.map((item) => (
+                                        <tr key={item.id} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
+                                            <td className="p-4 text-sm text-[#176637]">
+                                                <div className="font-semibold">{item.item}</div>
+                                                <div className="text-xs text-[#176637]/55">{item.time}</div>
+                                            </td>
+                                            <td className="p-4 text-sm text-[#176637]/70">{item.type}</td>
+                                            <td className="p-4 text-sm font-bold text-[#176637]">{item.total}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
                         <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
                             <h2 className="font-gabriela text-2xl text-[#176637]">Riwayat Tambah Stok</h2>
                         </div>
-                        <table className="min-w-full text-left">
-                            <thead>
-                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                    <th className="p-4 pl-6">ID</th>
-                                    <th className="p-4">Item</th>
-                                    <th className="p-4">Perubahan</th>
-                                    <th className="p-4">Sumber</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {stockMovements.map((item) => (
-                                    <tr key={item.id} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
-                                        <td className="p-4 text-sm text-[#176637]">{item.item}</td>
-                                        <td className="p-4 text-sm font-bold text-[#176637]">{item.change}</td>
-                                        <td className="p-4 text-sm text-[#176637]/70">{item.source}</td>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full min-w-max text-left">
+                                <thead>
+                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                        <th className="p-4 pl-6">ID</th>
+                                        <th className="p-4">Item</th>
+                                        <th className="p-4">Perubahan</th>
+                                        <th className="p-4">Sumber</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {stockMovements.map((item) => (
+                                        <tr key={item.id} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
+                                            <td className="p-4 text-sm text-[#176637]">{item.item}</td>
+                                            <td className="p-4 text-sm font-bold text-[#176637]">{item.change}</td>
+                                            <td className="p-4 text-sm text-[#176637]/70">{item.source}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
                 </div>
 

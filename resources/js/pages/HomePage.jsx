@@ -26,8 +26,8 @@ function LogoMark({ variant = 'light' }) {
 function NotificationModal({ isOpen, title = 'Pemberitahuan', message, onClose }) {
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#176637]/40 px-4 backdrop-blur-sm" onClick={onClose}>
-            <div className="reveal relative w-full max-w-sm rounded-[32px] border border-[#72AD43]/20 bg-white p-8 text-center shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-[#176637]/40 px-4 py-4 backdrop-blur-sm sm:items-center sm:py-6" onClick={onClose}>
+            <div className="reveal relative w-full max-w-sm rounded-[32px] border border-[#72AD43]/20 bg-white p-8 text-center shadow-2xl max-h-[calc(100vh-2rem)] overflow-y-auto" onClick={e => e.stopPropagation()}>
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#FF901A]/10 text-[#FF901A]">
                     <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

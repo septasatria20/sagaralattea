@@ -86,7 +86,7 @@ function Icon({ name, className = 'h-5 w-5', stroke = false }) {
 
 function Sidebar({ activeMenu, setActiveMenu, logoUrl }) {
     return (
-        <aside className="relative flex min-h-screen w-64 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl">
+        <aside className="relative flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl">
             <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
                 <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
             </svg>
@@ -131,15 +131,15 @@ function Header({ title }) {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
 
     return (
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-[#176637]/10 bg-[#FFF6DB]/80 px-8 py-5 backdrop-blur-md">
+        <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 border-b border-[#176637]/10 bg-[#FFF6DB]/80 px-4 py-4 backdrop-blur-md md:px-8 md:py-5">
             <h1 className="font-gabriela flex items-center gap-3 text-2xl text-[#176637]">{title}</h1>
-            <div className="flex items-center gap-6">
-                <div className="relative">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                <div className="relative w-full sm:w-auto">
                     <Icon name="search" className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[#176637]/50" stroke />
                     <input
                         type="text"
                         placeholder="Cari data..."
-                        className="w-64 rounded-full border-2 border-[#176637]/10 bg-white py-2 pl-10 pr-4 text-sm transition-colors focus:border-[#72AD43] focus:outline-none"
+                        className="w-full rounded-full border-2 border-[#176637]/10 bg-white py-2 pl-10 pr-4 text-sm transition-colors focus:border-[#72AD43] focus:outline-none sm:w-64"
                     />
                 </div>
                 <button className="relative text-[#176637] transition-colors hover:text-[#FF901A]">
@@ -268,6 +268,40 @@ function SalesChart({ data }) {
     );
 }
 
+function CategoryDonutChart() {
+    return (
+        <div className="flex flex-col rounded-[30px] border border-[#176637]/5 bg-white p-6 shadow-sm">
+            <h3 className="mb-2 font-gabriela text-xl text-[#176637]">Proporsi Penjualan</h3>
+            <p className="mb-4 text-xs text-[#176637]/60">Berdasarkan kategori produk</p>
+            <div className="relative flex flex-1 items-center justify-center py-2">
+                <svg viewBox="0 0 100 100" className="h-full max-h-[160px] w-full max-w-[160px] -rotate-90 transform">
+                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#176637" strokeWidth="16" strokeDasharray="251.2" strokeDashoffset="0" className="opacity-10" />
+                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#72AD43" strokeWidth="16" strokeDasharray="251.2" strokeDashoffset="100.48" className="transition-all duration-1000 ease-out" />
+                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#FF901A" strokeWidth="16" strokeDasharray="251.2" strokeDashoffset="188.4" className="transition-all duration-1000 ease-out" />
+                </svg>
+                <div className="absolute flex flex-col items-center justify-center text-center">
+                    <span className="text-xl font-bold text-[#176637]">1,4K</span>
+                    <span className="text-[10px] uppercase tracking-widest text-[#176637]/50">Pesanan</span>
+                </div>
+            </div>
+            <div className="mt-4 flex flex-col gap-3 text-xs">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-[#72AD43]" /> Latte Series</div>
+                    <span className="font-bold text-[#176637]">60%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-[#FF901A]" /> Pastry</div>
+                    <span className="font-bold text-[#176637]">25%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-[#176637] opacity-20" /> Pure Tea</div>
+                    <span className="font-bold text-[#176637]">15%</span>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentComplaints }) {
     const [startDate, setStartDate] = React.useState('');
     const [endDate, setEndDate] = React.useState('');
@@ -297,7 +331,7 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
 
 
 
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
                 <div className="relative overflow-hidden rounded-tl-[40px] rounded-br-[40px] border border-[#176637]/5 bg-white p-6 shadow-sm lg:col-span-2">
                     <div className="absolute right-6 top-4 flex gap-2 opacity-20">
                         <svg width="40" height="30" viewBox="0 0 40 30" fill="#176637">
@@ -333,6 +367,8 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
                     </div>
                     <SalesChart data={salesData} />
                 </div>
+
+                <CategoryDonutChart />
 
                 <div className="flex flex-col rounded-tr-[40px] rounded-bl-[40px] border border-[#176637]/5 bg-white p-6 shadow-sm">
                     <div className="mb-6 flex items-center justify-between">
@@ -373,7 +409,7 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
 function OutletTab() {
     const [outlets, setOutlets] = React.useState([]);
     const [isLoading, setIsLoading] = React.useState(true);
-    const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const [viewMode, setViewMode] = React.useState('list');
     const [editingId, setEditingId] = React.useState(null);
     const [formData, setFormData] = React.useState({
         name: '', location: '', address: '', status: 'Aktif',
@@ -394,37 +430,116 @@ function OutletTab() {
 
     const openCreate = () => {
         setEditingId(null);
-        setFormData({ name: '', location: '', address: '', status: 'Aktif', mitra_name: '', mitra_email: '', mitra_password: ''});
-        setIsModalOpen(true);
+        setFormData({ name: '', location: '', address: '', status: 'Aktif', mitra_name: '', mitra_email: '', mitra_password: '' });
+        setViewMode('form');
     };
 
     const openEdit = (outlet) => {
         setEditingId(outlet.id);
-        setFormData({ name: outlet.name, location: outlet.location || '', address: outlet.address || '', status: outlet.status, mitra_name: '', mitra_email: '', mitra_password: ''});
-        setIsModalOpen(true);
+        setFormData({ name: outlet.name, location: outlet.location || '', address: outlet.address || '', status: outlet.status, mitra_name: '', mitra_email: '', mitra_password: '' });
+        setViewMode('form');
+    };
+
+    const closeForm = () => {
+        setViewMode('list');
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const url = editingId ? `/api/admin/outlets/${editingId}` : '/api/admin/outlets';
         const method = editingId ? 'PUT' : 'POST';
-        
+
         fetch(url, {
             method,
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify(formData)
         }).then(r => r.json()).then(() => {
-            setIsModalOpen(false);
+            setViewMode('list');
             fetchOutlets();
         });
     };
 
     const handleDelete = (id) => {
         if (confirm('Yakin ingin menghapus outlet ini?')) {
-            fetch(`/api/admin/outlets/${id}`, { method: 'DELETE' })
-                .then(() => fetchOutlets());
+            fetch(`/api/admin/outlets/${id}`, { method: 'DELETE' }).then(() => fetchOutlets());
         }
     };
+
+    if (viewMode === 'form') {
+        return (
+            <section className="animate-slide-up overflow-hidden rounded-[28px] border border-[#176637]/10 bg-white shadow-sm">
+                <div className="flex flex-col gap-4 border-b border-[#176637]/10 bg-[#FFF6DB]/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                    <div>
+                        <button onClick={closeForm} className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#176637]/15 px-3 py-2 text-xs font-bold text-[#176637] transition hover:bg-white">
+                            <Icon name="chevronLeft" className="h-4 w-4" stroke />
+                            Kembali ke Daftar
+                        </button>
+                        <h3 className="font-gabriela text-2xl text-[#176637]">{editingId ? 'Edit Outlet' : 'Tambah Mitra / Outlet Baru'}</h3>
+                        <p className="text-sm text-[#176637]/60">Halaman khusus agar form tidak terpotong di layar kecil.</p>
+                    </div>
+                </div>
+
+                <div className="grid gap-6 p-5 lg:grid-cols-[1.15fr_0.85fr] lg:p-6">
+                    <form id="outletForm" onSubmit={handleSubmit} className="flex flex-col gap-5">
+                        <div>
+                            <label className="mb-1 block text-sm font-bold text-[#176637]">Nama Outlet</label>
+                            <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm font-bold text-[#176637]">Lokasi (Kota)</label>
+                            <input value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm font-bold text-[#176637]">Alamat Lengkap</label>
+                            <textarea value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows="5" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
+                            <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                <option value="Aktif">Aktif</option>
+                                <option value="Tidak Aktif">Tidak Aktif</option>
+                            </select>
+                        </div>
+
+                        {!editingId && (
+                            <div className="rounded-2xl border border-[#176637]/10 bg-[#FFF6DB]/30 p-5">
+                                <h4 className="mb-4 font-gabriela text-lg text-[#176637]">Informasi Akun Mitra</h4>
+                                <div className="flex flex-col gap-4">
+                                    <div>
+                                        <label className="mb-1 block text-sm font-bold text-[#176637]">Nama PIC Mitra</label>
+                                        <input required value={formData.mitra_name} onChange={e => setFormData({...formData, mitra_name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-sm font-bold text-[#176637]">Email Akun Mitra</label>
+                                        <input required type="email" value={formData.mitra_email} onChange={e => setFormData({...formData, mitra_email: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-sm font-bold text-[#176637]">Password</label>
+                                        <input required type="password" value={formData.mitra_password} onChange={e => setFormData({...formData, mitra_password: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </form>
+
+                    <aside className="rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB]/35 p-5">
+                        <h4 className="font-gabriela text-xl text-[#176637]">Catatan</h4>
+                        <p className="mt-3 text-sm leading-7 text-[#176637]/70">
+                            Setiap outlet baru otomatis menyiapkan akun mitra.
+                        </p>
+                    </aside>
+                </div>
+
+                <div className="border-t border-[#176637]/10 bg-[#FFF6DB]/30 px-5 py-4 sm:px-6">
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                        <button type="button" onClick={closeForm} className="flex-1 rounded-xl bg-gray-200/70 py-3 font-bold text-gray-600 transition-colors hover:bg-gray-200">Batal</button>
+                        <button form="outletForm" type="submit" className="flex-1 rounded-xl bg-[#FF901A] py-3 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-0.5 hover:shadow-[1px_1px_0px_#176637]">Simpan</button>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
     return (
         <div className="animate-slide-up">
             <div className="mb-6 flex items-center justify-between">
@@ -438,8 +553,8 @@ function OutletTab() {
                 </button>
             </div>
 
-            <div className="overflow-hidden rounded-tl-[30px] rounded-br-[30px] border border-[#176637]/10 bg-white shadow-sm">
-                <table className="w-full border-collapse text-left">
+            <div className="overflow-x-auto rounded-tl-[30px] rounded-br-[30px] border border-[#176637]/10 bg-white shadow-sm">
+                <table className="w-full min-w-max border-collapse text-left">
                     <thead>
                         <tr className="border-b-2 border-[#176637]/10 bg-[#FFF6DB]/50 text-sm font-bold text-[#176637]">
                             <th className="p-4 pl-6">Nama Mitra / Outlet</th>
@@ -490,65 +605,6 @@ function OutletTab() {
                     </tbody>
                 </table>
             </div>
-
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-                    <div className="w-full max-w-lg rounded-3xl bg-white p-6 sm:p-8 shadow-xl max-h-[90vh] overflow-y-auto">
-                        <div className="mb-6 flex items-center justify-between">
-                            <h3 className="font-gabriela text-xl text-[#176637]">{editingId ? 'Edit Outlet' : 'Tambah Mitra / Outlet Baru'}</h3>
-                            <button onClick={() => setIsModalOpen(false)} className="rounded-full p-2 text-[#176637]/50 hover:bg-[#FFF6DB] hover:text-[#176637]">
-                                <Icon name="close" className="h-5 w-5" stroke />
-                            </button>
-                        </div>
-                        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                            <div>
-                                <label className="mb-1 block text-sm font-bold text-[#176637]">Nama Outlet</label>
-                                <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm font-bold text-[#176637]">Lokasi (Kota)</label>
-                                <input value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm font-bold text-[#176637]">Alamat Lengkap</label>
-                                <textarea value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows="3" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
-                                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]">
-                                    <option value="Aktif">Aktif</option>
-                                    <option value="Tidak Aktif">Tidak Aktif</option>
-                                </select>
-                            </div>
-                            
-                            {!editingId && (
-                                <div className="mt-4 border-t-2 border-dashed border-[#176637]/20 pt-4">
-                                    <h4 className="mb-3 font-gabriela text-lg text-[#176637]">Informasi Akun Mitra</h4>
-                                    <div className="flex flex-col gap-4">
-                                        <div>
-                                            <label className="mb-1 block text-sm font-bold text-[#176637]">Nama PIC Mitra</label>
-                                            <input required value={formData.mitra_name} onChange={e => setFormData({...formData, mitra_name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-[#FFF6DB]/30 px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
-                                        </div>
-                                        <div>
-                                            <label className="mb-1 block text-sm font-bold text-[#176637]">Email Akun Mitra</label>
-                                            <input required type="email" value={formData.mitra_email} onChange={e => setFormData({...formData, mitra_email: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-[#FFF6DB]/30 px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
-                                        </div>
-                                        <div>
-                                            <label className="mb-1 block text-sm font-bold text-[#176637]">Password</label>
-                                            <input required type="password" value={formData.mitra_password} onChange={e => setFormData({...formData, mitra_password: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-[#FFF6DB]/30 px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="mt-4 flex gap-3">
-                                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-xl bg-gray-100 py-3 font-bold text-gray-500 transition-colors hover:bg-gray-200">Batal</button>
-                                <button type="submit" className="flex-1 rounded-xl bg-[#FF901A] py-3 font-bold text-[#FFF6DB] transition-transform hover:-translate-y-0.5">Simpan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
@@ -619,9 +675,87 @@ function PromoTab() {
         }
     };
 
+    if (isModalOpen) {
+        return (
+            <section className="animate-slide-up overflow-hidden rounded-[28px] border border-[#176637]/10 bg-white shadow-sm">
+                <div className="flex flex-col gap-4 border-b border-[#176637]/10 bg-[#FFF6DB]/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                    <div>
+                        <button onClick={() => setIsModalOpen(false)} className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#176637]/15 px-3 py-2 text-xs font-bold text-[#176637] transition hover:bg-white">
+                            <Icon name="chevronLeft" className="h-4 w-4" stroke />
+                            Kembali ke Daftar
+                        </button>
+                        <h3 className="font-gabriela text-2xl text-[#176637]">{editingId ? 'Edit Promo' : 'Tambah Promo Baru'}</h3>
+                        <p className="text-sm text-[#176637]/60">Form ini dibuka sebagai halaman penuh supaya tidak terpotong.</p>
+                    </div>
+                </div>
+
+                <div className="grid gap-6 p-5 lg:grid-cols-[1.1fr_0.9fr] lg:p-6">
+                    <form id="promoForm" onSubmit={handleSubmit} className="flex flex-col gap-5">
+                        <div>
+                            <label className="mb-1 block text-sm font-bold text-[#176637]">Judul Promo</label>
+                            <input required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm font-bold text-[#176637]">Kode Promo</label>
+                            <input value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm font-bold text-[#176637]">Ringkasan</label>
+                            <textarea required value={formData.summary} onChange={e => setFormData({...formData, summary: e.target.value})} rows="5" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Tgl Mulai</label>
+                                <input type="date" value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-bold text-[#176637]">Tgl Selesai</label>
+                                <input type="date" value={formData.end_date} onChange={e => setFormData({...formData, end_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm font-bold text-[#176637]">Target Audiens</label>
+                            <input value={formData.target} onChange={e => setFormData({...formData, target: e.target.value})} placeholder="Cth: Semua Outlet" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
+                            <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                <option value="Aktif">Aktif</option>
+                                <option value="Jadwal">Jadwal</option>
+                                <option value="Selesai">Selesai</option>
+                            </select>
+                        </div>
+                    </form>
+
+                    <aside className="rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB]/35 p-5">
+                        <h4 className="font-gabriela text-xl text-[#176637]">Preview Singkat</h4>
+                        <div className="mt-4 rounded-2xl border border-[#176637]/10 bg-white p-4">
+                            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${formData.status === 'Aktif' ? 'bg-[#72AD43]/20 text-[#176637]' : 'bg-[#FF901A]/20 text-[#FF901A]'}`}>
+                                {formData.status || 'Status'}
+                            </span>
+                            <h5 className="mt-4 font-gabriela text-2xl text-[#176637]">{formData.title || 'Judul promo'}</h5>
+                            <p className="mt-2 text-sm leading-7 text-[#176637]/70">{formData.summary || 'Ringkasan promo akan tampil di sini.'}</p>
+                            <div className="mt-4 text-sm text-[#176637]/65">
+                                {formData.start_date || 'mulai'} - {formData.end_date || 'selesai'}
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+
+                <div className="border-t border-[#176637]/10 bg-[#FFF6DB]/30 px-5 py-4 sm:px-6">
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                        <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-xl bg-gray-200/70 py-3 font-bold text-gray-600 transition-colors hover:bg-gray-200">Batal</button>
+                        <button form="promoForm" type="submit" className="flex-1 rounded-xl bg-[#FF901A] py-3 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-0.5 hover:shadow-[3px_3px_0px_#176637]">Simpan</button>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
     return (
-        <div className="animate-slide-up">
-            <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <>
+            <div className="animate-slide-up">
+                <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
                     <h2 className="mb-1 font-gabriela text-xl text-[#176637]">Manajemen Promo</h2>
                     <p className="text-sm text-[#176637]/70">Promo yang dibuat di sini akan tampil di landing page.</p>
@@ -664,61 +798,83 @@ function PromoTab() {
                     </article>
                 ))}
             </div>
+            </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-                    <div className="w-full max-w-lg rounded-3xl bg-white p-6 sm:p-8 shadow-xl max-h-[90vh] overflow-y-auto">
-                        <div className="mb-6 flex items-center justify-between">
-                            <h3 className="font-gabriela text-xl text-[#176637]">{editingId ? 'Edit Promo' : 'Tambah Promo Baru'}</h3>
-                            <button onClick={() => setIsModalOpen(false)} className="rounded-full p-2 text-[#176637]/50 hover:bg-[#FFF6DB] hover:text-[#176637]">
-                                <Icon name="close" className="h-5 w-5" stroke />
-                            </button>
+                <section className="mb-8 overflow-hidden rounded-[28px] border border-[#176637]/10 bg-white shadow-sm">
+                    <div className="flex flex-col gap-4 border-b border-[#176637]/10 bg-[#FFF6DB]/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                        <div>
+                            <h3 className="font-gabriela text-2xl text-[#176637]">{editingId ? 'Edit Promo' : 'Tambah Promo Baru'}</h3>
+                            <p className="text-sm text-[#176637]/60">Promo tampil di landing page, jadi form dibuat seperti halaman biasa supaya mudah dipakai.</p>
                         </div>
-                        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                        <button onClick={() => setIsModalOpen(false)} className="inline-flex items-center gap-2 self-start rounded-full border border-[#176637]/15 px-4 py-2 text-sm font-bold text-[#176637] transition hover:bg-[#FFF6DB]">
+                            <Icon name="close" className="h-4 w-4" stroke />
+                            Tutup
+                        </button>
+                    </div>
+
+                    <div className="grid gap-6 p-5 lg:grid-cols-[1.1fr_0.9fr] lg:p-6">
+                        <form id="promoForm" onSubmit={handleSubmit} className="flex flex-col gap-5">
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Judul Promo</label>
-                                <input required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                                <input required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Kode Promo</label>
-                                <input value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                                <input value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Ringkasan</label>
-                                <textarea required value={formData.summary} onChange={e => setFormData({...formData, summary: e.target.value})} rows="3" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                                <textarea required value={formData.summary} onChange={e => setFormData({...formData, summary: e.target.value})} rows="4" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
-                            <div className="flex gap-4">
-                                <div className="flex-1">
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div>
                                     <label className="mb-1 block text-sm font-bold text-[#176637]">Tgl Mulai</label>
-                                    <input type="date" value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                                    <input type="date" value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                                 </div>
-                                <div className="flex-1">
+                                <div>
                                     <label className="mb-1 block text-sm font-bold text-[#176637]">Tgl Selesai</label>
-                                    <input type="date" value={formData.end_date} onChange={e => setFormData({...formData, end_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                                    <input type="date" value={formData.end_date} onChange={e => setFormData({...formData, end_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                                 </div>
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Target Audiens</label>
-                                <input value={formData.target} onChange={e => setFormData({...formData, target: e.target.value})} placeholder="Cth: Semua Outlet" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]" />
+                                <input value={formData.target} onChange={e => setFormData({...formData, target: e.target.value})} placeholder="Cth: Semua Outlet" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
-                                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#72AD43]">
+                                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
                                     <option value="Aktif">Aktif</option>
                                     <option value="Jadwal">Jadwal</option>
                                     <option value="Selesai">Selesai</option>
                                 </select>
                             </div>
-                            
-                            <div className="mt-4 flex gap-3">
-                                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-xl bg-gray-100 py-3 font-bold text-gray-500 transition-colors hover:bg-gray-200">Batal</button>
-                                <button type="submit" className="flex-1 rounded-xl bg-[#FF901A] py-3 font-bold text-[#FFF6DB] transition-transform hover:-translate-y-0.5">Simpan</button>
-                            </div>
                         </form>
+
+                        <aside className="rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB]/35 p-5">
+                            <h4 className="font-gabriela text-xl text-[#176637]">Preview Singkat</h4>
+                            <div className="mt-4 rounded-2xl border border-[#176637]/10 bg-white p-4">
+                                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${formData.status === 'Aktif' ? 'bg-[#72AD43]/20 text-[#176637]' : 'bg-[#FF901A]/20 text-[#FF901A]'}`}>
+                                    {formData.status || 'Status'}
+                                </span>
+                                <h5 className="mt-4 font-gabriela text-2xl text-[#176637]">{formData.title || 'Judul promo'}</h5>
+                                <p className="mt-2 text-sm leading-7 text-[#176637]/70">{formData.summary || 'Ringkasan promo akan tampil di sini.'}</p>
+                                <div className="mt-4 text-sm text-[#176637]/65">
+                                    {formData.start_date || 'mulai'} - {formData.end_date || 'selesai'}
+                                </div>
+                            </div>
+                        </aside>
                     </div>
-                </div>
+
+                    <div className="border-t border-[#176637]/10 bg-[#FFF6DB]/30 px-5 py-4 sm:px-6">
+                        <div className="flex flex-col gap-3 sm:flex-row">
+                            <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-xl bg-gray-200/70 py-3 font-bold text-gray-600 transition-colors hover:bg-gray-200">Batal</button>
+                            <button form="promoForm" type="submit" className="flex-1 rounded-xl bg-[#FF901A] py-3 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-0.5 hover:shadow-[1px_1px_0px_#176637]">Simpan</button>
+                        </div>
+                    </div>
+                </section>
             )}
-        </div>
+        </>
     );
 }
 
@@ -969,7 +1125,7 @@ function EmployeeTab() {
                 </div>
 
                 {selectedId && (
-                    <aside className="rounded-[26px] border border-[#176637]/10 bg-white p-5 shadow-sm">
+                    <aside className="max-h-[calc(100vh-8rem)] overflow-y-auto rounded-[26px] border border-[#176637]/10 bg-white p-5 shadow-sm">
                         <div className="mb-4 flex items-center justify-between">
                             <div>
                                 <h3 className="font-gabriela text-2xl text-[#176637]">{selectedId === 'new' ? 'Tambah Karyawan' : 'Edit Karyawan'}</h3>

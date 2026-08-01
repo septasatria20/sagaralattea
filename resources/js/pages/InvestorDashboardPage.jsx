@@ -126,7 +126,7 @@ function Sidebar({ logoUrl, activeTab, setActiveTab }) {
     ];
 
     return (
-        <aside className="relative flex min-h-screen w-64 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl">
+        <aside className="relative flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl">
             <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
                 <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
             </svg>
@@ -480,98 +480,106 @@ function ReportView() {
                         <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
                             <h2 className="font-gabriela text-2xl text-[#176637]">Finance Per Outlet</h2>
                         </div>
-                        <table className="min-w-full text-left">
-                            <thead>
-                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                    <th className="p-4 pl-6">Item</th>
-                                    <th className="p-4">Nilai</th>
-                                    <th className="p-4">Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {visibleOutlets.map((outlet) => (
-                                    <tr key={outlet.name} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{outlet.name}</td>
-                                        <td className="p-4 text-sm font-semibold text-[#176637]">{outlet.omzet}</td>
-                                        <td className="p-4 text-sm text-[#176637]/70">{outlet.status}</td>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full min-w-max text-left">
+                                <thead>
+                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                        <th className="p-4 pl-6">Item</th>
+                                        <th className="p-4">Nilai</th>
+                                        <th className="p-4">Keterangan</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {visibleOutlets.map((outlet) => (
+                                        <tr key={outlet.name} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{outlet.name}</td>
+                                            <td className="p-4 text-sm font-semibold text-[#176637]">{outlet.omzet}</td>
+                                            <td className="p-4 text-sm text-[#176637]/70">{outlet.status}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
                         <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
                             <h2 className="font-gabriela text-2xl text-[#176637]">Rekap Harian</h2>
                         </div>
-                        <table className="min-w-full text-left">
-                            <thead>
-                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                    <th className="p-4 pl-6">Periode</th>
-                                    <th className="p-4">Nilai</th>
-                                    <th className="p-4">Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {dailyReports.map((item) => (
-                                    <tr key={item.label} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
-                                        <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
-                                        <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full min-w-max text-left">
+                                <thead>
+                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                        <th className="p-4 pl-6">Periode</th>
+                                        <th className="p-4">Nilai</th>
+                                        <th className="p-4">Keterangan</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {dailyReports.map((item) => (
+                                        <tr key={item.label} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
+                                            <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
+                                            <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
                         <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
                             <h2 className="font-gabriela text-2xl text-[#176637]">Performa Outlet Bulanan</h2>
                         </div>
-                        <table className="min-w-full text-left">
-                            <thead>
-                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                    <th className="p-4 pl-6">Outlet</th>
-                                    <th className="p-4">Omzet</th>
-                                    <th className="p-4">Trend</th>
-                                    <th className="p-4">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {visibleOutlets.map((outlet) => (
-                                    <tr key={outlet.name} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{outlet.name}</td>
-                                        <td className="p-4 text-sm text-[#176637]/70">{outlet.omzet}</td>
-                                        <td className="p-4 text-sm font-semibold text-[#176637]">{outlet.trend}</td>
-                                        <td className="p-4 text-sm text-[#176637]/70">{outlet.status}</td>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full min-w-max text-left">
+                                <thead>
+                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                        <th className="p-4 pl-6">Outlet</th>
+                                        <th className="p-4">Omzet</th>
+                                        <th className="p-4">Trend</th>
+                                        <th className="p-4">Status</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {visibleOutlets.map((outlet) => (
+                                        <tr key={outlet.name} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{outlet.name}</td>
+                                            <td className="p-4 text-sm text-[#176637]/70">{outlet.omzet}</td>
+                                            <td className="p-4 text-sm font-semibold text-[#176637]">{outlet.trend}</td>
+                                            <td className="p-4 text-sm text-[#176637]/70">{outlet.status}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
                         <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
                             <h2 className="font-gabriela text-2xl text-[#176637]">Rekap Tahunan</h2>
                         </div>
-                        <table className="min-w-full text-left">
-                            <thead>
-                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                    <th className="p-4 pl-6">Periode</th>
-                                    <th className="p-4">Nilai</th>
-                                    <th className="p-4">Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {yearlyReports.map((item) => (
-                                    <tr key={item.label} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
-                                        <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
-                                        <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full min-w-max text-left">
+                                <thead>
+                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                        <th className="p-4 pl-6">Periode</th>
+                                        <th className="p-4">Nilai</th>
+                                        <th className="p-4">Keterangan</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {yearlyReports.map((item) => (
+                                        <tr key={item.label} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
+                                            <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
+                                            <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
                 </div>
 
