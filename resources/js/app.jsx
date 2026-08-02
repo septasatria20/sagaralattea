@@ -4,7 +4,9 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import MitraDashboardPage from './pages/MitraDashboardPage';
+import POSPage from './pages/POSPage';
 import InvestorDashboardPage from './pages/InvestorDashboardPage';
+import CustomerOrderPage from './pages/CustomerOrderPage';
 
 const root = createRoot(document.getElementById('app'));
 const pageData = window.__INITIAL_PAGE_DATA__ ?? {};
@@ -13,10 +15,14 @@ const PageComponent = page === 'admin-dashboard'
     ? AdminDashboardPage
     : page === 'login'
         ? LoginPage
-    : (page === 'mitra-dashboard' || page === 'pos-dashboard')
+    : page === 'mitra-dashboard'
         ? MitraDashboardPage
-        : page === 'investor-dashboard'
-            ? InvestorDashboardPage
+    : page === 'pos-dashboard'
+        ? POSPage
+    : page === 'customer-order'
+        ? CustomerOrderPage
+    : page === 'investor-dashboard'
+        ? InvestorDashboardPage
         : HomePage;
 
 root.render(

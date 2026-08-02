@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
 
 const apiFetch = async (url, options = {}) => {
     if (options.method && ['POST', 'PUT', 'DELETE'].includes(options.method.toUpperCase())) {
@@ -43,13 +44,13 @@ const navigation = [
     { id: 'overview', label: 'Overview', icon: 'dashboard' },
     { id: 'outlet', label: 'Manajemen Mitra / Outlet', icon: 'store' },
     { id: 'promo', label: 'Manajemen Promo', icon: 'tag' },
-    { id: 'menu', label: 'Daftar Menu', icon: 'menu' },
+    { id: 'menu', label: 'Daftar Menu', icon: 'menu', stroke: true },
     { id: 'karyawan', label: 'Karyawan (Global)', icon: 'users' },
     { id: 'member', label: 'Membership', icon: 'award' },
     { id: 'stok', label: 'Supply Chain', icon: 'package' },
     { id: 'komplain', label: 'Komplain', icon: 'message' },
     { id: 'investor', label: 'Manajemen Investor', icon: 'trending' },
-    { id: 'rekap', label: 'Rekap Laporan', icon: 'report' },
+    { id: 'rekap', label: 'Rekap Laporan', icon: 'report', stroke: true },
 ];
 
 const salesData = [
@@ -148,7 +149,7 @@ function Sidebar({ activeMenu, setActiveMenu, logoUrl }) {
                                         : 'text-[#FFF6DB]/72 hover:bg-[#FFF6DB]/10 hover:text-[#FFF6DB]'
                                 }`}
                             >
-                                <Icon name={item.icon} className={`h-5 w-5 ${active ? 'text-[#FF901A]' : ''}`} />
+                                <Icon name={item.icon} stroke={item.stroke} className={`h-5 w-5 ${active ? 'text-[#FF901A]' : ''}`} />
                                 <span className="text-sm font-medium">{item.label}</span>
                                 {active && <span className="absolute right-0 top-0 h-full w-2 bg-[#FF901A]" />}
                             </button>
@@ -166,26 +167,71 @@ function Sidebar({ activeMenu, setActiveMenu, logoUrl }) {
     );
 }
 
-function Header({ title }) {
+function Header({ title, setActiveMenu }) {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [notifMenuOpen, setNotifMenuOpen] = useState(false);
+
+    const notifRef = React.useRef(null);
+    const userRef = React.useRef(null);
+
+    React.useEffect(() => {
+        function handleClickOutside(event) {
+            if (notifRef.current && !notifRef.current.contains(event.target)) {
+                setNotifMenuOpen(false);
+            }
+            if (userRef.current && !userRef.current.contains(event.target)) {
+                setUserMenuOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     return (
         <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 border-b border-[#176637]/10 bg-[#FFF6DB]/80 px-4 py-4 backdrop-blur-md md:px-8 md:py-5">
             <h1 className="font-gabriela flex items-center gap-3 text-2xl text-[#176637]">{title}</h1>
             <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-                <div className="relative w-full sm:w-auto">
-                    <Icon name="search" className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[#176637]/50" stroke />
-                    <input
-                        type="text"
-                        placeholder="Cari data..."
-                        className="w-full rounded-full border-2 border-[#176637]/10 bg-white py-2 pl-10 pr-4 text-sm transition-colors focus:border-[#72AD43] focus:outline-none sm:w-64"
-                    />
+                <div className="relative" ref={notifRef}>
+                    <button 
+                        onClick={() => setNotifMenuOpen((value) => !value)}
+                        className="relative text-[#176637] transition-colors hover:text-[#FF901A] p-2"
+                    >
+                        <Icon name="bell" className="h-6 w-6" stroke />
+                        <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full border-2 border-[#FFF6DB] bg-[#FF901A]" />
+                    </button>
+                    {notifMenuOpen && (
+                        <div className="absolute right-0 top-[calc(100%+10px)] w-72 rounded-[22px] border border-[#176637]/10 bg-white p-4 shadow-[0_18px_50px_rgba(23,102,55,0.14)] z-50">
+                            <h3 className="mb-3 font-gabriela text-lg text-[#176637]">Notifikasi</h3>
+                            <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
+                                <button 
+                                    onClick={() => { setNotifMenuOpen(false); setActiveMenu('komplain'); }}
+                                    className="rounded-xl bg-[#FFF6DB]/50 p-3 text-left transition hover:bg-[#FFF6DB]"
+                                >
+                                    <p className="text-sm font-bold text-[#176637]">Komplain Baru: Mitra Utara</p>
+                                    <p className="mt-1 text-xs text-[#176637]/70">Ada 3 komplain pelanggan baru yang belum ditangani.</p>
+                                    <p className="mt-2 text-[10px] text-[#176637]/40">10 Menit yang lalu</p>
+                                </button>
+                                <button 
+                                    onClick={() => { setNotifMenuOpen(false); setActiveMenu('stok'); }}
+                                    className="rounded-xl bg-red-50 p-3 text-left transition hover:bg-red-100"
+                                >
+                                    <p className="text-sm font-bold text-red-600">Stok Menipis: Cup Reguler</p>
+                                    <p className="mt-1 text-xs text-red-500/80">Stok Cup Reguler di Sagara Lattea - Selatan sisa 50 pcs.</p>
+                                    <p className="mt-2 text-[10px] text-red-500/50">1 Jam yang lalu</p>
+                                </button>
+                                <button 
+                                    onClick={() => { setNotifMenuOpen(false); setActiveMenu('outlet'); }}
+                                    className="rounded-xl bg-[#FFF6DB]/50 p-3 text-left transition hover:bg-[#FFF6DB]"
+                                >
+                                    <p className="text-sm font-bold text-[#176637]">Mitra Baru</p>
+                                    <p className="mt-1 text-xs text-[#176637]/70">Ada pengajuan outlet baru di Sagara Lattea - Timur.</p>
+                                    <p className="mt-2 text-[10px] text-[#176637]/40">Kemarin</p>
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                <button className="relative text-[#176637] transition-colors hover:text-[#FF901A]">
-                    <Icon name="bell" className="h-6 w-6" stroke />
-                    <span className="absolute right-0 top-0 h-2.5 w-2.5 rounded-full border-2 border-[#FFF6DB] bg-[#FF901A]" />
-                </button>
-                <div className="relative flex items-center gap-3 border-l-2 border-[#176637]/20 pl-6">
+                <div className="relative flex items-center gap-3 border-l-2 border-[#176637]/20 pl-6" ref={userRef}>
                     <button
                         onClick={() => setUserMenuOpen((value) => !value)}
                         className="flex cursor-pointer items-center gap-3 rounded-full px-1 py-1 transition hover:bg-[#176637]/5"
@@ -199,7 +245,18 @@ function Header({ title }) {
                     </button>
                             {userMenuOpen && (
                                 <div className="absolute right-0 top-[calc(100%+10px)] w-48 rounded-[22px] border border-[#176637]/10 bg-white p-2 shadow-[0_18px_50px_rgba(23,102,55,0.14)]">
-                                    <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]">
+                                    <button 
+                                        onClick={() => {
+                                            setUserMenuOpen(false);
+                                            window.Swal?.fire({
+                                                title: 'Pengaturan Akun',
+                                                text: 'Menu pengaturan profil saat ini sedang dalam pemeliharaan.',
+                                                icon: 'info',
+                                                confirmButtonColor: '#176637'
+                                            });
+                                        }}
+                                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]"
+                                    >
                                         <Icon name="settings" className="h-4 w-4" stroke />
                                         Pengaturan
                                     </button>
@@ -240,102 +297,119 @@ function StatCard({ stat }) {
 }
 
 function SalesChart({ data }) {
-    const width = 760;
-    const height = 300;
-    const padding = { top: 20, right: 20, bottom: 30, left: 55 };
-    const innerWidth = width - padding.left - padding.right;
-    const innerHeight = height - padding.top - padding.bottom;
-    const maxValue = Math.max(...data.flatMap((item) => [item.omzet, item.laba]));
-    const xStep = innerWidth / (data.length - 1);
-
-    const pathFor = (key) =>
-        data
-            .map((item, index) => {
-                const x = padding.left + index * xStep;
-                const y = padding.top + innerHeight - (item[key] / maxValue) * innerHeight;
-                return `${index === 0 ? 'M' : 'L'}${x} ${y}`;
-            })
-            .join(' ');
-
-    const areaFor = (key) => `${pathFor(key)} L ${padding.left + innerWidth} ${padding.top + innerHeight} L ${padding.left} ${padding.top + innerHeight} Z`;
-
     return (
-        <div className="relative h-[300px] w-full overflow-hidden">
-            <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="h-full w-full">
-                <defs>
-                    <linearGradient id="omzetGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#72AD43" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#72AD43" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="labaGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#FF901A" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#FF901A" stopOpacity={0} />
-                    </linearGradient>
-                </defs>
-                {[0, 1, 2, 3, 4].map((index) => {
-                    const y = padding.top + (innerHeight / 4) * index;
-                    return <line key={index} x1={padding.left} x2={padding.left + innerWidth} y1={y} y2={y} stroke="#176637" strokeOpacity="0.08" strokeDasharray="4 6" />;
-                })}
-                {data.map((item, index) => {
-                    const x = padding.left + index * xStep;
-                    const omzetY = padding.top + innerHeight - (item.omzet / maxValue) * innerHeight;
-                    const labaY = padding.top + innerHeight - (item.laba / maxValue) * innerHeight;
-                    return (
-                        <g key={item.name}>
-                            <circle cx={x} cy={omzetY} r="4" fill="#72AD43" />
-                            <circle cx={x} cy={labaY} r="4" fill="#FF901A" />
-                        </g>
-                    );
-                })}
-                <path d={areaFor('omzet')} fill="url(#omzetGradient)" />
-                <path d={pathFor('omzet')} fill="none" stroke="#72AD43" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
-                <path d={areaFor('laba')} fill="url(#labaGradient)" />
-                <path d={pathFor('laba')} fill="none" stroke="#FF901A" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
-                {data.map((item, index) => {
-                    const x = padding.left + index * xStep;
-                    return (
-                        <text key={item.name} x={x} y={height - 6} textAnchor="middle" fill="#176637" opacity="0.7" fontSize="12">
-                            {item.name}
-                        </text>
-                    );
-                })}
-                <text x="10" y={padding.top + 10} fill="#176637" opacity="0.7" fontSize="12">
-                    Rp
-                </text>
-            </svg>
+        <div className="relative h-[300px] w-full mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <defs>
+                        <linearGradient id="colorOmzet" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#72AD43" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#72AD43" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="colorLaba" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#FF901A" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#FF901A" stopOpacity={0}/>
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#176637" strokeOpacity="0.1" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} dx={-10} tickFormatter={(val) => `Rp${(val/1000000)}M`} />
+                    <RechartsTooltip 
+                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: '#FFF6DB' }}
+                        itemStyle={{ color: '#176637', fontWeight: 'bold' }}
+                        formatter={(value) => [`Rp ${value.toLocaleString('id-ID')}`, '']}
+                    />
+                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
+                    <Line type="monotone" name="Omzet" dataKey="omzet" stroke="#72AD43" strokeWidth={3} dot={{ r: 4, fill: '#72AD43', strokeWidth: 0 }} activeDot={{ r: 6 }} />
+                    <Line type="monotone" name="Laba Bersih" dataKey="laba" stroke="#FF901A" strokeWidth={3} dot={{ r: 4, fill: '#FF901A', strokeWidth: 0 }} activeDot={{ r: 6 }} />
+                </LineChart>
+            </ResponsiveContainer>
         </div>
     );
 }
 
 function CategoryDonutChart() {
+    const data = [
+        { name: 'Latte Series', value: 60, color: '#72AD43' },
+        { name: 'Pastry', value: 25, color: '#FF901A' },
+        { name: 'Pure Tea', value: 15, color: '#176637' },
+    ];
+
     return (
         <div className="flex flex-col rounded-[30px] border border-[#176637]/5 bg-white p-6 shadow-sm">
             <h3 className="mb-2 font-gabriela text-xl text-[#176637]">Proporsi Penjualan</h3>
             <p className="mb-4 text-xs text-[#176637]/60">Berdasarkan kategori produk</p>
-            <div className="relative flex flex-1 items-center justify-center py-2">
-                <svg viewBox="0 0 100 100" className="h-full max-h-[160px] w-full max-w-[160px] -rotate-90 transform">
-                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#176637" strokeWidth="16" strokeDasharray="251.2" strokeDashoffset="0" className="opacity-10" />
-                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#72AD43" strokeWidth="16" strokeDasharray="251.2" strokeDashoffset="100.48" className="transition-all duration-1000 ease-out" />
-                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#FF901A" strokeWidth="16" strokeDasharray="251.2" strokeDashoffset="188.4" className="transition-all duration-1000 ease-out" />
-                </svg>
-                <div className="absolute flex flex-col items-center justify-center text-center">
+            <div className="relative flex h-[200px] w-full items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                        <Pie
+                            data={data}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={55}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                            stroke="none"
+                        >
+                            {data.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} opacity={entry.name === 'Pure Tea' ? 0.4 : 1} />
+                            ))}
+                        </Pie>
+                        <RechartsTooltip 
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: '#FFF6DB' }}
+                            itemStyle={{ color: '#176637', fontWeight: 'bold' }}
+                            formatter={(value) => [`${value}%`, '']}
+                        />
+                    </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <span className="text-xl font-bold text-[#176637]">1,4K</span>
                     <span className="text-[10px] uppercase tracking-widest text-[#176637]/50">Pesanan</span>
                 </div>
             </div>
             <div className="mt-4 flex flex-col gap-3 text-xs">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-[#72AD43]" /> Latte Series</div>
-                    <span className="font-bold text-[#176637]">60%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-[#FF901A]" /> Pastry</div>
-                    <span className="font-bold text-[#176637]">25%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-[#176637] opacity-20" /> Pure Tea</div>
-                    <span className="font-bold text-[#176637]">15%</span>
-                </div>
+                {data.map((item) => (
+                    <div key={item.name} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <span className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color, opacity: item.name === 'Pure Tea' ? 0.4 : 1 }} /> 
+                            {item.name}
+                        </div>
+                        <span className="font-bold text-[#176637]">{item.value}%</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function TopProductsChart() {
+    const topProducts = [
+        { name: 'Matcha Lattea', sold: 420 },
+        { name: 'Hojicha', sold: 350 },
+        { name: 'Brown Sugar', sold: 290 },
+        { name: 'Croissant', sold: 200 },
+        { name: 'Red Velvet', sold: 180 },
+    ];
+    
+    return (
+        <div className="flex flex-col rounded-[30px] border border-[#176637]/5 bg-white p-6 shadow-sm">
+            <h3 className="mb-2 font-gabriela text-xl text-[#176637]">Produk Terlaris</h3>
+            <p className="mb-4 text-xs text-[#176637]/60">Bulan Ini</p>
+            <div className="h-[250px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={topProducts} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#176637" strokeOpacity={0.1} />
+                        <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} />
+                        <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, fontWeight: 'bold' }} dx={-10} />
+                        <RechartsTooltip 
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: '#FFF6DB' }}
+                            itemStyle={{ color: '#176637', fontWeight: 'bold' }}
+                            formatter={(value) => [`${value} Porsi`, 'Terjual']}
+                        />
+                        <Bar dataKey="sold" fill="#72AD43" radius={[0, 10, 10, 0]} barSize={20} />
+                    </BarChart>
+                </ResponsiveContainer>
             </div>
         </div>
     );
@@ -347,18 +421,30 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
     const [stats, setStats] = React.useState(initialStats);
     const [salesData, setSalesData] = React.useState(initialSalesData);
     const [isLoading, setIsLoading] = React.useState(false);
+    const [selectedOutlet, setSelectedOutlet] = React.useState('all');
+    const [outlets, setOutlets] = React.useState([]);
+
+    React.useEffect(() => {
+        apiFetch('/api/admin/outlets')
+            .then(res => res.json())
+            .then(data => setOutlets(data));
+    }, []);
 
     React.useEffect(() => {
         if (!startDate || !endDate) return;
         setIsLoading(true);
-        apiFetch(`/api/admin/dashboard/stats?start=${startDate}&end=${endDate}`)
+        const queryParams = new URLSearchParams({ start: startDate, end: endDate });
+        if (selectedOutlet !== 'all') {
+            queryParams.append('outlet_id', selectedOutlet);
+        }
+        apiFetch(`/api/admin/dashboard/stats?${queryParams.toString()}`)
             .then(res => res.json())
             .then(data => {
                 setStats(data.stats);
                 setSalesData(data.salesData);
             })
             .finally(() => setIsLoading(false));
-    }, [startDate, endDate]);
+    }, [startDate, endDate, selectedOutlet]);
 
     return (
         <div className="animate-slide-up">
@@ -384,9 +470,21 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
                         </svg>
                     </div>
                     <div className="relative z-10 mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-                        <div>
+                        <div className="flex flex-col gap-1">
                             <h3 className="font-gabriela text-xl text-[#176637]">Grafik Penjualan & Laba</h3>
-                            <p className="text-sm text-[#176637]/60">Semua Outlet (Konsolidasi)</p>
+                            <div className="relative">
+                                <select 
+                                    value={selectedOutlet} 
+                                    onChange={(e) => setSelectedOutlet(e.target.value)}
+                                    className="w-full appearance-none rounded-xl border border-[#176637]/15 bg-white py-1.5 pl-3 pr-8 text-xs font-semibold text-[#176637] outline-none transition focus:border-[#72AD43]"
+                                >
+                                    <option value="all">Semua Mitra (Konsolidasi)</option>
+                                    {outlets.map((o) => (
+                                        <option key={o.id} value={o.id}>{o.name}</option>
+                                    ))}
+                                </select>
+                                <Icon name="chevronDown" className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#176637]/50" stroke />
+                            </div>
                         </div>
                         <div className="flex items-center gap-2 rounded-xl bg-[#FFF6DB] p-2">
                             <input 
@@ -415,7 +513,7 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
                         <button className="text-sm font-bold text-[#FF901A] transition-colors hover:text-[#176637]">Lihat Semua</button>
                     </div>
 
-                    <div className="flex flex-1 flex-col gap-4">
+                    <div className="flex flex-1 flex-col gap-4 overflow-y-auto max-h-[300px]">
                         {recentComplaints.map((item, index) => {
                             const statusClass =
                                 item.status === 'Baru'
@@ -440,6 +538,48 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
                         })}
                     </div>
                 </div>
+
+                <div className="lg:col-span-4 mt-2 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <TopOutletsBarChart />
+                    <TopProductsChart />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function TopOutletsBarChart() {
+    const data = [
+        { name: 'Sagara Lattea - Pusat', omzet: 12500000 },
+        { name: 'Sagara Lattea - Utara', omzet: 8400000 },
+        { name: 'Sagara Lattea - Selatan', omzet: 9200000 },
+        { name: 'Sagara Lattea - Barat', omzet: 6500000 },
+        { name: 'Sagara Lattea - Timur', omzet: 10100000 },
+    ].sort((a, b) => b.omzet - a.omzet);
+
+    return (
+        <div className="flex flex-col rounded-[30px] border border-[#176637]/5 bg-white p-6 shadow-sm">
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div>
+                    <h3 className="font-gabriela text-xl text-[#176637]">Performa Omset Mitra (Top 5)</h3>
+                    <p className="text-sm text-[#176637]/60">Berdasarkan total penjualan bulan ini</p>
+                </div>
+            </div>
+            <div className="relative h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={data} layout="vertical" margin={{ top: 0, right: 30, left: 10, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#176637" strokeOpacity="0.1" />
+                        <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} tickFormatter={(val) => `Rp${(val/1000000)}M`} />
+                        <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 11, fontWeight: 'bold' }} width={140} />
+                        <RechartsTooltip 
+                            cursor={{ fill: '#FFF6DB', opacity: 0.4 }}
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: '#FFF6DB' }}
+                            itemStyle={{ color: '#176637', fontWeight: 'bold' }}
+                            formatter={(value) => [`Rp ${value.toLocaleString('id-ID')}`, 'Omzet']}
+                        />
+                        <Bar dataKey="omzet" fill="#72AD43" radius={[0, 8, 8, 0]} barSize={24} />
+                    </BarChart>
+                </ResponsiveContainer>
             </div>
         </div>
     );
@@ -1807,7 +1947,7 @@ function MenuTab() {
     const [activeCategory, setActiveCategory] = useState('Semua Menu');
     const [selectedId, setSelectedId] = useState(null);
     const [formData, setFormData] = useState({
-        name: '', category: 'Signature', price: 0, summary: '', status: 'Aktif'
+        name: '', category: 'Signature', price: 0, summary: '', status: 'Aktif', image: null
     });
 
     const fetchMenus = () => {
@@ -1835,27 +1975,36 @@ function MenuTab() {
 
     const openCreate = () => {
         setSelectedId('new');
-        setFormData({ name: '', category: 'Signature', price: 0, summary: '', status: 'Aktif' });
+        setFormData({ name: '', category: 'Signature', price: 0, summary: '', status: 'Aktif', image: null });
     };
 
     const openEdit = (item) => {
         setSelectedId(item.id);
-        setFormData({ name: item.name, category: item.category, price: item.price, summary: item.description || '', status: item.status });
+        setFormData({ name: item.name, category: item.category, price: item.price, summary: item.description || '', status: item.status, image: null });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const isEditing = selectedId !== 'new';
         const url = isEditing ? `/api/admin/menus/${selectedId}` : '/api/admin/menus';
-        const method = isEditing ? 'PUT' : 'POST';
         
-        // Map summary to description for backend
-        const payload = { ...formData, description: formData.summary, is_featured: false };
+        const payload = new FormData();
+        payload.append('name', formData.name);
+        payload.append('category', formData.category);
+        payload.append('price', formData.price);
+        payload.append('description', formData.summary);
+        payload.append('is_featured', 0);
+        payload.append('status', formData.status);
+        if (formData.image instanceof File) {
+            payload.append('image', formData.image);
+        }
+        if (isEditing) {
+            payload.append('_method', 'PUT'); // Laravel way to handle PUT with FormData
+        }
 
         apiFetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify(payload)
+            method: 'POST', // Always POST for FormData in Laravel, spoof PUT with _method
+            body: payload // Do not set Content-Type header manually for FormData
         }).then(r => r.json()).then(() => {
             fetchMenus();
             setSelectedId(null);
@@ -2026,10 +2175,35 @@ function MenuTab() {
 
                                 <div className="space-y-4">
                                     <div className="text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Foto Produk</div>
-                                    <div className="rounded-[26px] border-2 border-dashed border-[#176637]/15 bg-[#FFF1C9] p-4">
-                                        <div className="flex h-80 items-center justify-center rounded-[22px] bg-white/70 p-4">
-                                            <img src={selectedItem?.image ?? '/minum2.png'} alt={selectedItem?.name ?? 'Preview produk'} className="h-full w-full object-contain" />
-                                        </div>
+                                    <div className="rounded-[26px] border-2 border-dashed border-[#176637]/15 bg-[#FFF1C9] p-4 text-center">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            id="menuImageUpload"
+                                            className="hidden"
+                                            onChange={e => {
+                                                if (e.target.files && e.target.files[0]) {
+                                                    setFormData({ ...formData, image: e.target.files[0] });
+                                                }
+                                            }}
+                                        />
+                                        <label htmlFor="menuImageUpload" className="cursor-pointer flex flex-col items-center justify-center gap-2">
+                                            {formData.image instanceof File ? (
+                                                <div className="h-32 w-full max-w-[200px] overflow-hidden rounded-xl border border-[#176637]/20">
+                                                    <img src={URL.createObjectURL(formData.image)} alt="Preview" className="h-full w-full object-contain bg-white" />
+                                                </div>
+                                            ) : selectedItem?.image ? (
+                                                <div className="h-32 w-full max-w-[200px] overflow-hidden rounded-xl border border-[#176637]/20">
+                                                    <img src={selectedItem.image} alt={selectedItem.name} className="h-full w-full object-contain bg-white" />
+                                                </div>
+                                            ) : (
+                                                <div className="flex h-32 w-full max-w-[200px] items-center justify-center rounded-xl border border-[#176637]/20 bg-white">
+                                                    <Icon name="tag" className="h-8 w-8 text-[#176637]/20" />
+                                                </div>
+                                            )}
+                                            <span className="rounded-full bg-[#176637]/10 px-4 py-2 text-xs font-bold text-[#176637] hover:bg-[#176637]/20 transition">Pilih Gambar</span>
+                                            <span className="text-[10px] text-[#176637]/50">Format PNG Transparan disarankan. Maks 2MB.</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -2371,7 +2545,9 @@ function ReportTab({ menuItems, employees, members, supply, complaints, promos, 
                             </>
                         )}
                     />
+                </div>
 
+                <div className="space-y-6">
                     <ReportSectionTable
                         title="Inventaris"
                         rows={supplyRows}
@@ -2676,7 +2852,7 @@ export default function AdminDashboardPage({ data = {} }) {
             <Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} logoUrl={logoUrl} />
 
             <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
-                <Header title={title} />
+                <Header title={title} setActiveMenu={setActiveMenu} />
 
                 <div className="relative z-0 flex-1 overflow-y-auto p-8">
                     <div className="pointer-events-none absolute bottom-[-20px] right-[-50px] z-[-1] h-32 w-96 opacity-[0.05]">

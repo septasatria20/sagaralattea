@@ -23,9 +23,15 @@ class AdminMenuController extends Controller
             'description' => 'nullable|string',
             'is_featured' => 'boolean',
             'status' => 'required|string|in:Aktif,Tidak Aktif',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']) . '-' . uniqid();
+        
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('menus', 'public');
+            $validated['image'] = '/storage/' . $path;
+        }
 
         $menu = MenuItem::create($validated);
 
@@ -41,10 +47,19 @@ class AdminMenuController extends Controller
             'description' => 'nullable|string',
             'is_featured' => 'boolean',
             'status' => 'required|string|in:Aktif,Tidak Aktif',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($request->name !== $menu->name) {
             $validated['slug'] = Str::slug($validated['name']) . '-' . uniqid();
+        }
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('menus', 'public');
+            $validated['image'] = '/storage/' . $path;
+        } else if ($request->has('image') && $request->image === null) {
+            // Optional: Handle image removal if needed
+            // $validated['image'] = null;
         }
 
         $menu->update($validated);

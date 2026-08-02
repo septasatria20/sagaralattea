@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
-
-const iconPaths = {
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';const iconPaths = {
     dashboard: 'M4 13.5V6a2 2 0 0 1 2-2h4v9.5H4Zm0 2.5h6V20H6a2 2 0 0 1-2-2v-2Zm8 4V4h6a2 2 0 0 1 2 2v14h-8Zm8 0h2a2 2 0 0 0 2-2v-5h-4v7Z',
     store: 'M3 7h18l-1 5H4L3 7Zm2 6h14v7H5v-7Zm1-9h12l1 2H5l1-2Z',
     users: 'M9 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm7 1a3 3 0 1 0-3-3 3 3 0 0 0 3 3ZM2 20a7 7 0 0 1 14 0Zm14 0a5 5 0 0 1 6 0v0Z',
@@ -11,6 +10,7 @@ const iconPaths = {
     minus: 'M5 12h14',
     pencil: 'M4 20h16M4 16l10.5-10.5a1.5 1.5 0 0 1 2.1 0l1.9 1.9a1.5 1.5 0 0 1 0 2.1L9 20H4v-4Z',
     chevronRight: 'M9 6l6 6-6 6',
+    chevronDown: 'M6 9l6 6 6-6',
     coffee: 'M7 7h8a4 4 0 0 1 0 8H7V7Zm-2 0h2v8H7a4 4 0 0 1 0-8Zm1 12h10',
     leaf: 'M5 19c8 0 14-6 14-14-8 0-14 6-14 14Zm2-2c2 0 5-1 7-3',
     cookie: 'M12 3a9 9 0 1 0 9 9c-1.5 0-2.5-.7-3.3-1.7-.8-1-.8-2.6 0-3.6.8-1 1.8-1.7 3.3-1.7A9 9 0 0 0 12 3Zm-3 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2Zm6 3a1 1 0 1 1 0 2 1 1 0 0 1 0-2Zm-2-5a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z',
@@ -303,54 +303,7 @@ function GlobalStyles() {
     );
 }
 
-function DashboardChart({ data }) {
-    const width = 760;
-    const height = 300;
-    const padding = { top: 20, right: 24, bottom: 30, left: 54 };
-    const innerWidth = width - padding.left - padding.right;
-    const innerHeight = height - padding.top - padding.bottom;
-    const maxValue = Math.max(...data.map((item) => item.omzet));
-    const xStep = innerWidth / (data.length - 1);
 
-    const linePath = data
-        .map((item, index) => {
-            const x = padding.left + index * xStep;
-            const y = padding.top + innerHeight - (item.omzet / maxValue) * innerHeight;
-            return `${index === 0 ? 'M' : 'L'}${x} ${y}`;
-        })
-        .join(' ');
-
-    const areaPath = `${linePath} L ${padding.left + innerWidth} ${padding.top + innerHeight} L ${padding.left} ${padding.top + innerHeight} Z`;
-
-    return (
-        <div className="h-[300px] w-full overflow-hidden">
-            <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="h-full w-full">
-                <defs>
-                    <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#72AD43" stopOpacity="0.35" />
-                        <stop offset="95%" stopColor="#72AD43" stopOpacity="0" />
-                    </linearGradient>
-                </defs>
-                {[0, 1, 2, 3, 4].map((index) => {
-                    const y = padding.top + (innerHeight / 4) * index;
-                    return <line key={index} x1={padding.left} x2={padding.left + innerWidth} y1={y} y2={y} stroke="#176637" strokeOpacity="0.08" strokeDasharray="4 6" />;
-                })}
-                <path d={areaPath} fill="url(#chartFill)" />
-                <path d={linePath} fill="none" stroke="#176637" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
-                {data.map((item, index) => {
-                    const x = padding.left + index * xStep;
-                    const y = padding.top + innerHeight - (item.omzet / maxValue) * innerHeight;
-                    return <circle key={item.name} cx={x} cy={y} r="4" fill="#72AD43" />;
-                })}
-                {data.map((item, index) => (
-                    <text key={item.name} x={padding.left + index * xStep} y={height - 8} textAnchor="middle" fill="#176637" opacity="0.7" fontSize="12">
-                        {item.name}
-                    </text>
-                ))}
-            </svg>
-        </div>
-    );
-}
 
 function StatCard({ stat }) {
     const palette = {
@@ -361,14 +314,69 @@ function StatCard({ stat }) {
     };
 
     return (
-        <div className={`group flex min-h-[170px] flex-col rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg border border-[#176637]/5 bg-white p-5 shadow-[2px_2px_15px_rgba(23,102,55,0.05)] transition-all duration-300 hover:shadow-[4px_4px_0px_#176637]`}>
+        <div className={`group flex min-h-[170px] flex-col rounded-[30px] border border-[#176637]/5 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-[4px_4px_0px_#176637]`}>
             <div className="mb-4 flex items-start justify-between">
                 <div className={`rounded-br-xl rounded-tl-xl p-2.5 ${palette[stat.accent] ?? palette.forest}`}>
                     <Icon name={stat.icon} className="h-5 w-5" stroke />
                 </div>
             </div>
             <p className="mb-1 text-[13px] font-medium leading-snug text-[#176637]/70">{stat.title}</p>
-            <p className="mt-auto whitespace-nowrap text-[clamp(1.05rem,1.8vw,1.45rem)] font-bold leading-none tracking-tight text-[#176637]">{stat.value}</p>
+            <p className="mt-auto whitespace-nowrap text-[clamp(1.1rem,1.8vw,1.55rem)] font-bold leading-none tracking-tight text-[#176637]">{stat.value}</p>
+        </div>
+    );
+}
+
+function CategoryDonutChart() {
+    const data = [
+        { name: 'Latte Series', value: 60, color: '#72AD43' },
+        { name: 'Pastry', value: 25, color: '#FF901A' },
+        { name: 'Pure Tea', value: 15, color: '#176637' },
+    ];
+
+    return (
+        <div className="flex flex-col rounded-[40px] border border-[#176637]/5 bg-white p-6 shadow-sm">
+            <h3 className="mb-2 font-gabriela text-xl text-[#176637]">Proporsi Penjualan</h3>
+            <p className="mb-4 text-xs text-[#176637]/60">Berdasarkan kategori produk</p>
+            <div className="relative flex h-[250px] w-full items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                        <Pie
+                            data={data}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={55}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                            stroke="none"
+                        >
+                            {data.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} opacity={entry.name === 'Pure Tea' ? 0.4 : 1} />
+                            ))}
+                        </Pie>
+                        <RechartsTooltip 
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: '#FFF6DB' }}
+                            itemStyle={{ color: '#176637', fontWeight: 'bold' }}
+                            formatter={(value) => [`${value}%`, '']}
+                        />
+                    </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span className="text-xl font-bold text-[#176637]">1,4K</span>
+                    <span className="text-[10px] uppercase tracking-widest text-[#176637]/50">Pesanan</span>
+                </div>
+            </div>
+            <div className="mt-4 flex flex-col gap-3 text-xs">
+                {data.map((item) => (
+                    <div key={item.name} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <span className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color, opacity: item.name === 'Pure Tea' ? 0.4 : 1 }} /> 
+                            {item.name}
+                        </div>
+                        <span className="font-bold text-[#176637]">{item.value}%</span>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
@@ -377,7 +385,7 @@ function Sidebar({ activeTab, setActiveTab, logoUrl, user }) {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const items = [
         { id: 'dashboard', icon: 'dashboard', label: 'Dashboard' },
-        { id: 'pos', icon: 'store', label: 'Point of Sale' },
+        { id: 'pos', icon: 'store', label: 'Manajemen POS' },
         { id: 'employees', icon: 'users', label: 'Karyawan' },
         { id: 'supply', icon: 'package', label: 'Inventaris' },
         { id: 'report', icon: 'report', label: 'Rekap Laporan' },
@@ -451,12 +459,136 @@ function Sidebar({ activeTab, setActiveTab, logoUrl, user }) {
     );
 }
 
+function Header({ title, user, setActiveMenu }) {
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [notifMenuOpen, setNotifMenuOpen] = useState(false);
+
+    const notifRef = React.useRef(null);
+    const userRef = React.useRef(null);
+
+    React.useEffect(() => {
+        function handleClickOutside(event) {
+            if (notifRef.current && !notifRef.current.contains(event.target)) {
+                setNotifMenuOpen(false);
+            }
+            if (userRef.current && !userRef.current.contains(event.target)) {
+                setUserMenuOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    return (
+        <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 border-b border-[#176637]/10 bg-[#FFF6DB]/80 px-4 py-4 backdrop-blur-md md:px-8 md:py-5">
+            <h1 className="font-gabriela flex items-center gap-3 text-2xl text-[#176637]">{title}</h1>
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                <div className="relative" ref={notifRef}>
+                    <button 
+                        onClick={() => setNotifMenuOpen((value) => !value)}
+                        className="relative text-[#176637] transition-colors hover:text-[#FF901A] p-2"
+                    >
+                        <Icon name="bell" className="h-6 w-6" stroke />
+                        <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full border-2 border-[#FFF6DB] bg-[#FF901A]" />
+                    </button>
+                    {notifMenuOpen && (
+                        <div className="absolute right-0 top-[calc(100%+10px)] w-72 rounded-[22px] border border-[#176637]/10 bg-white p-4 shadow-[0_18px_50px_rgba(23,102,55,0.14)] z-50">
+                            <h3 className="mb-3 font-gabriela text-lg text-[#176637]">Notifikasi</h3>
+                            <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
+                                <button 
+                                    onClick={() => { setNotifMenuOpen(false); setActiveMenu('employees'); }}
+                                    className="rounded-xl bg-[#FFF6DB]/50 p-3 text-left transition hover:bg-[#FFF6DB]"
+                                >
+                                    <p className="text-sm font-bold text-[#176637]">Jadwal Karyawan</p>
+                                    <p className="mt-1 text-xs text-[#176637]/70">Shift baru telah diterbitkan untuk bulan depan.</p>
+                                    <p className="mt-2 text-[10px] text-[#176637]/40">10 Menit yang lalu</p>
+                                </button>
+                                <button 
+                                    onClick={() => { setNotifMenuOpen(false); setActiveMenu('supply'); }}
+                                    className="rounded-xl bg-red-50 p-3 text-left transition hover:bg-red-100"
+                                >
+                                    <p className="text-sm font-bold text-red-600">Stok Menipis: Cup Reguler</p>
+                                    <p className="mt-1 text-xs text-red-500/80">Stok Cup Reguler di Outlet sisa 50 pcs.</p>
+                                    <p className="mt-2 text-[10px] text-red-500/50">1 Jam yang lalu</p>
+                                </button>
+                                <button 
+                                    onClick={() => { setNotifMenuOpen(false); setActiveMenu('report'); }}
+                                    className="rounded-xl bg-[#FFF6DB]/50 p-3 text-left transition hover:bg-[#FFF6DB]"
+                                >
+                                    <p className="text-sm font-bold text-[#176637]">Laporan Bulanan</p>
+                                    <p className="mt-1 text-xs text-[#176637]/70">Laporan keuangan bulan ini siap diunduh.</p>
+                                    <p className="mt-2 text-[10px] text-[#176637]/40">Kemarin</p>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <div className="relative flex items-center gap-3 border-l-2 border-[#176637]/20 pl-6" ref={userRef}>
+                    <button
+                        onClick={() => setUserMenuOpen((value) => !value)}
+                        className="flex cursor-pointer items-center gap-3 rounded-full px-1 py-1 transition hover:bg-[#176637]/5"
+                    >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-tl-xl rounded-br-xl bg-[#72AD43] font-bold text-white">{user?.initial ?? 'U'}</div>
+                        <div className="hidden md:block text-left">
+                            <p className="text-sm font-bold text-[#176637]">{user?.name ?? 'User'}</p>
+                            <p className="text-xs text-[#176637]/60">{user?.role ?? 'Role'}</p>
+                        </div>
+                        <Icon name="chevronDown" className="h-4 w-4 text-[#176637]/50" stroke />
+                    </button>
+                    {userMenuOpen && (
+                        <div className="absolute right-0 top-[calc(100%+10px)] w-48 rounded-[22px] border border-[#176637]/10 bg-white p-2 shadow-[0_18px_50px_rgba(23,102,55,0.14)] z-50">
+                            <button 
+                                onClick={() => {
+                                    setUserMenuOpen(false);
+                                    window.Swal?.fire({
+                                        title: 'Pengaturan Akun',
+                                        text: 'Menu pengaturan profil saat ini sedang dalam pemeliharaan.',
+                                        icon: 'info',
+                                        confirmButtonColor: '#176637'
+                                    });
+                                }}
+                                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]"
+                            >
+                                <Icon name="settings" className="h-4 w-4" stroke />
+                                Pengaturan
+                            </button>
+                            <form action="/logout" method="POST" className="w-full">
+                                <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
+                                <button type="submit" className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]">
+                                    <Icon name="logout" className="h-4 w-4" stroke />
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </header>
+    );
+}
+
 function DashboardView() {
     const [startDate, setStartDate] = React.useState('');
     const [endDate, setEndDate] = React.useState('');
     const [stats, setStats] = React.useState([]);
     const [dynamicSales, setDynamicSales] = React.useState(salesData);
     const [isLoading, setIsLoading] = React.useState(false);
+
+    const topProducts = [
+        { name: 'Matcha Lattea', sold: 420 },
+        { name: 'Hojicha', sold: 350 },
+        { name: 'Brown Sugar', sold: 290 },
+        { name: 'Croissant', sold: 200 },
+        { name: 'Red Velvet', sold: 180 },
+    ];
+    
+    const categoryData = [
+        { name: 'Latte Tea', value: 45 },
+        { name: 'Pure Tea', value: 30 },
+        { name: 'Pastry', value: 25 },
+    ];
+    
+    const COLORS = ['#176637', '#72AD43', '#FF901A', '#e28743', '#873e23'];
 
     React.useEffect(() => {
         if (!startDate || !endDate) return;
@@ -472,12 +604,9 @@ function DashboardView() {
 
     return (
         <div className="animate-slide-up flex-1 overflow-y-auto p-6 pr-6 lg:p-8 lg:pr-10">
-            <header className="mb-8">
-                <div>
-                    <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Dashboard Mitra</h1>
-                    <p className="text-sm font-medium text-[#72AD43]">Outlet Harmoni - Ringkasan Hari Ini</p>
-                </div>
-            </header>
+            <div className="mb-6">
+                <p className="text-sm font-medium text-[#72AD43]">Outlet Harmoni - Ringkasan Hari Ini</p>
+            </div>
 
             <div className={`mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
                 {stats.length > 0 ? stats.map((stat) => (
@@ -520,7 +649,26 @@ function DashboardView() {
                             />
                         </div>
                     </div>
-                    <DashboardChart data={dynamicSales} />
+                    <div className="h-[300px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={dynamicSales} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                <defs>
+                                    <linearGradient id="colorOmzet" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#72AD43" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#72AD43" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#176637" strokeOpacity={0.1} />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} dx={-10} tickFormatter={(val) => `Rp ${val / 1000000}M`} />
+                                <RechartsTooltip 
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(23,102,55,0.1)' }}
+                                    formatter={(value) => [`Rp ${value.toLocaleString('id-ID')}`, 'Omzet']}
+                                />
+                                <Line type="monotone" dataKey="omzet" stroke="#72AD43" strokeWidth={3} dot={{ r: 4, fill: '#72AD43', strokeWidth: 0 }} activeDot={{ r: 6, strokeWidth: 0, fill: '#FF901A' }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
                 </section>
 
                 <aside className="flex flex-col rounded-tr-[40px] rounded-bl-[40px] border border-[#176637]/5 bg-white p-6 shadow-sm">
@@ -543,361 +691,248 @@ function DashboardView() {
                     </div>
                 </aside>
             </div>
-        </div>
-    );
-}
 
-function POSView({ user }) {
-    const [menus, setMenus] = useState([]);
-    const [tables, setTables] = useState([]);
-    const [activeCategory, setActiveCategory] = useState('Semua');
-    const [cart, setCart] = useState([]);
-    const [customerName, setCustomerName] = useState('');
-    const [orderType, setOrderType] = useState('Dine In');
-    const [selectedTableId, setSelectedTableId] = useState(null);
-    const [qrModalOpen, setQrModalOpen] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState('QRIS');
-    const [isProcessing, setIsProcessing] = useState(false);
-
-    React.useEffect(() => {
-        fetch('/api/pos/menus').then(r => r.json()).then(setMenus);
-        const fetchTables = () => {
-            fetch('/api/pos/tables').then(r => r.json()).then(data => {
-                setTables(data);
-                if (data.length > 0 && !selectedTableId) setSelectedTableId(data[0].id);
-            });
-        };
-        fetchTables();
-        const interval = setInterval(fetchTables, 10000);
-        return () => clearInterval(interval);
-    }, []);
-
-    React.useEffect(() => {
-        if (!selectedTableId) return;
-        const table = tables.find((t) => t.id === selectedTableId);
-        if (table && table.active_order) {
-            setCart(table.active_order.items.map(item => ({
-                id: item.menu.id,
-                menu_item_id: item.menu_item_id,
-                name: item.menu.name,
-                price: parseFloat(item.price),
-                image: item.menu.image_path ? `/storage/${item.menu.image_path}` : '/minum2.png',
-                qty: item.quantity
-            })));
-        } else {
-            setCart([]);
-        }
-    }, [selectedTableId, tables]);
-
-    const categories = ['Semua', ...new Set(menus.map((item) => item.category).filter(Boolean))];
-    const filteredProducts = useMemo(() => activeCategory === 'Semua' ? menus : menus.filter((item) => item.category === activeCategory), [menus, activeCategory]);
-    const selectedTable = tables.find((table) => table.id === selectedTableId) || { id: '-', table_number: '-', status: 'Kosong' };
-
-    const addToCart = (product) => {
-        setCart((prev) => {
-            const existing = prev.find((item) => item.id === product.id);
-            if (existing) {
-                return prev.map((item) => (item.id === product.id ? { ...item, qty: item.qty + 1 } : item));
-            }
-            return [...prev, { ...product, menu_item_id: product.id, qty: 1 }];
-        });
-    };
-
-    const updateQty = (id, delta) => {
-        setCart((prev) => prev.map((item) => {
-            if (item.id === id) {
-                const nextQty = item.qty + delta;
-                return nextQty > 0 ? { ...item, qty: nextQty } : item;
-            }
-            return item;
-        }).filter((item) => item.qty > 0));
-    };
-
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-    const tax = subtotal * 0.11;
-    const total = subtotal + tax;
-    const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    const orderTypes = ['Dine In', 'Take Away', 'Delivery'];
-
-    const handleCheckout = async () => {
-        setIsProcessing(true);
-        try {
-            const res = await fetch('/api/pos/checkout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content },
-                body: JSON.stringify({
-                    table_id: selectedTable.id,
-                    customer_name: customerName,
-                    payment_method: paymentMethod,
-                    type: orderType,
-                    items: cart.map(item => ({
-                        menu_item_id: item.menu_item_id,
-                        qty: item.qty,
-                        price: item.price
-                    }))
-                })
-            });
-            if (res.ok) {
-                setCart([]);
-                fetch('/api/pos/tables').then(r => r.json()).then(setTables);
-                alert('Pesanan berhasil diselesaikan!');
-            } else {
-                const err = await res.json();
-                alert('Gagal checkout: ' + (err.error || err.message));
-            }
-        } catch (e) {
-            alert('Terjadi kesalahan.');
-        }
-        setIsProcessing(false);
-    };
-
-    return (
-        <div className="animate-slide-up flex-1 overflow-hidden">
-            <QrGeneratorModal isOpen={qrModalOpen} onClose={() => setQrModalOpen(false)} tables={tables} />
-            <div className="flex h-full flex-col overflow-hidden bg-transparent xl:flex-row">
-                <main className="flex min-w-0 flex-1 flex-col overflow-hidden p-6 pr-0 lg:p-8 lg:pr-0">
-                    <header className="mb-8 flex flex-col gap-4 pr-6 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                            <h1 className="font-gabriela mb-1 text-2xl text-[#176637]">Kasir Sagara</h1>
-                            <p className="text-sm font-medium text-[#72AD43]">{today}</p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="relative w-full sm:w-auto">
-                                <Icon name="search" className="absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[#176637]/40" stroke />
-                                <input type="text" placeholder="Cari menu (⌘K)" className="w-full rounded-full border-2 border-[#176637]/10 bg-white py-2 pl-12 pr-4 text-sm text-[#176637] transition-colors focus:border-[#72AD43] focus:outline-none sm:w-64" />
-                            </div>
-                            <form action="/logout" method="POST" className="inline">
-                                <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
-                                <button type="submit" className="flex items-center gap-2 rounded-full border-2 border-[#176637]/10 bg-white px-4 py-1.5 text-sm font-bold text-[#176637] transition-colors hover:border-[#FF901A] hover:text-[#FF901A]">
-                                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#176637] text-[10px] text-white">{user?.initial ?? 'U'}</div>
-                                    <span className="hidden sm:inline">{user?.name ?? 'Karyawan'}</span>
-                                </button>
-                            </form>
-                        </div>
-                    </header>
-
-                    <section className="mb-6 mr-6 rounded-[28px] border border-[#176637]/10 bg-white p-5 shadow-sm">
-                        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                            <div>
-                                <h3 className="font-gabriela text-2xl text-[#176637]">Meja Order</h3>
-                                <p className="text-sm text-[#176637]/60">Pilih meja untuk mengatur pesanan dan pembayaran.</p>
-                            </div>
-                            <button onClick={() => setQrModalOpen(true)} className="rounded-full bg-[#176637] px-4 py-2 text-xs font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A]">
-                                Generate QR Meja
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3 xl:grid-cols-3 2xl:grid-cols-6">
-                            {tables.map((table) => {
-                                const isSelected = selectedTableId === table.id;
-                                const isKosong = table.status === 'Kosong';
-                                const isOrdering = table.status === 'Sedang Pesan';
-
-                                return (
-                                    <button
-                                        key={table.id}
-                                        onClick={() => setSelectedTableId(table.id)}
-                                        className={`flex flex-col items-center justify-center rounded-2xl border-2 p-4 transition-all ${
-                                            isSelected
-                                                ? 'scale-105 border-[#176637] bg-[#176637] text-white shadow-lg'
-                                                : isKosong
-                                                ? 'border-[#176637]/10 bg-white text-[#176637] hover:border-[#176637]/30 hover:bg-[#FFF6DB]/50'
-                                                : isOrdering
-                                                ? 'border-[#FF901A]/30 bg-[#FF901A]/10 text-[#176637]'
-                                                : 'border-[#72AD43]/30 bg-[#72AD43]/10 text-[#176637]'
-                                        }`}
-                                    >
-                                        <span className="font-gabriela text-2xl font-bold">{table.table_number}</span>
-                                        <div className="mt-1 flex items-center gap-1 opacity-80">
-                                            <Icon name="users" className="h-3 w-3" stroke />
-                                            <span className="text-[10px] uppercase tracking-wider">{table.status}</span>
-                                        </div>
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </section>
-
-                    <section className="flex flex-1 flex-col overflow-hidden pr-6">
-                        <div className="mb-4 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                            {categories.map((category) => (
-                                <button
-                                    key={category}
-                                    onClick={() => setActiveCategory(category)}
-                                    className={`flex items-center gap-2 whitespace-nowrap rounded-full border-2 px-4 py-2 text-sm font-bold transition-all ${
-                                        activeCategory === category ? 'border-[#176637] bg-[#176637] text-white shadow-[2px_2px_0px_#FF901A]' : 'border-[#176637]/10 bg-white text-[#176637] hover:border-[#176637]/30 hover:bg-[#FFF6DB]'
-                                    }`}
-                                >
-                                    <span className="capitalize">{category}</span>
-                                </button>
-                            ))}
-                        </div>
-                        <div className="grid flex-1 grid-cols-2 gap-4 overflow-y-auto pb-6 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                            {filteredProducts.map((product) => (
-                                <button
-                                    key={product.id}
-                                    onClick={() => addToCart(product)}
-                                    className="group flex h-48 flex-col justify-between overflow-hidden rounded-[24px] border border-[#176637]/10 bg-white p-3 text-left shadow-sm transition-all hover:-translate-y-1 hover:border-[#FF901A] hover:shadow-md"
-                                >
-                                    <div className="flex h-24 w-full items-center justify-center overflow-hidden rounded-xl bg-[#FFF6DB]/30 transition-colors group-hover:bg-[#FFF6DB]/60">
-                                        <img src={product.image_path ? `/storage/${product.image_path}` : '/minum2.png'} alt={product.name} className="h-full w-full object-contain p-2" />
-                                    </div>
-                                    <div>
-                                        <h3 className="line-clamp-2 text-sm font-bold leading-tight text-[#176637]">{product.name}</h3>
-                                        <div className="mt-1 flex items-center justify-between">
-                                            <p className="text-sm font-medium text-[#72AD43]">Rp {parseFloat(product.price).toLocaleString('id-ID')}</p>
-                                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#176637]/5 text-[#176637] group-hover:bg-[#176637] group-hover:text-white">
-                                                <Icon name="plus" className="h-3 w-3" stroke />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </section>
-                </main>
-
-                <aside className="flex h-full w-full flex-col border-l border-[#176637]/10 bg-white shadow-[-10px_0_30px_rgba(23,102,55,0.05)] xl:w-[380px]">
-                    <div className="rounded-tl-[40px] border-b border-[#176637]/5 bg-[#FFF6DB]/30 p-6">
-                        <div className="text-center">
-                            <h2 className="font-gabriela text-lg font-bold text-[#176637]">Nota Pesanan</h2>
-                            <p className="text-xs text-[#176637]/60">Meja {selectedTable.table_number}</p>
-                        </div>
+            <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+                <section className="relative overflow-hidden rounded-[40px] border border-[#176637]/5 bg-white p-6 shadow-sm">
+                    <h3 className="font-gabriela text-xl text-[#176637] mb-6">Produk Terlaris (Bulan Ini)</h3>
+                    <div className="h-[320px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={topProducts} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#176637" strokeOpacity={0.1} />
+                                <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} />
+                                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, fontWeight: 'bold' }} dx={-10} />
+                                <RechartsTooltip 
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(23,102,55,0.1)' }}
+                                    formatter={(value) => [`${value} Porsi`, 'Terjual']}
+                                />
+                                <Bar dataKey="sold" fill="#72AD43" radius={[0, 10, 10, 0]} barSize={20} />
+                            </BarChart>
+                        </ResponsiveContainer>
                     </div>
+                </section>
 
-                    <div className="flex flex-1 flex-col overflow-hidden p-6">
-                        <div className="mb-5 flex rounded-full border border-[#176637]/10 bg-[#FFF6DB] p-1">
-                            {orderTypes.map((type) => (
-                                <button
-                                    key={type}
-                                    onClick={() => setOrderType(type)}
-                                    className={`flex-1 rounded-full py-2 text-xs font-medium transition-colors ${orderType === type ? 'bg-[#176637] text-[#FFF6DB] shadow-sm' : 'text-[#176637]/70 hover:text-[#176637]'}`}
-                                >
-                                    {type}
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className="mb-5">
-                            <input
-                                type="text"
-                                placeholder="Nama Pelanggan"
-                                value={customerName}
-                                onChange={(event) => setCustomerName(event.target.value)}
-                                className="w-full rounded-xl border-2 border-[#176637]/10 px-3 py-2 text-sm text-[#176637] focus:border-[#72AD43] focus:outline-none"
-                            />
-                        </div>
-
-                        {orderType === 'Dine In' && (
-                            <div className="mb-5 rounded-[22px] border border-[#176637]/10 bg-[#FFF6DB]/35 p-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Meja Aktif</div>
-                                        <div className="mt-1 font-gabriela text-2xl text-[#176637]">{selectedTable.table_number}</div>
-                                    </div>
-                                    <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{selectedTable.status}</span>
-                                </div>
-                                {selectedTable.status === 'Sedang Pesan' && (
-                                    <div className="mt-4 rounded-xl border border-red-400/30 bg-red-50 p-3 text-sm text-red-700">
-                                        <strong className="block">Pesanan Aktif!</strong>
-                                        Pelanggan sedang/telah memesan.
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        <div className="flex-1 overflow-y-auto pr-2">
-                            {cart.length === 0 ? (
-                                <div className="flex h-full flex-col items-center justify-center text-center opacity-50">
-                                    <Icon name="package" className="mb-3 h-12 w-12 text-[#176637]" stroke />
-                                    <p className="text-sm font-medium text-[#176637]">Keranjang masih kosong</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    {cart.map((item) => (
-                                        <div key={item.id} className="flex items-center gap-3 rounded-xl border border-[#FFF6DB] bg-[#FFF6DB]/20 p-2">
-                                            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm">
-                                                <img src={item.image} alt={item.name} className="h-full w-full object-contain p-1" />
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <h4 className="truncate text-sm font-semibold text-[#176637]">{item.name}</h4>
-                                                <p className="text-xs text-[#176637]/60">Rp {item.price.toLocaleString('id-ID')}</p>
-                                            </div>
-                                            <div className="flex items-center gap-2 rounded-lg border border-[#176637]/10 bg-white px-1.5 py-1">
-                                                <button onClick={() => updateQty(item.id, -1)} className="text-[#176637]">
-                                                    <Icon name="minus" className="h-3 w-3" stroke />
-                                                </button>
-                                                <span className="w-3 text-center text-xs font-bold">{item.qty}</span>
-                                                <button onClick={() => updateQty(item.id, 1)} className="text-[#176637]">
-                                                    <Icon name="plus" className="h-3 w-3" stroke />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="mt-auto border-t-2 border-dashed border-[#176637]/10 pt-4">
-                            <div className="mb-4 space-y-1.5">
-                                <div className="flex justify-between text-sm text-[#176637]/70">
-                                    <span>Subtotal</span>
-                                    <span>Rp {subtotal.toLocaleString('id-ID')}</span>
-                                </div>
-                                <div className="flex justify-between text-sm text-[#176637]/70">
-                                    <span>Pajak (11%)</span>
-                                    <span>Rp {tax.toLocaleString('id-ID')}</span>
-                                </div>
-                                <div className="mt-2 flex justify-between border-t border-[#176637]/10 pt-2 text-lg font-bold text-[#176637]">
-                                    <span>Total</span>
-                                    <span>Rp {total.toLocaleString('id-ID')}</span>
-                                </div>
-                            </div>
-                            <div className="mb-4 rounded-2xl border border-[#176637]/10 bg-[#FFF6DB]/35 p-4">
-                                <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Metode Pembayaran</div>
-                                <div className="grid grid-cols-3 gap-2">
-                                    {['QRIS', 'Kartu', 'Cash'].map(method => (
-                                        <button
-                                            key={method}
-                                            onClick={() => setPaymentMethod(method)}
-                                            className={`rounded-xl px-3 py-2 text-xs font-bold transition-colors ${
-                                                paymentMethod === method 
-                                                ? 'bg-[#176637] text-[#FFF6DB]' 
-                                                : 'border border-[#176637]/15 text-[#176637] hover:bg-[#176637]/5'
-                                            }`}
-                                        >
-                                            {method}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            <button
-                                onClick={handleCheckout}
-                                className={`flex w-full items-center justify-between rounded-xl px-5 py-3 font-bold shadow-[4px_4px_0px_#72AD43] transition-all ${
-                                    cart.length > 0 && !isProcessing ? 'bg-[#176637] text-[#FFF6DB] hover:-translate-y-1' : 'cursor-not-allowed bg-gray-300 text-gray-500 shadow-none'
-                                }`}
-                                disabled={cart.length === 0 || isProcessing}
-                            >
-                                <span>{isProcessing ? 'Memproses...' : (selectedTable.status === 'Sedang Pesan' ? 'Terima & Proses' : 'Selesaikan Pembayaran')}</span>
-                                <span className="rounded-lg bg-[#FFF6DB]/20 px-2 py-1 text-sm">Rp {total.toLocaleString('id-ID')}</span>
-                            </button>
-                        </div>
-                    </div>
-                </aside>
+                <CategoryDonutChart />
             </div>
         </div>
     );
 }
+
+function ManajemenPOSView({ user }) {
+    const [menus, setMenus] = useState([
+        { id: 1, name: 'Matcha Lattea', category: 'Latte Series', status: 'Tersedia', price: 25000 },
+        { id: 2, name: 'Hojicha', category: 'Latte Series', status: 'Tersedia', price: 23000 },
+        { id: 3, name: 'Brown Sugar', category: 'Latte Series', status: 'Habis', price: 20000 },
+    ]);
+    const [tables, setTables] = useState([
+        { id: 1, table_number: '1', status: 'Kosong', description: 'Dekat Jendela' },
+        { id: 2, table_number: '2', status: 'Kosong', description: 'Tengah' },
+        { id: 3, table_number: '3', status: 'Terisi', description: 'Outdoor' },
+    ]);
+    const [qrModalOpen, setQrModalOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('menu');
+    const [searchMenu, setSearchMenu] = useState('');
+    
+    const [isTableFormOpen, setIsTableFormOpen] = useState(false);
+    const [editingTable, setEditingTable] = useState(null);
+    const [tableFormData, setTableFormData] = useState({ table_number: '', description: '' });
+
+    const toggleMenuStatus = (id) => {
+        setMenus(menus.map(menu => {
+            if (menu.id === id) {
+                return { ...menu, status: menu.status === 'Tersedia' ? 'Habis' : 'Tersedia' };
+            }
+            return menu;
+        }));
+    };
+
+    const handleSaveTable = () => {
+        if (!tableFormData.table_number) return;
+        
+        if (editingTable) {
+            setTables(tables.map(t => t.id === editingTable.id ? { ...t, ...tableFormData } : t));
+        } else {
+            setTables([...tables, { 
+                id: Date.now(), 
+                table_number: tableFormData.table_number, 
+                description: tableFormData.description, 
+                status: 'Kosong' 
+            }]);
+        }
+        setIsTableFormOpen(false);
+        setEditingTable(null);
+    };
+
+    const openAddTable = () => {
+        setTableFormData({ table_number: '', description: '' });
+        setEditingTable(null);
+        setIsTableFormOpen(true);
+    };
+
+    const openEditTable = (table) => {
+        setTableFormData({ table_number: table.table_number, description: table.description || '' });
+        setEditingTable(table);
+        setIsTableFormOpen(true);
+    };
+
+    const filteredMenus = menus.filter(menu => menu.name.toLowerCase().includes(searchMenu.toLowerCase()));
+
+    return (
+        <div className="animate-slide-up flex flex-col h-full overflow-y-auto p-4 md:p-6 lg:p-8">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h2 className="font-gabriela text-4xl text-[#176637]">Manajemen POS</h2>
+                    <p className="mt-2 text-base text-[#176637]/70">Atur ketersediaan menu dan master meja outlet Anda.</p>
+                </div>
+                <div className="flex gap-2 bg-[#FFF6DB] p-1.5 rounded-2xl border border-[#176637]/10">
+                    <button 
+                        onClick={() => setActiveTab('menu')} 
+                        className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'menu' ? 'bg-[#176637] text-[#FFF6DB]' : 'text-[#176637]/70 hover:text-[#176637]'}`}
+                    >
+                        Ketersediaan Menu
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('meja')} 
+                        className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'meja' ? 'bg-[#176637] text-[#FFF6DB]' : 'text-[#176637]/70 hover:text-[#176637]'}`}
+                    >
+                        Master Meja
+                    </button>
+                </div>
+            </div>
+
+            {activeTab === 'meja' && (
+                <div className="bg-white rounded-[28px] border-2 border-[#176637]/10 p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="font-gabriela text-2xl text-[#176637]">Daftar Meja</h3>
+                        <div className="flex gap-3">
+                            <button onClick={() => setQrModalOpen(true)} className="flex items-center gap-2 rounded-xl border-2 border-[#176637] px-4 py-2 font-bold text-[#176637] transition-all hover:bg-[#176637]/5">
+                                <Icon name="qr" className="h-4 w-4" stroke />
+                                Generate Semua QR
+                            </button>
+                            <button onClick={openAddTable} className="flex items-center gap-2 rounded-xl bg-[#176637] px-4 py-2 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A] transition-all hover:translate-y-1">
+                                <Icon name="plus" className="h-4 w-4" stroke />
+                                Tambah Meja
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {tables.map(table => (
+                            <div key={table.id} className="rounded-2xl border border-[#176637]/10 bg-[#FFF6DB]/30 p-5 flex flex-col items-center justify-center text-center">
+                                <div className="text-sm font-bold uppercase tracking-[0.2em] text-[#176637]/60 mb-2">Meja</div>
+                                <div className="font-gabriela text-5xl text-[#176637] mb-2">{table.table_number}</div>
+                                <div className="text-xs text-[#176637]/70 mb-4 px-2 min-h-[32px] flex items-center">{table.description || '-'}</div>
+                                <div className="flex w-full gap-2">
+                                    <button onClick={() => openEditTable(table)} className="flex-1 rounded-xl bg-white border border-[#176637]/15 py-2 text-xs font-bold text-[#176637] hover:bg-[#176637]/5">Edit</button>
+                                    <button onClick={() => setQrModalOpen(true)} className="flex-1 rounded-xl bg-white border border-[#176637]/15 py-2 text-xs font-bold text-[#176637] hover:bg-[#176637]/5">QR</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {isTableFormOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#176637]/40 backdrop-blur-sm p-4">
+                            <div className="w-full max-w-sm rounded-[32px] bg-white p-6 shadow-2xl reveal">
+                                <h3 className="font-gabriela text-2xl text-[#176637] mb-4">{editingTable ? 'Edit Meja' : 'Tambah Meja Baru'}</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="text-xs font-bold uppercase tracking-wider text-[#176637]/70">Nomor Meja</label>
+                                        <input 
+                                            type="text" 
+                                            value={tableFormData.table_number}
+                                            onChange={(e) => setTableFormData({...tableFormData, table_number: e.target.value})}
+                                            className="mt-1 w-full rounded-xl border border-[#176637]/20 bg-[#FFF6DB]/30 p-3 outline-none focus:border-[#72AD43]"
+                                            placeholder="Contoh: 01, A2, dll"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold uppercase tracking-wider text-[#176637]/70">Deskripsi (Opsional)</label>
+                                        <input 
+                                            type="text" 
+                                            value={tableFormData.description}
+                                            onChange={(e) => setTableFormData({...tableFormData, description: e.target.value})}
+                                            className="mt-1 w-full rounded-xl border border-[#176637]/20 bg-[#FFF6DB]/30 p-3 outline-none focus:border-[#72AD43]"
+                                            placeholder="Contoh: Dekat Jendela, Teras"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="mt-6 flex gap-3">
+                                    <button onClick={() => setIsTableFormOpen(false)} className="flex-1 rounded-xl border border-[#176637]/20 py-3 font-bold text-[#176637] hover:bg-[#176637]/5">Batal</button>
+                                    <button onClick={handleSaveTable} className="flex-1 rounded-xl bg-[#176637] py-3 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#FF901A]">Simpan</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <QrGeneratorModal isOpen={qrModalOpen} onClose={() => setQrModalOpen(false)} tables={tables} />
+                </div>
+            )}
+
+            {activeTab === 'menu' && (
+                <div className="bg-white rounded-[28px] border-2 border-[#176637]/10 p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="font-gabriela text-2xl text-[#176637]">Ketersediaan Menu</h3>
+                        <div className="relative w-64">
+                            <Icon name="search" className="absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[#176637]/40" stroke />
+                            <input 
+                                value={searchMenu}
+                                onChange={(e) => setSearchMenu(e.target.value)}
+                                type="text" 
+                                placeholder="Cari menu..." 
+                                className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] py-3 pl-12 pr-4 text-[13px] text-[#176637] outline-none transition-colors focus:border-[#72AD43]" 
+                            />
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                    <th className="p-4 pl-6">Menu</th>
+                                    <th className="p-4">Kategori</th>
+                                    <th className="p-4">Harga</th>
+                                    <th className="p-4">Status</th>
+                                    <th className="p-4">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredMenus.map((menu) => (
+                                    <tr key={menu.id} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                        <td className="p-4 pl-6 font-bold text-[#176637]">{menu.name}</td>
+                                        <td className="p-4 text-sm text-[#176637]/70">{menu.category}</td>
+                                        <td className="p-4 text-sm font-semibold text-[#176637]">Rp {menu.price.toLocaleString('id-ID')}</td>
+                                        <td className="p-4">
+                                            <span className={`rounded-full px-3 py-1 text-xs font-bold ${menu.status === 'Tersedia' ? 'bg-[#72AD43]/15 text-[#176637]' : 'bg-red-100 text-red-600'}`}>
+                                                {menu.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-4">
+                                            <button 
+                                                onClick={() => toggleMenuStatus(menu.id)}
+                                                className={`rounded-xl px-4 py-2 text-xs font-bold transition-all ${menu.status === 'Tersedia' ? 'bg-[#176637]/10 text-[#176637] hover:bg-[#176637]/20' : 'bg-[#176637] text-[#FFF6DB] hover:bg-[#176637]/90'}`}
+                                            >
+                                                {menu.status === 'Tersedia' ? 'Tandai Habis' : 'Buka Menu'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
 function EmployeesView() {
     const [members, setMembers] = useState(teamMembers);
 
     return (
         <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
-            <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Manajemen Tim</h1>
                     <p className="text-sm font-medium text-[#72AD43]">Daftar Karyawan Outlet Harmoni</p>
                 </div>
-            </header>
+            </div>
 
             <div className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
                 <div className="overflow-x-auto">
@@ -985,10 +1020,9 @@ function SupplyView() {
 
     return (
         <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
-            <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Inventaris & Stok</h1>
-                    <p className="text-sm font-medium text-[#72AD43]">Pantau ketersediaan bahan operasional</p>
+                    <p className="text-sm font-medium text-[#72AD43]">Pemantauan Stok & Bahan Baku</p>
                 </div>
                 <button
                     onClick={() => setShowAddForm((value) => !value)}
@@ -996,7 +1030,7 @@ function SupplyView() {
                 >
                     Tambah Stok
                 </button>
-            </header>
+            </div>
 
             <section className="mb-8 rounded-[28px] border border-[#176637]/10 bg-white p-5 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
@@ -1123,26 +1157,25 @@ function SupplyView() {
 function ReportView() {
     return (
         <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
-            <header className="mb-8 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+            <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
                 <div>
-                    <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Rekap Laporan</h1>
                     <p className="text-sm font-medium text-[#72AD43]">Finance, order, stok, karyawan, dan laporan outlet</p>
                 </div>
-            </header>
+            </div>
 
-            <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+            <div className="grid gap-6 lg:grid-cols-2">
                 <div className="space-y-6">
                     <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
                         <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
                             <h2 className="font-gabriela text-2xl text-[#176637]">Rekap Finance</h2>
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="min-w-full min-w-max text-left">
+                            <table className="min-w-full text-left">
                                 <thead>
                                     <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                        <th className="p-4 pl-6">Periode</th>
-                                        <th className="p-4">Nilai</th>
-                                        <th className="p-4">Keterangan</th>
+                                        <th className="w-1/3 p-4 pl-6">Periode</th>
+                                        <th className="w-1/3 p-4">Nilai</th>
+                                        <th className="w-1/3 p-4">Keterangan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1163,7 +1196,7 @@ function ReportView() {
                             <h2 className="font-gabriela text-2xl text-[#176637]">Riwayat Pesanan</h2>
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="min-w-full min-w-max text-left">
+                            <table className="min-w-full text-left">
                                 <thead>
                                     <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
                                         <th className="p-4 pl-6">No</th>
@@ -1194,13 +1227,13 @@ function ReportView() {
                             <h2 className="font-gabriela text-2xl text-[#176637]">Riwayat Tambah Stok</h2>
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="min-w-full min-w-max text-left">
+                            <table className="min-w-full text-left">
                                 <thead>
                                     <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                        <th className="p-4 pl-6">ID</th>
-                                        <th className="p-4">Item</th>
-                                        <th className="p-4">Perubahan</th>
-                                        <th className="p-4">Sumber</th>
+                                        <th className="w-1/4 p-4 pl-6">ID</th>
+                                        <th className="w-1/4 p-4">Item</th>
+                                        <th className="w-1/4 p-4">Perubahan</th>
+                                        <th className="w-1/4 p-4">Sumber</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1261,11 +1294,19 @@ export default function MitraDashboardPage({ data = {} }) {
 
     const renderView = () => {
         if (activeTab === 'dashboard') return <DashboardView />;
-        if (activeTab === 'pos') return <POSView user={pageData.user} />;
+        if (activeTab === 'pos') return <ManajemenPOSView user={pageData.user} />;
         if (activeTab === 'employees') return <EmployeesView />;
         if (activeTab === 'supply') return <SupplyView />;
         if (activeTab === 'report') return <ReportView />;
         return <DashboardView />;
+    };
+
+    const titles = {
+        'dashboard': 'Dashboard Mitra',
+        'pos': 'Manajemen POS',
+        'employees': 'Manajemen Tim',
+        'supply': 'Inventaris Outlet',
+        'report': 'Rekap Laporan',
     };
 
     return (
@@ -1273,9 +1314,17 @@ export default function MitraDashboardPage({ data = {} }) {
             <GlobalStyles />
             <div className="flex h-screen overflow-hidden bg-[#FFF6DB]">
                 {!isPos && <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} logoUrl={logoUrl} user={pageData.user} />}
-                <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-                    {renderView()}
-                </div>
+                <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+                    <Header title={titles[activeTab]} setActiveMenu={setActiveTab} user={pageData.user} />
+                    <div className="relative z-0 flex-1 overflow-y-auto">
+                        <div className="pointer-events-none absolute bottom-[-20px] right-[-50px] z-[-1] h-32 w-96 opacity-[0.05]">
+                            <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="h-full w-full stroke-[#176637] stroke-[3px] fill-transparent">
+                                <path d="M0,10 Q25,20 50,10 T100,10" />
+                            </svg>
+                        </div>
+                        {renderView()}
+                    </div>
+                </main>
             </div>
         </>
     );

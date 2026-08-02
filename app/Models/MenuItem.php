@@ -12,9 +12,11 @@ use Illuminate\Database\Eloquent\Model;
     'tagline',
     'description',
     'price',
+    'image',
     'accent_color',
     'is_featured',
     'sort_order',
+    'status',
 ])]
 class MenuItem extends Model
 {

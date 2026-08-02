@@ -10,6 +10,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class);
 
+Route::get('/meja/{table}', function ($table) {
+    return view('app', [
+        'pageData' => [
+            'page' => 'customer-order',
+            'table_number' => strtoupper($table)
+        ]
+    ]);
+});
 Route::middleware('guest')->group(function () {
     Route::get('/login', LoginPageController::class)->name('login');
     Route::post('/login', [AuthController::class, 'login']);
