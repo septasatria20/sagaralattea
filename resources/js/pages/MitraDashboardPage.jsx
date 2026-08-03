@@ -1,5 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';const iconPaths = {
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
+import { downloadCombinedCsv, downloadCsvFile, openPrintableWindow } from '../utils/reportExport';
+
+const iconPaths = {
     dashboard: 'M4 13.5V6a2 2 0 0 1 2-2h4v9.5H4Zm0 2.5h6V20H6a2 2 0 0 1-2-2v-2Zm8 4V4h6a2 2 0 0 1 2 2v14h-8Zm8 0h2a2 2 0 0 0 2-2v-5h-4v7Z',
     store: 'M3 7h18l-1 5H4L3 7Zm2 6h14v7H5v-7Zm1-9h12l1 2H5l1-2Z',
     users: 'M9 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm7 1a3 3 0 1 0-3-3 3 3 0 0 0 3 3ZM2 20a7 7 0 0 1 14 0Zm14 0a5 5 0 0 1 6 0v0Z',
@@ -403,27 +406,29 @@ function Sidebar({ activeTab, setActiveTab, logoUrl, user }) {
                 </div>
                 <div className="mb-4 pl-2 text-xs font-bold uppercase tracking-[0.32em] text-[#72AD43]">Mitra Panel</div>
 
-                <nav className="flex flex-col gap-2">
-                {items.map((item) => {
-                    const active = activeTab === item.id;
+                <div className="flex-1 overflow-y-auto hide-scroll">
+                    <nav className="flex flex-col gap-2 pb-4">
+                    {items.map((item) => {
+                        const active = activeTab === item.id;
 
-                    return (
-                        <button
-                            key={item.id}
-                            onClick={() => setActiveTab(item.id)}
-                            className={`relative flex w-[calc(100%+1.5rem)] items-center gap-3 px-4 py-3 text-left transition-all duration-300 ${
-                                active
-                                    ? 'translate-x-4 rounded-tl-xl rounded-bl-xl bg-[#FFF6DB] text-[#176637] shadow-[-4px_0_10px_rgba(0,0,0,0.1)]'
-                                    : 'text-[#FFF6DB]/72 hover:bg-[#FFF6DB]/10 hover:text-[#FFF6DB]'
-                            }`}
-                        >
-                            <Icon name={item.icon} className={`h-5 w-5 ${active ? 'text-[#FF901A]' : ''}`} stroke />
-                            <span className="text-sm font-medium">{item.label}</span>
-                            {active && <span className="absolute right-0 top-0 h-full w-2 bg-[#FF901A]" />}
-                        </button>
-                    );
-                })}
-                </nav>
+                        return (
+                            <button
+                                key={item.id}
+                                onClick={() => setActiveTab(item.id)}
+                                className={`relative flex w-[calc(100%+1.5rem)] items-center gap-3 px-4 py-3 text-left transition-all duration-300 ${
+                                    active
+                                        ? 'translate-x-4 rounded-tl-xl rounded-bl-xl bg-[#FFF6DB] text-[#176637] shadow-[-4px_0_10px_rgba(0,0,0,0.1)]'
+                                        : 'text-[#FFF6DB]/72 hover:bg-[#FFF6DB]/10 hover:text-[#FFF6DB]'
+                                }`}
+                            >
+                                <Icon name={item.icon} className={`h-5 w-5 ${active ? 'text-[#FF901A]' : ''}`} stroke />
+                                <span className="text-sm font-medium">{item.label}</span>
+                                {active && <span className="absolute right-0 top-0 h-full w-2 bg-[#FF901A]" />}
+                            </button>
+                        );
+                    })}
+                    </nav>
+                </div>
             </div>
 
             <div className="mt-auto border-t border-[#FFF6DB]/10 p-5">
@@ -702,6 +707,7 @@ function DashboardView() {
                                 <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} />
                                 <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, fontWeight: 'bold' }} dx={-10} />
                                 <RechartsTooltip 
+                                    cursor={{fill: 'transparent'}}
                                     contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(23,102,55,0.1)' }}
                                     formatter={(value) => [`${value} Porsi`, 'Terjual']}
                                 />
@@ -1155,6 +1161,22 @@ function SupplyView() {
 }
 
 function ReportView() {
+    const financeRows = financeReports.map((item) => [item.label, item.value, item.note]);
+    const orderRows = orderReports.map((item) => [item.id, item.item, item.type, item.total]);
+    const stockRows = stockMovements.map((item) => [item.id, item.item, item.change, item.source]);
+
+    const printableTables = [
+        { title: 'Rekap Finance', headers: ['Periode', 'Nilai', 'Keterangan'], rows: financeRows },
+        { title: 'Riwayat Pesanan', headers: ['No', 'Item', 'Tipe', 'Total'], rows: orderRows },
+        { title: 'Riwayat Tambah Stok', headers: ['ID', 'Item', 'Perubahan', 'Sumber'], rows: stockRows },
+    ];
+
+    const printTables = (tables) => openPrintableWindow({
+        title: 'Rekap Laporan Mitra',
+        subtitle: 'Laporan outlet dan operasional',
+        tables,
+    });
+
     return (
         <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
             <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
@@ -1163,124 +1185,137 @@ function ReportView() {
                 </div>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-2">
-                <div className="space-y-6">
-                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
-                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
-                            <h2 className="font-gabriela text-2xl text-[#176637]">Rekap Finance</h2>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full text-left">
-                                <thead>
-                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                        <th className="w-1/3 p-4 pl-6">Periode</th>
-                                        <th className="w-1/3 p-4">Nilai</th>
-                                        <th className="w-1/3 p-4">Keterangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {financeReports.map((item) => (
-                                        <tr key={item.key} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
-                                            <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
-                                            <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-
-                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
-                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
-                            <h2 className="font-gabriela text-2xl text-[#176637]">Riwayat Pesanan</h2>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full text-left">
-                                <thead>
-                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                        <th className="p-4 pl-6">No</th>
-                                        <th className="p-4">Item</th>
-                                        <th className="p-4">Tipe</th>
-                                        <th className="p-4">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {orderReports.map((item) => (
-                                        <tr key={item.id} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
-                                            <td className="p-4 text-sm text-[#176637]">
-                                                <div className="font-semibold">{item.item}</div>
-                                                <div className="text-xs text-[#176637]/55">{item.time}</div>
-                                            </td>
-                                            <td className="p-4 text-sm text-[#176637]/70">{item.type}</td>
-                                            <td className="p-4 text-sm font-bold text-[#176637]">{item.total}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-
-                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
-                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
-                            <h2 className="font-gabriela text-2xl text-[#176637]">Riwayat Tambah Stok</h2>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full text-left">
-                                <thead>
-                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                        <th className="w-1/4 p-4 pl-6">ID</th>
-                                        <th className="w-1/4 p-4">Item</th>
-                                        <th className="w-1/4 p-4">Perubahan</th>
-                                        <th className="w-1/4 p-4">Sumber</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {stockMovements.map((item) => (
-                                        <tr key={item.id} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
-                                            <td className="p-4 text-sm text-[#176637]">{item.item}</td>
-                                            <td className="p-4 text-sm font-bold text-[#176637]">{item.change}</td>
-                                            <td className="p-4 text-sm text-[#176637]/70">{item.source}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                </div>
-
-                <aside className="space-y-6">
-                    <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
-                        <h3 className="font-gabriela text-2xl text-[#176637]">Preview Print</h3>
-                        <div className="mt-4 rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB] p-4">
-                            <div className="rounded-[20px] bg-white p-4 shadow-sm">
-                                <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Outlet Harmoni</div>
-                                <div className="mt-2 font-gabriela text-2xl text-[#176637]">Ringkasan Laporan Hari Ini</div>
-                                <div className="mt-4 space-y-3">
-                                    {financeReports.map((item) => (
-                                        <div key={item.key} className="flex items-center justify-between border-b border-[#176637]/8 pb-2 text-sm">
-                                            <span className="text-[#176637]/70">{item.label}</span>
-                                            <span className="font-bold text-[#176637]">{item.value}</span>
-                                        </div>
-                                    ))}
-                                </div>
+            <div className="grid gap-6 xl:grid-cols-2">
+                <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                    <h3 className="font-gabriela text-2xl text-[#176637]">Preview Print</h3>
+                    <div className="mt-4 rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB] p-4">
+                        <div className="rounded-[20px] bg-white p-4 shadow-sm">
+                            <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Outlet Harmoni</div>
+                            <div className="mt-2 font-gabriela text-2xl text-[#176637]">Ringkasan Laporan Hari Ini</div>
+                            <div className="mt-4 space-y-3">
+                                {financeReports.map((item) => (
+                                    <div key={item.key} className="flex items-center justify-between border-b border-[#176637]/8 pb-2 text-sm">
+                                        <span className="text-[#176637]/70">{item.label}</span>
+                                        <span className="font-bold text-[#176637]">{item.value}</span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    </section>
+                    </div>
+                </section>
 
-                    <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
-                        <h3 className="font-gabriela text-2xl text-[#176637]">Ekspor Cepat</h3>
-                        <div className="mt-4 grid gap-3">
-                            <button className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh PDF</button>
-                            <button className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Excel</button>
-                            <button onClick={() => window.print()} className="rounded-2xl bg-[#176637] px-4 py-3 text-sm font-bold text-[#FFF6DB]">
-                                Buka Print Preview
-                            </button>
+                <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                    <h3 className="font-gabriela text-2xl text-[#176637]">Ekspor Cepat</h3>
+                    <div className="mt-4 grid gap-3">
+                        <button onClick={() => printTables(printableTables)} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh PDF</button>
+                        <button onClick={() => downloadCombinedCsv('mitra-rekap-laporan.csv', printableTables)} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Excel</button>
+                        <button onClick={() => printTables(printableTables)} className="rounded-2xl bg-[#176637] px-4 py-3 text-sm font-bold text-[#FFF6DB]">
+                            Buka Print Preview
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <div className="mt-6 grid gap-6">
+                <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
+                    <div className="flex items-center justify-between gap-4 border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
+                        <h2 className="font-gabriela text-2xl text-[#176637]">Rekap Finance</h2>
+                        <div className="flex gap-2">
+                            <button onClick={() => printTables([{ title: 'Rekap Finance', headers: ['Periode', 'Nilai', 'Keterangan'], rows: financeRows }])} className="rounded-full bg-[#176637] px-3 py-1.5 text-xs font-bold text-[#FFF6DB]">PDF</button>
+                            <button onClick={() => downloadCsvFile('mitra-rekap-finance.csv', ['Periode', 'Nilai', 'Keterangan'], financeRows)} className="rounded-full border border-[#176637]/15 bg-white px-3 py-1.5 text-xs font-bold text-[#176637]">Excel</button>
+                            <button onClick={() => printTables([{ title: 'Rekap Finance', headers: ['Periode', 'Nilai', 'Keterangan'], rows: financeRows }])} className="rounded-full border border-[#176637]/15 bg-white px-3 py-1.5 text-xs font-bold text-[#176637]">Print</button>
                         </div>
-                    </section>
-                </aside>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full text-left">
+                            <thead>
+                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                    <th className="p-4 pl-6">Periode</th>
+                                    <th className="p-4">Nilai</th>
+                                    <th className="p-4">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {financeReports.map((item) => (
+                                    <tr key={item.key} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
+                                        <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
+                                        <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
+                    <div className="flex items-center justify-between gap-4 border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
+                        <h2 className="font-gabriela text-2xl text-[#176637]">Riwayat Pesanan</h2>
+                        <div className="flex gap-2">
+                            <button onClick={() => printTables([{ title: 'Riwayat Pesanan', headers: ['No', 'Item', 'Tipe', 'Total'], rows: orderRows }])} className="rounded-full bg-[#176637] px-3 py-1.5 text-xs font-bold text-[#FFF6DB]">PDF</button>
+                            <button onClick={() => downloadCsvFile('mitra-riwayat-pesanan.csv', ['No', 'Item', 'Tipe', 'Total'], orderRows)} className="rounded-full border border-[#176637]/15 bg-white px-3 py-1.5 text-xs font-bold text-[#176637]">Excel</button>
+                            <button onClick={() => printTables([{ title: 'Riwayat Pesanan', headers: ['No', 'Item', 'Tipe', 'Total'], rows: orderRows }])} className="rounded-full border border-[#176637]/15 bg-white px-3 py-1.5 text-xs font-bold text-[#176637]">Print</button>
+                        </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full text-left">
+                            <thead>
+                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                    <th className="p-4 pl-6">No</th>
+                                    <th className="p-4">Item</th>
+                                    <th className="p-4">Tipe</th>
+                                    <th className="p-4">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {orderReports.map((item) => (
+                                    <tr key={item.id} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
+                                        <td className="p-4 text-sm text-[#176637]">
+                                            <div className="font-semibold">{item.item}</div>
+                                            <div className="text-xs text-[#176637]/55">{item.time}</div>
+                                        </td>
+                                        <td className="p-4 text-sm text-[#176637]/70">{item.type}</td>
+                                        <td className="p-4 text-sm font-bold text-[#176637]">{item.total}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
+                    <div className="flex items-center justify-between gap-4 border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
+                        <h2 className="font-gabriela text-2xl text-[#176637]">Riwayat Tambah Stok</h2>
+                        <div className="flex gap-2">
+                            <button onClick={() => printTables([{ title: 'Riwayat Tambah Stok', headers: ['ID', 'Item', 'Perubahan', 'Sumber'], rows: stockRows }])} className="rounded-full bg-[#176637] px-3 py-1.5 text-xs font-bold text-[#FFF6DB]">PDF</button>
+                            <button onClick={() => downloadCsvFile('mitra-riwayat-stok.csv', ['ID', 'Item', 'Perubahan', 'Sumber'], stockRows)} className="rounded-full border border-[#176637]/15 bg-white px-3 py-1.5 text-xs font-bold text-[#176637]">Excel</button>
+                            <button onClick={() => printTables([{ title: 'Riwayat Tambah Stok', headers: ['ID', 'Item', 'Perubahan', 'Sumber'], rows: stockRows }])} className="rounded-full border border-[#176637]/15 bg-white px-3 py-1.5 text-xs font-bold text-[#176637]">Print</button>
+                        </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full text-left">
+                            <thead>
+                                <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                                    <th className="w-1/4 p-4 pl-6">ID</th>
+                                    <th className="w-1/4 p-4">Item</th>
+                                    <th className="w-1/4 p-4">Perubahan</th>
+                                    <th className="w-1/4 p-4">Sumber</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {stockMovements.map((item) => (
+                                    <tr key={item.id} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                        <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
+                                        <td className="p-4 text-sm text-[#176637]">{item.item}</td>
+                                        <td className="p-4 text-sm font-bold text-[#176637]">{item.change}</td>
+                                        <td className="p-4 text-sm text-[#176637]/70">{item.source}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
             </div>
         </div>
     );

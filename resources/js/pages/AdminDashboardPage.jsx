@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
+import { downloadCombinedCsv, downloadCsvFile, openPrintableWindow } from '../utils/reportExport';
 
 const apiFetch = async (url, options = {}) => {
     if (options.method && ['POST', 'PUT', 'DELETE'].includes(options.method.toUpperCase())) {
@@ -403,6 +404,7 @@ function TopProductsChart() {
                         <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} />
                         <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, fontWeight: 'bold' }} dx={-10} />
                         <RechartsTooltip 
+                            cursor={{fill: 'transparent'}}
                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: '#FFF6DB' }}
                             itemStyle={{ color: '#176637', fontWeight: 'bold' }}
                             formatter={(value) => [`${value} Porsi`, 'Terjual']}
@@ -572,7 +574,7 @@ function TopOutletsBarChart() {
                         <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} tickFormatter={(val) => `Rp${(val/1000000)}M`} />
                         <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 11, fontWeight: 'bold' }} width={140} />
                         <RechartsTooltip 
-                            cursor={{ fill: '#FFF6DB', opacity: 0.4 }}
+                            cursor={{ fill: 'transparent' }}
                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: '#FFF6DB' }}
                             itemStyle={{ color: '#176637', fontWeight: 'bold' }}
                             formatter={(value) => [`Rp ${value.toLocaleString('id-ID')}`, 'Omzet']}
@@ -2403,7 +2405,7 @@ function InvestorTab() {
     );
 }
 
-function ReportTab({ menuItems, employees, members, supply, complaints, promos, investorData, outlets, movements, salesData }) {
+function ReportTab({ menuItems, employees, members, supply, complaints, promos, investorData, outlets, movements }) {
     const financeRows = [
         { label: 'Pendapatan hari ini', value: 'Rp 4.250.000', note: 'Estimasi transaksi outlet hari ini' },
         { label: 'Total pesanan', value: '142', note: 'Semua order selesai diproses' },
@@ -2454,7 +2456,24 @@ function ReportTab({ menuItems, employees, members, supply, complaints, promos, 
         outlet: item.outlet,
     }));
 
-    const printDashboard = () => window.print();
+    const printableTables = [
+        { title: 'Finance', headers: ['Item', 'Nilai', 'Catatan'], rows: financeRows.map((row) => [row.label, row.value, row.note]) },
+        { title: 'Riwayat Promo', headers: ['Judul', 'Kode', 'Periode', 'Status'], rows: promos.map((promo) => [promo.title, promo.code, promo.period, promo.status]) },
+        { title: 'Karyawan', headers: ['Nama', 'Peran', 'Penempatan', 'Status'], rows: employees.map((employee) => [employee.name, employee.role, employee.outlet, employee.blacklisted ? 'Blacklist' : employee.status]) },
+        { title: 'Membership', headers: ['Member', 'HP', 'Poin', 'Status'], rows: members.map((member) => [member.name, member.phone, `${member.points} pts`, member.status]) },
+        { title: 'Inventaris', headers: ['Item', 'Stok', 'Outlet', 'Status'], rows: supplyRows.map((item) => [item.name, item.stock, item.outlet, item.status]) },
+        { title: 'Riwayat Tambah Stok', headers: ['ID', 'Item', 'Perubahan', 'Outlet'], rows: movementRows.map((item) => [item.id, item.item, `${item.direction} ${item.qty}`, item.outlet]) },
+        { title: 'Komplain', headers: ['Tiket', 'Masalah', 'Outlet', 'Status'], rows: complaintRows.map((ticket) => [ticket.id, ticket.issue, ticket.outlet, ticket.status]) },
+        { title: 'Investor', headers: ['Investor', 'ROI', 'Akses', 'Ticket'], rows: investorRows.map((item) => [item.name, item.roi, item.access, item.ticket]) },
+        { title: 'Menu', headers: ['Menu', 'Kategori', 'Harga', 'Status'], rows: menuRows.map((item) => [item.name, item.category, item.price, item.status]) },
+        { title: 'Performa Antar Outlet', headers: ['Outlet', 'Omzet', 'Status', 'Lokasi'], rows: outletRows.map((item) => [item.name, item.omzet, item.status, item.location]) },
+    ];
+
+    const printTables = (tables) => openPrintableWindow({
+        title: 'Rekap Laporan Admin',
+        subtitle: 'Admin Pusat',
+        tables,
+    });
 
     return (
         <div className="animate-slide-up space-y-8">
@@ -2465,234 +2484,230 @@ function ReportTab({ menuItems, employees, members, supply, complaints, promos, 
                 </div>
             </div>
 
-            <div className="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
-                <div className="space-y-6">
-                    <ReportSectionTable
-                        title="Finance"
-                        rows={financeRows}
-                        columns={['Item', 'Nilai', 'Catatan']}
-                        pageSize={3}
-                        actions={[
-                            { label: 'PDF' },
-                            { label: 'Excel' },
-                            { label: 'Print', onClick: printDashboard },
-                        ]}
-                        renderRow={(row) => (
-                            <>
-                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{row.label}</td>
-                                <td className="p-4 text-sm font-semibold text-[#176637]">{row.value}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{row.note}</td>
-                            </>
-                        )}
-                    />
-
-                    <ReportSectionTable
-                        title="Riwayat Promo"
-                        rows={promos}
-                        columns={['Judul', 'Kode', 'Periode', 'Status']}
-                        pageSize={3}
-                        actions={[
-                            { label: 'PDF' },
-                            { label: 'Excel' },
-                            { label: 'Cetak', onClick: printDashboard },
-                        ]}
-                        renderRow={(promo) => (
-                            <>
-                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{promo.title}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{promo.code}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{promo.period}</td>
-                                <td className="p-4 text-sm font-semibold text-[#176637]">{promo.status}</td>
-                            </>
-                        )}
-                    />
-
-                    <ReportSectionTable
-                        title="Karyawan"
-                        rows={employees}
-                        columns={['Nama', 'Peran', 'Penempatan', 'Status']}
-                        pageSize={4}
-                        actions={[
-                            { label: 'PDF' },
-                            { label: 'Excel' },
-                            { label: 'Print', onClick: printDashboard },
-                        ]}
-                        renderRow={(employee) => (
-                            <>
-                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{employee.name}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{employee.role}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{employee.outlet}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{employee.blacklisted ? 'Blacklist' : employee.status}</td>
-                            </>
-                        )}
-                    />
-
-                    <ReportSectionTable
-                        title="Membership"
-                        rows={members}
-                        columns={['Member', 'HP', 'Poin', 'Status']}
-                        pageSize={4}
-                        actions={[
-                            { label: 'PDF' },
-                            { label: 'Excel' },
-                            { label: 'Print', onClick: printDashboard },
-                        ]}
-                        renderRow={(member) => (
-                            <>
-                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{member.name}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{member.phone}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{member.points} pts</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{member.status}</td>
-                            </>
-                        )}
-                    />
-                </div>
-
-                <div className="space-y-6">
-                    <ReportSectionTable
-                        title="Inventaris"
-                        rows={supplyRows}
-                        columns={['Item', 'Stok', 'Outlet', 'Status']}
-                        pageSize={4}
-                        actions={[
-                            { label: 'PDF' },
-                            { label: 'Excel' },
-                            { label: 'Print', onClick: printDashboard },
-                        ]}
-                        renderRow={(item) => (
-                            <>
-                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.name}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{item.stock}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{item.outlet}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{item.status}</td>
-                            </>
-                        )}
-                    />
-
-                    <ReportSectionTable
-                        title="Riwayat Tambah Stok"
-                        rows={movementRows}
-                        columns={['ID', 'Item', 'Perubahan', 'Outlet']}
-                        pageSize={4}
-                        actions={[
-                            { label: 'PDF' },
-                            { label: 'Excel' },
-                            { label: 'Print', onClick: printDashboard },
-                        ]}
-                        renderRow={(item) => (
-                            <>
-                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{item.item}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{item.direction} {item.qty}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{item.outlet}</td>
-                            </>
-                        )}
-                    />
-
-                    <ReportSectionTable
-                        title="Komplain"
-                        rows={complaintRows}
-                        columns={['Tiket', 'Masalah', 'Outlet', 'Status']}
-                        pageSize={3}
-                        actions={[
-                            { label: 'PDF' },
-                            { label: 'Excel' },
-                            { label: 'Print', onClick: printDashboard },
-                        ]}
-                        renderRow={(ticket) => (
-                            <>
-                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{ticket.id}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{ticket.issue}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{ticket.outlet}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{ticket.status}</td>
-                            </>
-                        )}
-                    />
-
-                    <ReportSectionTable
-                        title="Investor"
-                        rows={investorRows}
-                        columns={['Investor', 'ROI', 'Akses', 'Ticket']}
-                        pageSize={3}
-                        actions={[
-                            { label: 'PDF' },
-                            { label: 'Excel' },
-                            { label: 'Print', onClick: printDashboard },
-                        ]}
-                        renderRow={(item) => (
-                            <>
-                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.name}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{item.roi}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{item.access}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{item.ticket}</td>
-                            </>
-                        )}
-                    />
-
-                    <ReportSectionTable
-                        title="Menu"
-                        rows={menuRows}
-                        columns={['Menu', 'Kategori', 'Harga', 'Status']}
-                        pageSize={4}
-                        actions={[
-                            { label: 'PDF' },
-                            { label: 'Excel' },
-                            { label: 'Print', onClick: printDashboard },
-                        ]}
-                        renderRow={(item) => (
-                            <>
-                                <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.name}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{item.category}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{item.price}</td>
-                                <td className="p-4 text-sm text-[#176637]/70">{item.status}</td>
-                            </>
-                        )}
-                    />
-                </div>
-
-                <aside className="space-y-6">
-                    <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
-                        <h3 className="font-gabriela text-2xl text-[#176637]">Preview Print</h3>
-                        <div className="mt-4 rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB] p-4">
-                            <div className="rounded-[20px] bg-white p-4 shadow-sm">
-                                <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Admin Pusat</div>
-                                <div className="mt-2 font-gabriela text-2xl text-[#176637]">Ringkasan Cetak</div>
-                                <div className="mt-4 space-y-3">
-                                    {financeRows.map((row) => (
-                                        <div key={row.label} className="flex items-center justify-between border-b border-[#176637]/8 pb-2 text-sm">
-                                            <span className="text-[#176637]/70">{row.label}</span>
-                                            <span className="font-bold text-[#176637]">{row.value}</span>
-                                        </div>
-                                    ))}
-                                </div>
+            <div className="grid gap-6 xl:grid-cols-2">
+                <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                    <h3 className="font-gabriela text-2xl text-[#176637]">Preview Print</h3>
+                    <div className="mt-4 rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB] p-4">
+                        <div className="rounded-[20px] bg-white p-4 shadow-sm">
+                            <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Admin Pusat</div>
+                            <div className="mt-2 font-gabriela text-2xl text-[#176637]">Ringkasan Cetak</div>
+                            <div className="mt-4 space-y-3">
+                                {financeRows.map((row) => (
+                                    <div key={row.label} className="flex items-center justify-between border-b border-[#176637]/8 pb-2 text-sm">
+                                        <span className="text-[#176637]/70">{row.label}</span>
+                                        <span className="font-bold text-[#176637]">{row.value}</span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    </section>
+                    </div>
+                </section>
 
-                    <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
-                        <h3 className="font-gabriela text-2xl text-[#176637]">Ekspor Cepat</h3>
-                        <p className="mt-2 text-sm text-[#176637]/65">Unduh semua tabel sekaligus atau pilih tabel tertentu dari masing-masing section.</p>
-                        <div className="mt-4 grid gap-3">
-                            <button className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Semua PDF</button>
-                            <button className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Semua Excel</button>
-                            <button onClick={() => window.print()} className="rounded-2xl bg-[#176637] px-4 py-3 text-sm font-bold text-[#FFF6DB]">
-                                Cetak Semua
-                            </button>
-                        </div>
-                    </section>
-                </aside>
+                <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                    <h3 className="font-gabriela text-2xl text-[#176637]">Ekspor Cepat</h3>
+                    <p className="mt-2 text-sm text-[#176637]/65">Unduh semua tabel sekaligus atau lihat print preview tanpa sidebar.</p>
+                    <div className="mt-4 grid gap-3">
+                        <button onClick={() => printTables(printableTables)} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Semua PDF</button>
+                        <button onClick={() => downloadCombinedCsv('admin-rekap-laporan.csv', printableTables)} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Semua Excel</button>
+                        <button onClick={() => printTables(printableTables)} className="rounded-2xl bg-[#176637] px-4 py-3 text-sm font-bold text-[#FFF6DB]">
+                            Cetak Semua
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <div className="grid gap-6 xl:grid-cols-2">
+                <ReportSectionTable
+                    title="Finance"
+                    rows={financeRows}
+                    columns={['Item', 'Nilai', 'Catatan']}
+                    pageSize={10}
+                    actions={[
+                        { label: 'PDF', onClick: () => printTables([{ title: 'Finance', headers: ['Item', 'Nilai', 'Catatan'], rows: financeRows.map((row) => [row.label, row.value, row.note]) }]) },
+                        { label: 'Excel', onClick: () => downloadCsvFile('admin-finance.csv', ['Item', 'Nilai', 'Catatan'], financeRows.map((row) => [row.label, row.value, row.note])) },
+                        { label: 'Print', onClick: () => printTables([{ title: 'Finance', headers: ['Item', 'Nilai', 'Catatan'], rows: financeRows.map((row) => [row.label, row.value, row.note]) }]) },
+                    ]}
+                    renderRow={(row) => (
+                        <>
+                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{row.label}</td>
+                            <td className="p-4 text-sm font-semibold text-[#176637]">{row.value}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{row.note}</td>
+                        </>
+                    )}
+                />
+
+                <ReportSectionTable
+                    title="Komplain"
+                    rows={complaintRows}
+                    columns={['Tiket', 'Masalah', 'Outlet', 'Status']}
+                    pageSize={10}
+                    actions={[
+                        { label: 'PDF', onClick: () => printTables([{ title: 'Komplain', headers: ['Tiket', 'Masalah', 'Outlet', 'Status'], rows: complaintRows.map((ticket) => [ticket.id, ticket.issue, ticket.outlet, ticket.status]) }]) },
+                        { label: 'Excel', onClick: () => downloadCsvFile('admin-komplain.csv', ['Tiket', 'Masalah', 'Outlet', 'Status'], complaintRows.map((ticket) => [ticket.id, ticket.issue, ticket.outlet, ticket.status])) },
+                        { label: 'Print', onClick: () => printTables([{ title: 'Komplain', headers: ['Tiket', 'Masalah', 'Outlet', 'Status'], rows: complaintRows.map((ticket) => [ticket.id, ticket.issue, ticket.outlet, ticket.status]) }]) },
+                    ]}
+                    renderRow={(ticket) => (
+                        <>
+                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{ticket.id}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{ticket.issue}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{ticket.outlet}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{ticket.status}</td>
+                        </>
+                    )}
+                />
+
+                <ReportSectionTable
+                    title="Inventaris"
+                    rows={supplyRows}
+                    columns={['Item', 'Stok', 'Outlet', 'Status']}
+                    pageSize={10}
+                    actions={[
+                        { label: 'PDF', onClick: () => printTables([{ title: 'Inventaris', headers: ['Item', 'Stok', 'Outlet', 'Status'], rows: supplyRows.map((item) => [item.name, item.stock, item.outlet, item.status]) }]) },
+                        { label: 'Excel', onClick: () => downloadCsvFile('admin-inventaris.csv', ['Item', 'Stok', 'Outlet', 'Status'], supplyRows.map((item) => [item.name, item.stock, item.outlet, item.status])) },
+                        { label: 'Print', onClick: () => printTables([{ title: 'Inventaris', headers: ['Item', 'Stok', 'Outlet', 'Status'], rows: supplyRows.map((item) => [item.name, item.stock, item.outlet, item.status]) }]) },
+                    ]}
+                    renderRow={(item) => (
+                        <>
+                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.name}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{item.stock}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{item.outlet}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{item.status}</td>
+                        </>
+                    )}
+                />
+
+                <ReportSectionTable
+                    title="Riwayat Tambah Stok"
+                    rows={movementRows}
+                    columns={['ID', 'Item', 'Perubahan', 'Outlet']}
+                    pageSize={10}
+                    actions={[
+                        { label: 'PDF', onClick: () => printTables([{ title: 'Riwayat Tambah Stok', headers: ['ID', 'Item', 'Perubahan', 'Outlet'], rows: movementRows.map((item) => [item.id, item.item, `${item.direction} ${item.qty}`, item.outlet]) }]) },
+                        { label: 'Excel', onClick: () => downloadCsvFile('admin-riwayat-tambah-stok.csv', ['ID', 'Item', 'Perubahan', 'Outlet'], movementRows.map((item) => [item.id, item.item, `${item.direction} ${item.qty}`, item.outlet])) },
+                        { label: 'Print', onClick: () => printTables([{ title: 'Riwayat Tambah Stok', headers: ['ID', 'Item', 'Perubahan', 'Outlet'], rows: movementRows.map((item) => [item.id, item.item, `${item.direction} ${item.qty}`, item.outlet]) }]) },
+                    ]}
+                    renderRow={(item) => (
+                        <>
+                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.id}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{item.item}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{item.direction} {item.qty}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{item.outlet}</td>
+                        </>
+                    )}
+                />
+
+                <ReportSectionTable
+                    title="Riwayat Promo"
+                    rows={promos}
+                    columns={['Judul', 'Kode', 'Periode', 'Status']}
+                    pageSize={10}
+                    actions={[
+                        { label: 'PDF', onClick: () => printTables([{ title: 'Riwayat Promo', headers: ['Judul', 'Kode', 'Periode', 'Status'], rows: promos.map((promo) => [promo.title, promo.code, promo.period, promo.status]) }]) },
+                        { label: 'Excel', onClick: () => downloadCsvFile('admin-riwayat-promo.csv', ['Judul', 'Kode', 'Periode', 'Status'], promos.map((promo) => [promo.title, promo.code, promo.period, promo.status])) },
+                        { label: 'Print', onClick: () => printTables([{ title: 'Riwayat Promo', headers: ['Judul', 'Kode', 'Periode', 'Status'], rows: promos.map((promo) => [promo.title, promo.code, promo.period, promo.status]) }]) },
+                    ]}
+                    renderRow={(promo) => (
+                        <>
+                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{promo.title}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{promo.code}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{promo.period}</td>
+                            <td className="p-4 text-sm font-semibold text-[#176637]">{promo.status}</td>
+                        </>
+                    )}
+                />
+
+                <ReportSectionTable
+                    title="Karyawan"
+                    rows={employees}
+                    columns={['Nama', 'Peran', 'Penempatan', 'Status']}
+                    pageSize={10}
+                    actions={[
+                        { label: 'PDF', onClick: () => printTables([{ title: 'Karyawan', headers: ['Nama', 'Peran', 'Penempatan', 'Status'], rows: employees.map((employee) => [employee.name, employee.role, employee.outlet, employee.blacklisted ? 'Blacklist' : employee.status]) }]) },
+                        { label: 'Excel', onClick: () => downloadCsvFile('admin-karyawan.csv', ['Nama', 'Peran', 'Penempatan', 'Status'], employees.map((employee) => [employee.name, employee.role, employee.outlet, employee.blacklisted ? 'Blacklist' : employee.status])) },
+                        { label: 'Print', onClick: () => printTables([{ title: 'Karyawan', headers: ['Nama', 'Peran', 'Penempatan', 'Status'], rows: employees.map((employee) => [employee.name, employee.role, employee.outlet, employee.blacklisted ? 'Blacklist' : employee.status]) }]) },
+                    ]}
+                    renderRow={(employee) => (
+                        <>
+                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{employee.name}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{employee.role}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{employee.outlet}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{employee.blacklisted ? 'Blacklist' : employee.status}</td>
+                        </>
+                    )}
+                />
+
+                <ReportSectionTable
+                    title="Membership"
+                    rows={members}
+                    columns={['Member', 'HP', 'Poin', 'Status']}
+                    pageSize={10}
+                    actions={[
+                        { label: 'PDF', onClick: () => printTables([{ title: 'Membership', headers: ['Member', 'HP', 'Poin', 'Status'], rows: members.map((member) => [member.name, member.phone, `${member.points} pts`, member.status]) }]) },
+                        { label: 'Excel', onClick: () => downloadCsvFile('admin-membership.csv', ['Member', 'HP', 'Poin', 'Status'], members.map((member) => [member.name, member.phone, `${member.points} pts`, member.status])) },
+                        { label: 'Print', onClick: () => printTables([{ title: 'Membership', headers: ['Member', 'HP', 'Poin', 'Status'], rows: members.map((member) => [member.name, member.phone, `${member.points} pts`, member.status]) }]) },
+                    ]}
+                    renderRow={(member) => (
+                        <>
+                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{member.name}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{member.phone}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{member.points} pts</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{member.status}</td>
+                        </>
+                    )}
+                />
+
+                <ReportSectionTable
+                    title="Investor"
+                    rows={investorRows}
+                    columns={['Investor', 'ROI', 'Akses', 'Ticket']}
+                    pageSize={10}
+                    actions={[
+                        { label: 'PDF', onClick: () => printTables([{ title: 'Investor', headers: ['Investor', 'ROI', 'Akses', 'Ticket'], rows: investorRows.map((item) => [item.name, item.roi, item.access, item.ticket]) }]) },
+                        { label: 'Excel', onClick: () => downloadCsvFile('admin-investor.csv', ['Investor', 'ROI', 'Akses', 'Ticket'], investorRows.map((item) => [item.name, item.roi, item.access, item.ticket])) },
+                        { label: 'Print', onClick: () => printTables([{ title: 'Investor', headers: ['Investor', 'ROI', 'Akses', 'Ticket'], rows: investorRows.map((item) => [item.name, item.roi, item.access, item.ticket]) }]) },
+                    ]}
+                    renderRow={(item) => (
+                        <>
+                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.name}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{item.roi}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{item.access}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{item.ticket}</td>
+                        </>
+                    )}
+                />
+
+                <ReportSectionTable
+                    title="Menu"
+                    rows={menuRows}
+                    columns={['Menu', 'Kategori', 'Harga', 'Status']}
+                    pageSize={10}
+                    actions={[
+                        { label: 'PDF', onClick: () => printTables([{ title: 'Menu', headers: ['Menu', 'Kategori', 'Harga', 'Status'], rows: menuRows.map((item) => [item.name, item.category, item.price, item.status]) }]) },
+                        { label: 'Excel', onClick: () => downloadCsvFile('admin-menu.csv', ['Menu', 'Kategori', 'Harga', 'Status'], menuRows.map((item) => [item.name, item.category, item.price, item.status])) },
+                        { label: 'Print', onClick: () => printTables([{ title: 'Menu', headers: ['Menu', 'Kategori', 'Harga', 'Status'], rows: menuRows.map((item) => [item.name, item.category, item.price, item.status]) }]) },
+                    ]}
+                    renderRow={(item) => (
+                        <>
+                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.name}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{item.category}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{item.price}</td>
+                            <td className="p-4 text-sm text-[#176637]/70">{item.status}</td>
+                        </>
+                    )}
+                />
             </div>
         </div>
     );
 }
 
-function ReportSectionTable({ title, rows, columns, renderRow, actions = [], pageSize = 5 }) {
+function ReportSectionTable({ title, rows, columns, renderRow, actions = [], pageSize = 10 }) {
     const [page, setPage] = useState(1);
     const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
     const currentPage = Math.min(page, totalPages);
     const pageRows = rows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     return (
-        <section className="overflow-hidden rounded-[28px] border-2 border-[#176637]/10 bg-white shadow-sm">
+        <section className="flex h-full min-h-[460px] flex-col overflow-hidden rounded-[28px] border-2 border-[#176637]/10 bg-white shadow-sm">
             <div className="flex flex-col gap-4 border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
                 <h3 className="font-gabriela text-2xl text-[#176637]">{title}</h3>
                 <div className="flex flex-wrap gap-2">
@@ -2709,7 +2724,7 @@ function ReportSectionTable({ title, rows, columns, renderRow, actions = [], pag
                     ))}
                 </div>
             </div>
-            <div className="overflow-x-auto">
+            <div className="flex-1 overflow-x-auto">
                 <table className="min-w-full text-left">
                     <thead>
                         <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
@@ -2727,7 +2742,7 @@ function ReportSectionTable({ title, rows, columns, renderRow, actions = [], pag
                     </tbody>
                 </table>
             </div>
-            <div className="flex flex-col gap-3 border-t border-[#176637]/10 bg-[#FFF6DB]/60 px-6 py-4 text-sm text-[#176637]/70 md:flex-row md:items-center md:justify-between">
+            <div className="mt-auto flex flex-col gap-3 border-t border-[#176637]/10 bg-[#FFF6DB]/60 px-6 py-4 text-sm text-[#176637]/70 md:flex-row md:items-center md:justify-between">
                 <div>Menampilkan {pageRows.length} dari {rows.length} data</div>
                 <div className="flex items-center gap-2">
                     <button onClick={() => setPage((value) => Math.max(1, value - 1))} className="rounded-lg border border-[#176637]/10 bg-white px-3 py-2 text-[#176637]">

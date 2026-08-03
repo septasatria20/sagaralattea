@@ -1,4 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { 
+    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
+    BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, Legend
+} from 'recharts';
+import { downloadCombinedCsv, downloadCsvFile, openPrintableWindow } from '../utils/reportExport';
 
 const iconPaths = {
     dashboard: 'M4 13.5V6a2 2 0 0 1 2-2h4v9.5H4Zm0 2.5h6V20H6a2 2 0 0 1-2-2v-2Zm8 4V4h6a2 2 0 0 1 2 2v14h-8Zm8 0h2a2 2 0 0 0 2-2v-5h-4v7Z',
@@ -8,6 +13,7 @@ const iconPaths = {
     bell: 'M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z',
     search: 'M10.5 3a7.5 7.5 0 1 0 4.7 13.3L21 22l1-1-5.8-5.8A7.5 7.5 0 0 0 10.5 3Zm0 2a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z',
     chevronRight: 'M9 6l6 6-6 6',
+    chevronDown: 'M6 9l6 6 6-6',
     trendingUp: 'M4 17l5.5-5.5 4 4L20 9v4h2V5h-8v2h4l-6.5 6.5-4-4L2 15l2 2Z',
     alert: 'M12 9v4m0 4h.01M10.3 4.3 1.6 19a2 2 0 0 0 1.7 3h17.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z',
     settings: 'M12 8.5A3.5 3.5 0 1 0 15.5 12 3.5 3.5 0 0 0 12 8.5Zm8.5 3.5a6.9 6.9 0 0 0-.1-1l2-1.6-2-3.5-2.4.8a7.1 7.1 0 0 0-1.7-1L16 3h-4l-.3 2.7a7.1 7.1 0 0 0-1.7 1l-2.4-.8-2 3.5 2 1.6a6.9 6.9 0 0 0 0 2l-2 1.6 2 3.5 2.4-.8a7.1 7.1 0 0 0 1.7 1L12 21h4l.3-2.7a7.1 7.1 0 0 0 1.7-1l2.4.8 2-3.5-2-1.6c.1-.3.1-.6.1-1Z',
@@ -18,14 +24,8 @@ const iconPaths = {
     print: 'M7 8V4h10v4M7 17H6a2 2 0 0 1-2-2v-3h18v3a2 2 0 0 1-2 2h-1M8 17h8v3H8v-3Z',
 };
 
-const metrics = [
-    { title: 'Total Omzet (Bulan Ini)', value: 'Rp 75.000.000', accent: 'forest', icon: 'trendingUp', trend: '+15.2%' },
-    { title: 'Estimasi Laba Bersih', value: 'Rp 28.000.000', accent: 'greenLight', icon: 'store', trend: '+18.1%' },
-    { title: 'Total Transaksi', value: '3,240', accent: 'orange', icon: 'users', sub: 'Semua cabang' },
-    { title: 'Status Operasional', value: '3/3 Aktif', accent: 'greenLight', icon: 'alert', sub: 'Semua outlet beroperasi' },
-];
-
-const performanceData = [
+// Data Dasar (Semua Mitra)
+const basePerformanceData = [
     { name: 'Jan', omzet: 45000000, laba: 15000000 },
     { name: 'Feb', omzet: 52000000, laba: 18000000 },
     { name: 'Mar', omzet: 48000000, laba: 16000000 },
@@ -34,25 +34,49 @@ const performanceData = [
     { name: 'Jun', omzet: 75000000, laba: 28000000 },
 ];
 
-const outletStats = [
-    { name: 'Outlet Harmoni', omzet: 'Rp 28.500.000', trend: '+12%', status: 'Sangat Baik' },
-    { name: 'Outlet Sudirman', omzet: 'Rp 24.200.000', trend: '+5%', status: 'Baik' },
-    { name: 'Outlet Senayan', omzet: 'Rp 22.300.000', trend: '-2%', status: 'Perlu Perhatian' },
+const baseCategoryData = [
+    { name: 'Latte Series', value: 45 },
+    { name: 'Pure Tea', value: 25 },
+    { name: 'Pastry', value: 20 },
+    { name: 'Snacks', value: 10 },
 ];
 
-const dailyReports = [
-    { label: 'Pagi', value: 'Rp 8.200.000', note: 'Transaksi 08.00 - 12.00' },
-    { label: 'Siang', value: 'Rp 11.450.000', note: 'Transaksi 12.00 - 16.00' },
-    { label: 'Sore', value: 'Rp 6.850.000', note: 'Transaksi 16.00 - 20.00' },
-    { label: 'Malam', value: 'Rp 3.400.000', note: 'Transaksi 20.00 - 23.00' },
+const baseOutletPerformance = [
+    { name: 'Harmoni', omzet: 28500000, pengunjung: 1200 },
+    { name: 'Sudirman', omzet: 24200000, pengunjung: 950 },
+    { name: 'Senayan', omzet: 22300000, pengunjung: 1090 },
 ];
 
-const yearlyReports = [
-    { label: 'Q1', value: 'Rp 145.000.000', note: 'Jan - Mar' },
-    { label: 'Q2', value: 'Rp 168.000.000', note: 'Apr - Jun' },
-    { label: 'Q3', value: 'Rp 182.000.000', note: 'Jul - Sep' },
-    { label: 'Q4', value: 'Rp 220.000.000', note: 'Okt - Des' },
+const baseTopProducts = [
+    { name: 'Matcha Lattea', terjual: 1240 },
+    { name: 'Hojicha', terjual: 980 },
+    { name: 'Brown Sugar', terjual: 850 },
+    { name: 'Croissant', terjual: 620 },
+    { name: 'Pure Green', terjual: 540 },
 ];
+
+const baseDailyTraffic = [
+    { time: '08:00', pengunjung: 20 },
+    { time: '12:00', pengunjung: 85 },
+    { time: '16:00', pengunjung: 60 },
+    { time: '20:00', pengunjung: 95 },
+    { time: '22:00', pengunjung: 40 },
+];
+
+const basePaymentMethod = [
+    { name: 'QRIS', value: 65 },
+    { name: 'Tunai', value: 25 },
+    { name: 'Kartu Debit', value: 10 },
+];
+
+const baseMemberGrowth = [
+    { week: 'W1', baru: 45 },
+    { week: 'W2', baru: 52 },
+    { week: 'W3', baru: 38 },
+    { week: 'W4', baru: 65 },
+];
+
+const COLORS = ['#176637', '#72AD43', '#FF901A', '#FFB74D'];
 
 function Icon({ name, className = 'h-5 w-5', stroke = false }) {
     const path = iconPaths[name];
@@ -89,26 +113,19 @@ function GlobalStyles() {
             .hide-scroll::-webkit-scrollbar {
                 display: none;
             }
-
             .hide-scroll {
                 -ms-overflow-style: none;
                 scrollbar-width: none;
             }
-
+            
             .recharts-cartesian-grid-horizontal line,
             .recharts-cartesian-grid-vertical line {
                 stroke: rgba(23, 102, 55, 0.08);
             }
 
             @keyframes slideUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(14px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+                from { opacity: 0; transform: translateY(14px); }
+                to { opacity: 1; transform: translateY(0); }
             }
 
             .animate-slide-up {
@@ -119,21 +136,20 @@ function GlobalStyles() {
 }
 
 function Sidebar({ logoUrl, activeTab, setActiveTab }) {
-    const [userMenuOpen, setUserMenuOpen] = useState(false);
     const navItems = [
         { id: 'investor_dashboard', icon: 'dashboard', label: 'Dashboard Investor' },
         { id: 'report', icon: 'report', label: 'Rekap Laporan' },
     ];
 
     return (
-        <aside className="relative flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl">
+        <aside className="relative flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl z-20">
             <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
                 <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
             </svg>
 
             <div className="relative z-10 p-6">
                 <div className="mb-8 inline-flex rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg bg-[#FFF6DB] px-4 py-3 shadow-[2px_2px_15px_rgba(23,102,55,0.18)]">
-                    <img src={logoUrl} alt="Sagara Lattea" className="h-16 w-auto object-contain drop-shadow-[0_2px_2px_rgba(0,0,0,0.08)]" />
+                    <img src={logoUrl || '/logosagaralattea.png'} alt="Sagara Lattea" className="h-16 w-auto object-contain drop-shadow-[0_2px_2px_rgba(0,0,0,0.08)]" />
                 </div>
                 <div className="mb-4 pl-2 text-xs font-bold uppercase tracking-[0.32em] text-[#72AD43]">Investor Panel</div>
 
@@ -155,36 +171,6 @@ function Sidebar({ logoUrl, activeTab, setActiveTab }) {
                     ))}
                 </nav>
             </div>
-
-            <div className="mt-auto border-t border-[#FFF6DB]/10 p-5">
-                <button
-                    onClick={() => setUserMenuOpen((value) => !value)}
-                    className="flex w-full items-center gap-3 rounded-2xl bg-[#FFF6DB] px-3 py-3 text-left text-[#176637] shadow-[2px_2px_12px_rgba(23,102,55,0.12)] transition hover:-translate-y-0.5"
-                >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-tl-xl rounded-br-xl bg-[#72AD43] font-bold text-white">IV</div>
-                    <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold">Investor</p>
-                        <p className="text-xs text-[#176637]/60">Owner</p>
-                    </div>
-                    <Icon name="chevronRight" className={`h-4 w-4 rotate-90 transition-transform ${userMenuOpen ? 'text-[#176637]' : 'text-[#176637]/60'}`} stroke />
-                </button>
-                {userMenuOpen && (
-                    <div className="mt-3 space-y-2 rounded-2xl bg-[#FFF6DB]/10 p-2">
-                        <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#FFF6DB] transition hover:bg-[#FFF6DB]/10">
-                            <Icon name="settings" className="h-4 w-4" stroke />
-                            Pengaturan
-                        </button>
-                        <form action="/logout" method="POST" className="w-full">
-                            <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
-                            <button type="submit" className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#FFF6DB] transition hover:bg-[#FFF6DB]/10">
-                                <Icon name="logout" className="h-4 w-4" stroke />
-                                Logout
-                            </button>
-                        </form>
-                    </div>
-                )}
-            </div>
-
         </aside>
     );
 }
@@ -214,425 +200,639 @@ function StatCard({ metric }) {
     );
 }
 
-function MonthlyChart({ data = performanceData }) {
-    const width = 760;
-    const height = 300;
-    const padding = { top: 20, right: 20, bottom: 30, left: 55 };
-    const innerWidth = width - padding.left - padding.right;
-    const innerHeight = height - padding.top - padding.bottom;
-    const maxValue = Math.max(...performanceData.flatMap((item) => [item.omzet, item.laba]));
-    const xStep = innerWidth / (performanceData.length - 1);
-
-    const pathFor = (key) =>
-        performanceData
-            .map((item, index) => {
-                const x = padding.left + index * xStep;
-                const y = padding.top + innerHeight - (item[key] / maxValue) * innerHeight;
-                return `${index === 0 ? 'M' : 'L'}${x} ${y}`;
-            })
-            .join(' ');
-
-    const areaFor = (key) => `${pathFor(key)} L ${padding.left + innerWidth} ${padding.top + innerHeight} L ${padding.left} ${padding.top + innerHeight} Z`;
+function ReportSectionTable({ title, rows, columns, renderRow, actions = [], pageSize = 10 }) {
+    const [page, setPage] = useState(1);
+    const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+    const currentPage = Math.min(page, totalPages);
+    const pageRows = rows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     return (
-        <div className="h-[300px] w-full">
-            <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="h-full w-full">
-                <defs>
-                    <linearGradient id="omzetGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#176637" stopOpacity="0.3" />
-                        <stop offset="95%" stopColor="#176637" stopOpacity="0" />
-                    </linearGradient>
-                    <linearGradient id="labaGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#FF901A" stopOpacity="0.3" />
-                        <stop offset="95%" stopColor="#FF901A" stopOpacity="0" />
-                    </linearGradient>
-                </defs>
-                {[0, 1, 2, 3, 4].map((index) => {
-                    const y = padding.top + (innerHeight / 4) * index;
-                    return <line key={index} x1={padding.left} x2={padding.left + innerWidth} y1={y} y2={y} stroke="#176637" strokeOpacity="0.08" strokeDasharray="4 6" />;
-                })}
-                <path d={areaFor('omzet')} fill="url(#omzetGradient)" />
-                <path d={pathFor('omzet')} fill="none" stroke="#176637" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
-                <path d={areaFor('laba')} fill="url(#labaGradient)" />
-                <path d={pathFor('laba')} fill="none" stroke="#FF901A" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
-                {data.map((item, index) => {
-                    const x = padding.left + index * xStep;
-                    const omzetY = padding.top + innerHeight - (item.omzet / maxValue) * innerHeight;
-                    const labaY = padding.top + innerHeight - (item.laba / maxValue) * innerHeight;
-                    return (
-                        <g key={item.name}>
-                            <circle cx={x} cy={omzetY} r="4" fill="#176637" />
-                            <circle cx={x} cy={labaY} r="4" fill="#FF901A" />
-                        </g>
-                    );
-                })}
-                {data.map((item, index) => (
-                    <text key={item.name} x={padding.left + index * xStep} y={height - 6} textAnchor="middle" fill="#176637" opacity="0.7" fontSize="12">
-                        {item.name}
-                    </text>
-                ))}
-            </svg>
-        </div>
-    );
-}
-
-function Overview() {
-    const [selectedOutlet, setSelectedOutlet] = useState(outletStats[0]?.name ?? '');
-    const [startDate, setStartDate] = React.useState('');
-    const [endDate, setEndDate] = React.useState('');
-    const [dynamicPerformance, setDynamicPerformance] = React.useState(performanceData);
-    const [isLoading, setIsLoading] = React.useState(false);
-
-    React.useEffect(() => {
-        if (!startDate || !endDate) return;
-        setIsLoading(true);
-        fetch(`/api/admin/dashboard/stats?start=${startDate}&end=${endDate}`)
-            .then(res => res.json())
-            .then(data => {
-                // we can map data.salesData to performanceData format
-                const mapped = data.salesData.map(d => ({
-                    name: d.name,
-                    omzet: d.omzet,
-                    laba: d.laba
-                }));
-                setDynamicPerformance(mapped);
-            })
-            .finally(() => setIsLoading(false));
-    }, [startDate, endDate]);
-
-    const activeOutlet = outletStats.find((item) => item.name === selectedOutlet) ?? outletStats[0];
-
-    return (
-        <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
-            <div className="absolute top-0 right-0 h-64 w-full opacity-5 pointer-events-none z-0">
-                <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="h-full w-full fill-[#176637]">
-                    <path d="M0,60 C150,100 300,20 450,60 C600,100 750,20 900,60 C1050,100 1200,20 1200,60 L1200,120 L0,120 Z" />
-                </svg>
-            </div>
-
-            <div className="relative z-10">
-                <header className="mb-8">
-                    <div>
-                        <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Dashboard Investor</h1>
-                        <p className="text-sm font-medium text-[#72AD43]">Pantau performa bisnis dan ROI Sagara Lattea</p>
-                    </div>
-                    <div className="mt-4 flex flex-wrap items-center gap-3">
-                        <span className="text-sm font-semibold text-[#176637]/70">Filter:</span>
-                        <div className="relative">
-                            <select className="cursor-pointer appearance-none rounded-full border-2 border-[#176637]/20 bg-white py-2 pl-4 pr-10 font-bold text-[#176637] shadow-[2px_2px_0px_rgba(23,102,55,0.1)] focus:border-[#72AD43] focus:outline-none">
-                                <option>Semua Outlet</option>
-                                <option>Outlet Harmoni</option>
-                                <option>Outlet Sudirman</option>
-                                <option>Outlet Senayan</option>
-                            </select>
-                            <Icon name="chevronRight" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-[#176637]" stroke />
-                        </div>
-
-                        <span className="ml-4 text-sm font-semibold text-[#176637]/70">Periode:</span>
-                        <div className="flex items-center gap-2 rounded-xl border-2 border-[#176637]/20 bg-white p-2 shadow-[2px_2px_0px_rgba(23,102,55,0.1)] focus-within:border-[#72AD43]">
-                            <input 
-                                type="date" 
-                                value={startDate}
-                                onChange={e => setStartDate(e.target.value)}
-                                className="cursor-pointer border-none bg-transparent px-2 py-1 text-sm font-bold text-[#176637] outline-none" 
-                            />
-                            <span className="text-xs text-[#176637]/50">-</span>
-                            <input 
-                                type="date" 
-                                value={endDate}
-                                onChange={e => setEndDate(e.target.value)}
-                                className="cursor-pointer border-none bg-transparent px-2 py-1 text-sm font-bold text-[#176637] outline-none" 
-                            />
-                        </div>
-                    </div>
-                </header>
-
-                <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                    {metrics.map((metric) => (
-                        <StatCard key={metric.title} metric={metric} />
-                    ))}
-                </div>
-
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                    <section className="rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white p-6 lg:col-span-2">
-                        <div className="mb-6 flex items-center justify-between">
-                            <div>
-                                <h3 className="font-gabriela text-xl text-[#176637]">Tren Pertumbuhan Bisnis</h3>
-                                <p className="text-sm text-[#176637]/60">Omzet vs laba, 6 bulan terakhir</p>
-                            </div>
-                            <div className="flex items-center gap-4 text-xs font-medium">
-                                <div className="flex items-center gap-1"><span className="h-3 w-3 rounded-full bg-[#176637]" /> Omzet</div>
-                                <div className="flex items-center gap-1"><span className="h-3 w-3 rounded-full bg-[#FF901A]" /> Laba</div>
-                            </div>
-                        </div>
-                        <MonthlyChart data={dynamicPerformance} />
-                    </section>
-
-                    <aside className="flex flex-col rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white p-6">
-                        <h3 className="font-gabriela mb-6 text-xl text-[#176637]">Performa Outlet</h3>
-                        <div className="flex-1 space-y-4">
-                            {outletStats.map((outlet) => (
-                                <div key={outlet.name} className="rounded-xl border border-[#176637]/5 bg-[#FFF6DB]/30 p-4 transition-colors hover:border-[#72AD43]">
-                                    <div className="mb-2 flex items-center justify-between">
-                                        <h4 className="text-sm font-bold text-[#176637]">{outlet.name}</h4>
-                                        <span className={`rounded-md px-2 py-1 text-xs font-bold ${outlet.trend.startsWith('+') ? 'bg-[#72AD43]/20 text-[#176637]' : 'bg-red-100 text-red-600'}`}>{outlet.trend}</span>
-                                    </div>
-                                    <p className="mb-2 font-gabriela text-lg text-[#176637]">{outlet.omzet}</p>
-                                    <div className="flex items-center gap-2 text-xs">
-                                        <span className={`h-2 w-2 rounded-full ${outlet.status === 'Sangat Baik' ? 'bg-[#176637]' : outlet.status === 'Baik' ? 'bg-[#72AD43]' : 'bg-[#FF901A]'}`} />
-                                        <span className="text-[#176637]/70">{outlet.status}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[#176637] py-3 font-bold text-[#176637] transition-all hover:bg-[#176637] hover:text-[#FFF6DB]">
-                            Unduh Laporan Lengkap
-                        </button>
-                    </aside>
-                </div>
-
-                <div className="mt-8 grid gap-6 md:grid-cols-3">
-                    {[
-                        { title: 'ROI Bulan Ini', value: '18.2%', note: 'Tertinggi dari 3 portofolio aktif', icon: 'trendingUp' },
-                        { title: 'Dividen Terkirim', value: 'Rp 32.000.000', note: 'Distribusi berjalan sesuai jadwal', icon: 'store' },
-                        { title: 'Outlets Terpantau', value: '3 Outlet', note: 'Semua outlet ada dalam dashboard', icon: 'dashboard' },
-                    ].map((item) => (
-                        <div key={item.title} className="rounded-[24px] border border-[#176637]/10 bg-white p-5 shadow-sm">
-                            <div className="mb-3 inline-flex rounded-2xl bg-[#FFF6DB] p-3 text-[#176637]">
-                                <Icon name={item.icon} className="h-5 w-5" stroke />
-                            </div>
-                            <div className="text-sm font-semibold text-[#176637]/70">{item.title}</div>
-                            <div className="mt-2 font-gabriela text-3xl text-[#176637]">{item.value}</div>
-                            <div className="mt-2 text-sm leading-6 text-[#176637]/65">{item.note}</div>
-                        </div>
-                    ))}
-                </div>
-
-                <section className="mt-8 rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
-                    <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                        <div>
-                            <h3 className="font-gabriela text-2xl text-[#176637]">Rekap Laporan Investor</h3>
-                            <p className="text-sm text-[#176637]/60">Pilih outlet dulu, lalu lihat ringkasan finance dan performanya.</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <select
-                                value={selectedOutlet}
-                                onChange={(event) => setSelectedOutlet(event.target.value)}
-                                className="rounded-full border-2 border-[#176637]/15 bg-[#FFF6DB] px-4 py-2 text-sm font-semibold text-[#176637] outline-none"
-                            >
-                                {outletStats.map((outlet) => (
-                                    <option key={outlet.name}>{outlet.name}</option>
-                                ))}
-                            </select>
-                            <button className="rounded-full bg-[#176637] px-4 py-2 text-sm font-bold text-[#FFF6DB]">PDF</button>
-                            <button className="rounded-full border border-[#176637]/15 px-4 py-2 text-sm font-bold text-[#176637]">Excel</button>
-                            <button className="rounded-full border border-[#176637]/15 px-4 py-2 text-sm font-bold text-[#176637]">Print</button>
-                        </div>
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-3">
-                        {[
-                            { title: 'Pendapatan Outlet', value: activeOutlet?.omzet ?? '-', note: 'Bulan berjalan' },
-                            { title: 'ROI Outlet', value: activeOutlet?.trend ?? '-', note: 'Perbandingan performa' },
-                            { title: 'Status Outlet', value: activeOutlet?.status ?? '-', note: 'Monitoring operasional' },
-                        ].map((item) => (
-                            <div key={item.title} className="rounded-[24px] border border-[#176637]/10 bg-[#FFF6DB]/35 p-5">
-                                <div className="text-sm font-bold uppercase tracking-[0.18em] text-[#176637]/55">{item.title}</div>
-                                <div className="mt-3 font-gabriela text-2xl text-[#176637]">{item.value}</div>
-                                <div className="mt-2 text-sm text-[#176637]/65">{item.note}</div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            </div>
-        </div>
-    );
-}
-
-function ReportView() {
-    const [selectedOutlet, setSelectedOutlet] = useState('Semua Outlet');
-    const visibleOutlets = selectedOutlet === 'Semua Outlet' ? outletStats : outletStats.filter((item) => item.name === selectedOutlet);
-
-    return (
-        <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
-            <header className="mb-8 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-                <div>
-                    <h1 className="font-gabriela mb-1 text-3xl text-[#176637]">Rekap Laporan</h1>
-                    <p className="text-sm font-medium text-[#72AD43]">Pilih outlet dulu, lalu buka tabel finance dan performa</p>
-                </div>
+        <section className="flex h-full min-h-[460px] flex-col overflow-hidden rounded-[28px] border-2 border-[#176637]/10 bg-white shadow-sm">
+            <div className="flex flex-col gap-4 border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
+                <h3 className="font-gabriela text-2xl text-[#176637]">{title}</h3>
                 <div className="flex flex-wrap gap-2">
-                    <select
-                        value={selectedOutlet}
-                        onChange={(event) => setSelectedOutlet(event.target.value)}
-                        className="rounded-full border-2 border-[#176637]/15 bg-white px-4 py-2 text-sm font-semibold text-[#176637] outline-none"
-                    >
-                        <option>Semua Outlet</option>
-                        {outletStats.map((outlet) => (
-                            <option key={outlet.name}>{outlet.name}</option>
-                        ))}
-                    </select>
+                    {actions.map((action) => (
+                        <button
+                            key={`${title}-${action.label}`}
+                            onClick={action.onClick}
+                            className={`rounded-full px-3 py-1.5 text-xs font-bold ${
+                                action.label === 'PDF' ? 'bg-[#176637] text-[#FFF6DB]' : 'border border-[#176637]/15 bg-white text-[#176637]'
+                            }`}
+                        >
+                            {action.label}
+                        </button>
+                    ))}
                 </div>
-            </header>
-
-            <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-                <div className="space-y-6">
-                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
-                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
-                            <h2 className="font-gabriela text-2xl text-[#176637]">Finance Per Outlet</h2>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full min-w-max text-left">
-                                <thead>
-                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                        <th className="p-4 pl-6">Item</th>
-                                        <th className="p-4">Nilai</th>
-                                        <th className="p-4">Keterangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {visibleOutlets.map((outlet) => (
-                                        <tr key={outlet.name} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{outlet.name}</td>
-                                            <td className="p-4 text-sm font-semibold text-[#176637]">{outlet.omzet}</td>
-                                            <td className="p-4 text-sm text-[#176637]/70">{outlet.status}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-
-                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
-                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
-                            <h2 className="font-gabriela text-2xl text-[#176637]">Rekap Harian</h2>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full min-w-max text-left">
-                                <thead>
-                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                        <th className="p-4 pl-6">Periode</th>
-                                        <th className="p-4">Nilai</th>
-                                        <th className="p-4">Keterangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {dailyReports.map((item) => (
-                                        <tr key={item.label} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
-                                            <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
-                                            <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-
-                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
-                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
-                            <h2 className="font-gabriela text-2xl text-[#176637]">Performa Outlet Bulanan</h2>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full min-w-max text-left">
-                                <thead>
-                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                        <th className="p-4 pl-6">Outlet</th>
-                                        <th className="p-4">Omzet</th>
-                                        <th className="p-4">Trend</th>
-                                        <th className="p-4">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {visibleOutlets.map((outlet) => (
-                                        <tr key={outlet.name} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{outlet.name}</td>
-                                            <td className="p-4 text-sm text-[#176637]/70">{outlet.omzet}</td>
-                                            <td className="p-4 text-sm font-semibold text-[#176637]">{outlet.trend}</td>
-                                            <td className="p-4 text-sm text-[#176637]/70">{outlet.status}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-
-                    <section className="overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white shadow-sm">
-                        <div className="border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4">
-                            <h2 className="font-gabriela text-2xl text-[#176637]">Rekap Tahunan</h2>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full min-w-max text-left">
-                                <thead>
-                                    <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
-                                        <th className="p-4 pl-6">Periode</th>
-                                        <th className="p-4">Nilai</th>
-                                        <th className="p-4">Keterangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {yearlyReports.map((item) => (
-                                        <tr key={item.label} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
-                                            <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{item.label}</td>
-                                            <td className="p-4 text-sm font-semibold text-[#176637]">{item.value}</td>
-                                            <td className="p-4 text-sm text-[#176637]/70">{item.note}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                </div>
-
-                <aside className="space-y-6">
-                    <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
-                        <h3 className="font-gabriela text-2xl text-[#176637]">Preview Print</h3>
-                        <div className="mt-4 rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB] p-4">
-                            <div className="rounded-[20px] bg-white p-4 shadow-sm">
-                                <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">{selectedOutlet}</div>
-                                <div className="mt-2 font-gabriela text-2xl text-[#176637]">Investor Report</div>
-                                <div className="mt-4 space-y-3">
-                                    {(visibleOutlets.length ? visibleOutlets : outletStats).map((outlet) => (
-                                        <div key={outlet.name} className="flex items-center justify-between border-b border-[#176637]/8 pb-2 text-sm">
-                                            <span className="text-[#176637]/70">{outlet.name}</span>
-                                            <span className="font-bold text-[#176637]">{outlet.omzet}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
-                        <h3 className="font-gabriela text-2xl text-[#176637]">Ekspor Cepat</h3>
-                        <div className="mt-4 grid gap-3">
-                            <button className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh PDF</button>
-                            <button className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Excel</button>
-                            <button onClick={() => window.print()} className="rounded-2xl bg-[#176637] px-4 py-3 text-sm font-bold text-[#FFF6DB]">
-                                Buka Print Preview
-                            </button>
-                        </div>
-                    </section>
-                </aside>
             </div>
-        </div>
+            <div className="flex-1 overflow-x-auto">
+                <table className="min-w-full text-left">
+                    <thead>
+                        <tr className="bg-[#FFF6DB]/70 text-[12px] font-bold uppercase tracking-[0.08em] text-[#176637]/80">
+                            {columns.map((column) => (
+                                <th key={column} className="p-4 pl-6 first:pl-6">{column}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {pageRows.map((row, index) => (
+                            <tr key={row.id ?? row.key ?? `${title}-${index}`} className="border-t border-[#176637]/8 hover:bg-[#FFF6DB]/25">
+                                {renderRow(row, index)}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div className="mt-auto flex flex-col gap-3 border-t border-[#176637]/10 bg-[#FFF6DB]/60 px-6 py-4 text-sm text-[#176637]/70 md:flex-row md:items-center md:justify-between">
+                <div>Menampilkan {pageRows.length} dari {rows.length} data</div>
+                <div className="flex items-center gap-2">
+                    <button onClick={() => setPage((value) => Math.max(1, value - 1))} className="rounded-lg border border-[#176637]/10 bg-white px-3 py-2 text-[#176637]">
+                        <Icon name="chevronLeft" className="h-4 w-4" stroke />
+                    </button>
+                    {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                        <button
+                            key={pageNumber}
+                            onClick={() => setPage(pageNumber)}
+                            className={`min-w-10 rounded-lg px-3 py-2 font-bold ${pageNumber === currentPage ? 'bg-[#176637] text-[#FFF6DB]' : 'text-[#176637]/70 hover:bg-white'}`}
+                        >
+                            {pageNumber}
+                        </button>
+                    ))}
+                    <button onClick={() => setPage((value) => Math.min(totalPages, value + 1))} className="rounded-lg border border-[#176637]/10 bg-white px-3 py-2 text-[#176637]">
+                        <Icon name="chevronRight" className="h-4 w-4" stroke />
+                    </button>
+                </div>
+            </div>
+        </section>
     );
 }
 
 export default function InvestorDashboardPage({ data }) {
-    const pageData = useMemo(() => data ?? {}, [data]);
-    const logoUrl = pageData?.brand?.logoUrl ?? '/logosagaralattea.png';
+    const user = data?.user || { name: 'Investor Utama', role: 'Owner', initial: 'IV' };
+    
     const [activeTab, setActiveTab] = useState('investor_dashboard');
+    const [selectedOutlet, setSelectedOutlet] = useState('Semua Outlet');
+    const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
+    const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
+    const profileRef = useRef(null);
+    const notifRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (notifRef.current && !notifRef.current.contains(event.target)) setShowNotifications(false);
+            if (profileRef.current && !profileRef.current.contains(event.target)) setShowProfileMenu(false);
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Filter scaling logic based on selected outlet to simulate interactive charts
+    const scaleFactor = selectedOutlet === 'Semua Outlet' ? 1 : 
+                        selectedOutlet === 'Outlet Harmoni' ? 0.38 : 
+                        selectedOutlet === 'Outlet Sudirman' ? 0.32 : 0.30;
+
+    const dynamicPerformance = useMemo(() => basePerformanceData.map(d => ({...d, omzet: d.omzet * scaleFactor, laba: d.laba * scaleFactor})), [scaleFactor]);
+    const dynamicTopProducts = useMemo(() => baseTopProducts.map(d => ({...d, terjual: Math.round(d.terjual * scaleFactor)})), [scaleFactor]);
+    const dynamicDailyTraffic = useMemo(() => baseDailyTraffic.map(d => ({...d, pengunjung: Math.round(d.pengunjung * scaleFactor)})), [scaleFactor]);
+    const dynamicMemberGrowth = useMemo(() => baseMemberGrowth.map(d => ({...d, baru: Math.round(d.baru * scaleFactor)})), [scaleFactor]);
+
+    // Outlet stats for the dropdown and report
+    const outletStats = [
+        { name: 'Outlet Harmoni', omzet: 'Rp 28.500.000', trend: '+12%', status: 'Sangat Baik' },
+        { name: 'Outlet Sudirman', omzet: 'Rp 24.200.000', trend: '+5%', status: 'Baik' },
+        { name: 'Outlet Senayan', omzet: 'Rp 22.300.000', trend: '-2%', status: 'Perlu Perhatian' },
+    ];
+    
+    // Derived Metrics for Header
+    const metrics = [
+        { title: 'Total Omzet (Bulan Ini)', value: selectedOutlet === 'Semua Outlet' ? 'Rp 75.000.000' : outletStats.find(o => o.name === selectedOutlet)?.omzet, accent: 'forest', icon: 'trendingUp', trend: selectedOutlet === 'Semua Outlet' ? '+15.2%' : outletStats.find(o => o.name === selectedOutlet)?.trend },
+        { title: 'Estimasi Laba Bersih', value: selectedOutlet === 'Semua Outlet' ? 'Rp 28.000.000' : 'Rp ' + (parseInt(outletStats.find(o => o.name === selectedOutlet)?.omzet.replace(/[^0-9]/g, '')) * 0.3).toLocaleString('id-ID'), accent: 'greenLight', icon: 'store', trend: '+18.1%' },
+        { title: 'Total Transaksi', value: Math.round(3240 * scaleFactor).toLocaleString('id-ID'), accent: 'orange', icon: 'users', sub: selectedOutlet },
+        { title: 'Status Operasional', value: selectedOutlet === 'Semua Outlet' ? '3/3 Aktif' : '1/1 Aktif', accent: 'greenLight', icon: 'alert', sub: 'Semua outlet beroperasi' },
+    ];
+
+    const activeOutlet = outletStats.find((item) => item.name === selectedOutlet) ?? outletStats[0];
+
+    const financeDailyRows = useMemo(() => {
+        const baseRevenue = 4250000 * scaleFactor;
+        const baseOrders = Math.max(1, Math.round(142 * scaleFactor));
+        const baseProfit = 1820000 * scaleFactor;
+
+        return [
+            { label: 'Pendapatan hari ini', value: `Rp ${baseRevenue.toLocaleString('id-ID')}`, note: selectedOutlet === 'Semua Outlet' ? 'Konsolidasi seluruh outlet' : selectedOutlet },
+            { label: 'Total pesanan', value: `${baseOrders.toLocaleString('id-ID')}`, note: 'Seluruh pesanan selesai diproses' },
+            { label: 'Laba bersih', value: `Rp ${baseProfit.toLocaleString('id-ID')}`, note: 'Setelah biaya operasional' },
+            { label: 'Margin harian', value: `${Math.round((baseProfit / baseRevenue) * 100)}%`, note: 'Estimasi margin hari ini' },
+        ];
+    }, [scaleFactor, selectedOutlet]);
+
+    const financeMonthlyRows = useMemo(() => basePerformanceData.map((item) => ({
+        periode: item.name,
+        omzet: `Rp ${(item.omzet * scaleFactor).toLocaleString('id-ID')}`,
+        laba: `Rp ${(item.laba * scaleFactor).toLocaleString('id-ID')}`,
+        margin: `${Math.round((item.laba / item.omzet) * 100)}%`,
+    })), [scaleFactor]);
+
+    const financeYearlyRows = useMemo(() => {
+        const totalRevenue = basePerformanceData.reduce((sum, item) => sum + item.omzet, 0);
+        const totalProfit = basePerformanceData.reduce((sum, item) => sum + item.laba, 0);
+        const q1Revenue = basePerformanceData.slice(0, 3).reduce((sum, item) => sum + item.omzet, 0);
+        const q1Profit = basePerformanceData.slice(0, 3).reduce((sum, item) => sum + item.laba, 0);
+        const q2Revenue = basePerformanceData.slice(3).reduce((sum, item) => sum + item.omzet, 0);
+        const q2Profit = basePerformanceData.slice(3).reduce((sum, item) => sum + item.laba, 0);
+
+        return [
+            {
+                periode: 'YTD 2026',
+                omzet: `Rp ${(totalRevenue * scaleFactor).toLocaleString('id-ID')}`,
+                laba: `Rp ${(totalProfit * scaleFactor).toLocaleString('id-ID')}`,
+                margin: `${Math.round((totalProfit / totalRevenue) * 100)}%`,
+            },
+            {
+                periode: 'Q1 2026',
+                omzet: `Rp ${Math.round(q1Revenue * scaleFactor).toLocaleString('id-ID')}`,
+                laba: `Rp ${Math.round(q1Profit * scaleFactor).toLocaleString('id-ID')}`,
+                margin: `${Math.round((q1Profit / q1Revenue) * 100)}%`,
+            },
+            {
+                periode: 'Q2 2026',
+                omzet: `Rp ${Math.round(q2Revenue * scaleFactor).toLocaleString('id-ID')}`,
+                laba: `Rp ${Math.round(q2Profit * scaleFactor).toLocaleString('id-ID')}`,
+                margin: `${Math.round((q2Profit / q2Revenue) * 100)}%`,
+            },
+        ];
+    }, [scaleFactor]);
+
+    const transactionRows = useMemo(() => ([
+        { id: 'TRX-091', outlet: 'Outlet Harmoni', type: 'Dine In', payment: 'QRIS', total: 'Rp 245.000', status: 'Selesai' },
+        { id: 'TRX-092', outlet: 'Outlet Sudirman', type: 'Take Away', payment: 'Tunai', total: 'Rp 128.000', status: 'Selesai' },
+        { id: 'TRX-093', outlet: 'Outlet Senayan', type: 'Delivery', payment: 'Kartu', total: 'Rp 187.000', status: 'Diproses' },
+        { id: 'TRX-094', outlet: 'Outlet Harmoni', type: 'Dine In', payment: 'QRIS', total: 'Rp 312.000', status: 'Selesai' },
+        { id: 'TRX-095', outlet: 'Outlet Sudirman', type: 'Take Away', payment: 'QRIS', total: 'Rp 96.000', status: 'Selesai' },
+    ]), []);
+
+    const outletRows = useMemo(() => outletStats.map((item) => ({
+        name: item.name,
+        omzet: item.omzet,
+        status: item.status,
+    })), []);
+
+    const reportTables = useMemo(() => [
+        {
+            title: 'Finance Harian',
+            headers: ['Item', 'Nilai', 'Catatan'],
+            rows: financeDailyRows.map((row) => [row.label, row.value, row.note]),
+        },
+        {
+            title: 'Finance Bulanan',
+            headers: ['Periode', 'Omzet', 'Laba', 'Margin'],
+            rows: financeMonthlyRows.map((row) => [row.periode, row.omzet, row.laba, row.margin]),
+        },
+        {
+            title: 'Finance Tahunan',
+            headers: ['Periode', 'Omzet', 'Laba', 'Margin'],
+            rows: financeYearlyRows.map((row) => [row.periode, row.omzet, row.laba, row.margin]),
+        },
+        {
+            title: 'Riwayat Transaksi',
+            headers: ['ID', 'Outlet', 'Jenis', 'Pembayaran', 'Total', 'Status'],
+            rows: transactionRows.map((row) => [row.id, row.outlet, row.type, row.payment, row.total, row.status]),
+        },
+        {
+            title: 'Performa Antar Outlet',
+            headers: ['Outlet', 'Omzet', 'Status'],
+            rows: outletRows.map((row) => [row.name, row.omzet, row.status]),
+        },
+    ], [financeDailyRows, financeMonthlyRows, financeYearlyRows, transactionRows, outletRows]);
+
+    const printReport = (tables) => openPrintableWindow({
+        title: 'Rekap Laporan Investor',
+        subtitle: selectedOutlet === 'Semua Outlet' ? 'Konsolidasi seluruh outlet' : `Outlet terpilih: ${selectedOutlet}`,
+        tables,
+    });
+
+    const exportReportCsv = (filename, sections) => downloadCombinedCsv(filename, sections);
 
     return (
-        <>
+        <div className="flex h-screen bg-[#FFF6DB] text-[#176637] font-sans overflow-hidden">
             <GlobalStyles />
-            <div className="flex h-screen overflow-hidden bg-[#FFF6DB]">
-                <Sidebar logoUrl={logoUrl} activeTab={activeTab} setActiveTab={setActiveTab} />
-                <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-                    {activeTab === 'investor_dashboard' && <Overview />}
-                    {activeTab === 'report' && <ReportView />}
+            <Sidebar logoUrl={data?.brand?.logoUrl || '/logosagaralattea.png'} activeTab={activeTab} setActiveTab={setActiveTab} />
+            
+            <div className="flex flex-1 flex-col overflow-hidden relative">
+                {/* Header (Same as POS/Admin) */}
+                <header className="flex h-20 items-center justify-between bg-[#FFF6DB]/80 px-6 backdrop-blur-sm border-b border-[#176637]/10 z-10 shrink-0">
+                    <div className="flex items-center gap-4">
+                        <h2 className="font-gabriela text-2xl text-[#176637] hidden sm:block">
+                            {activeTab === 'investor_dashboard' ? 'Dashboard Investor' : 'Rekap Laporan'}
+                        </h2>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        {/* Notifications */}
+                        <div className="relative" ref={notifRef}>
+                            <button onClick={() => setShowNotifications(!showNotifications)} className="p-2 rounded-full text-[#176637] hover:bg-white transition relative">
+                                <Icon name="bell" className="w-6 h-6" stroke />
+                            </button>
+                            {showNotifications && (
+                                <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-white shadow-xl border border-[#176637]/10 overflow-hidden z-50">
+                                    <div className="bg-[#176637] px-4 py-3 text-white font-bold text-sm">Notifikasi</div>
+                                    <div className="p-4 text-sm text-center text-gray-500">Tidak ada notifikasi baru</div>
+                                </div>
+                            )}
+                        </div>
+                        {/* User Profile */}
+                        <div className="relative" ref={profileRef}>
+                            <div 
+                                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                                className="flex items-center gap-2 bg-white rounded-full py-1 px-1 pr-4 shadow-sm border border-[#176637]/10 cursor-pointer hover:bg-gray-50 transition"
+                            >
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#72AD43] text-sm font-bold text-white">
+                                    {user.initial}
+                                </div>
+                                <div className="hidden md:block text-left">
+                                    <p className="text-[13px] font-bold text-[#176637] leading-tight">{user.name}</p>
+                                    <p className="text-[10px] text-[#176637]/60 leading-tight">{user.role}</p>
+                                </div>
+                                <Icon name="chevronDown" className="w-4 h-4 ml-1 text-[#176637]/50" stroke />
+                            </div>
+                            
+                            {showProfileMenu && (
+                                <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-white shadow-xl border border-[#176637]/10 overflow-hidden z-50">
+                                    <form action="/logout" method="POST" className="w-full">
+                                        <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
+                                        <button type="submit" className="flex items-center gap-3 w-full p-4 font-bold text-red-500 hover:bg-red-50 transition-all text-left">
+                                            <Icon name="logout" className="w-5 h-5 flex-shrink-0" stroke />
+                                            <span>Logout</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </header>
+
+                <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8 scrollbar-hide">
+                    <div className="absolute top-0 right-0 h-64 w-full opacity-5 pointer-events-none z-0">
+                        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="h-full w-full fill-[#176637]">
+                            <path d="M0,60 C150,100 300,20 450,60 C600,100 750,20 900,60 C1050,100 1200,20 1200,60 L1200,120 L0,120 Z" />
+                        </svg>
+                    </div>
+
+                    <div className="relative z-10">
+                        
+                        {/* Filter Section */}
+                        <div className="mb-8 flex flex-wrap items-center gap-3">
+                            <span className="text-sm font-semibold text-[#176637]/70">Pilih Mitra:</span>
+                            <div className="relative">
+                                <select 
+                                    value={selectedOutlet}
+                                    onChange={(e) => setSelectedOutlet(e.target.value)}
+                                    className="cursor-pointer appearance-none rounded-full border-2 border-[#176637]/20 bg-white py-2 pl-4 pr-10 font-bold text-[#176637] shadow-[2px_2px_0px_rgba(23,102,55,0.1)] focus:border-[#72AD43] focus:outline-none"
+                                >
+                                    <option>Semua Outlet</option>
+                                    <option>Outlet Harmoni</option>
+                                    <option>Outlet Sudirman</option>
+                                    <option>Outlet Senayan</option>
+                                </select>
+                                <Icon name="chevronRight" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-[#176637]" stroke />
+                            </div>
+
+                            <span className="ml-4 text-sm font-semibold text-[#176637]/70">Periode:</span>
+                            <div className="flex items-center gap-2 rounded-xl border-2 border-[#176637]/20 bg-white p-2 shadow-[2px_2px_0px_rgba(23,102,55,0.1)] focus-within:border-[#72AD43]">
+                                <input 
+                                    type="date" 
+                                    value={startDate}
+                                    onChange={e => setStartDate(e.target.value)}
+                                    className="cursor-pointer border-none bg-transparent px-2 py-1 text-sm font-bold text-[#176637] outline-none" 
+                                />
+                                <span className="text-xs text-[#176637]/50">-</span>
+                                <input 
+                                    type="date" 
+                                    value={endDate}
+                                    onChange={e => setEndDate(e.target.value)}
+                                    className="cursor-pointer border-none bg-transparent px-2 py-1 text-sm font-bold text-[#176637] outline-none" 
+                                />
+                            </div>
+                        </div>
+
+                        {activeTab === 'investor_dashboard' && (
+                            <>
+                                {/* Top Metrics Cards */}
+                        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                            {metrics.map((metric) => (
+                                <StatCard key={metric.title} metric={metric} />
+                            ))}
+                        </div>
+
+                        {/* CHARTS GRID */}
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-8">
+                            
+                            {/* Chart 1: Trend Omzet & Laba Bersih */}
+                            <section className="rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white p-6 lg:col-span-2 shadow-sm">
+                                <div className="mb-6">
+                                    <h3 className="font-gabriela text-xl text-[#176637]">Tren Pertumbuhan Bisnis</h3>
+                                    <p className="text-sm text-[#176637]/60">Omzet vs Laba Bersih, 6 bulan terakhir</p>
+                                </div>
+                                <div className="h-[300px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={dynamicPerformance} margin={{ top: 10, right: 10, left: 20, bottom: 0 }}>
+                                            <defs>
+                                                <linearGradient id="colorOmzet" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#176637" stopOpacity={0.3}/>
+                                                    <stop offset="95%" stopColor="#176637" stopOpacity={0}/>
+                                                </linearGradient>
+                                                <linearGradient id="colorLaba" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#FF901A" stopOpacity={0.3}/>
+                                                    <stop offset="95%" stopColor="#FF901A" stopOpacity={0}/>
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                            <XAxis dataKey="name" tick={{fill: '#176637', fontSize: 12}} tickLine={false} axisLine={false} />
+                                            <YAxis tickFormatter={(val) => `Rp${val/1000000}M`} tick={{fill: '#176637', fontSize: 12}} tickLine={false} axisLine={false} />
+                                            <RechartsTooltip formatter={(value) => `Rp ${value.toLocaleString('id-ID')}`} />
+                                            <Legend iconType="circle" />
+                                            <Area type="monotone" dataKey="omzet" stroke="#176637" strokeWidth={3} fillOpacity={1} fill="url(#colorOmzet)" />
+                                            <Area type="monotone" dataKey="laba" stroke="#FF901A" strokeWidth={3} fillOpacity={1} fill="url(#colorLaba)" />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </section>
+
+                            {/* Chart 2: Proporsi Kategori Penjualan */}
+                            <section className="flex flex-col rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                                <h3 className="font-gabriela text-xl text-[#176637] mb-2">Proporsi Kategori</h3>
+                                <div className="h-[250px] w-full flex-1">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie data={baseCategoryData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                                                {baseCategoryData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <RechartsTooltip />
+                                            <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </section>
+
+                            {/* Chart 3: Performa Outlet/Mitra (Only show if 'Semua Outlet' is selected) */}
+                            {selectedOutlet === 'Semua Outlet' && (
+                                <section className="rounded-[24px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                                    <div className="mb-4">
+                                        <h3 className="font-gabriela text-xl text-[#176637]">Performa Antar Mitra</h3>
+                                        <p className="text-sm text-[#176637]/60">Perbandingan Omzet</p>
+                                    </div>
+                                    <div className="h-[250px] w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={baseOutletPerformance} layout="vertical" margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
+                                                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                                                <XAxis type="number" hide />
+                                                <YAxis dataKey="name" type="category" tick={{fill: '#176637', fontSize: 12}} tickLine={false} axisLine={false} width={80} />
+                                                <RechartsTooltip formatter={(value) => `Rp ${value.toLocaleString('id-ID')}`} cursor={{fill: 'transparent'}} />
+                                                <Bar dataKey="omzet" fill="#72AD43" radius={[0, 10, 10, 0]} barSize={20} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Chart 4: Produk Terlaris Keseluruhan */}
+                            <section className="rounded-[24px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm lg:col-span-2">
+                                <div className="mb-4">
+                                    <h3 className="font-gabriela text-xl text-[#176637]">Menu Paling Laris</h3>
+                                    <p className="text-sm text-[#176637]/60">Top 5 produk dengan penjualan terbanyak</p>
+                                </div>
+                                <div className="h-[250px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={dynamicTopProducts} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                            <XAxis dataKey="name" tick={{fill: '#176637', fontSize: 12}} tickLine={false} axisLine={false} />
+                                            <YAxis tick={{fill: '#176637', fontSize: 12}} tickLine={false} axisLine={false} />
+                                            <RechartsTooltip formatter={(value) => `${value} cup`} cursor={{fill: 'transparent'}} />
+                                            <Bar dataKey="terjual" fill="#FF901A" radius={[10, 10, 0, 0]} barSize={40} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </section>
+
+                            {/* Chart 5: Kepadatan Transaksi Harian */}
+                            <section className="rounded-[24px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                                <div className="mb-4">
+                                    <h3 className="font-gabriela text-xl text-[#176637]">Trafik Harian</h3>
+                                    <p className="text-sm text-[#176637]/60">Rata-rata kepadatan jam</p>
+                                </div>
+                                <div className="h-[250px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={dynamicDailyTraffic} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                            <XAxis dataKey="time" tick={{fill: '#176637', fontSize: 12}} tickLine={false} axisLine={false} />
+                                            <YAxis tick={{fill: '#176637', fontSize: 12}} tickLine={false} axisLine={false} />
+                                            <RechartsTooltip formatter={(value) => `${value} trx`} />
+                                            <Line type="monotone" dataKey="pengunjung" stroke="#176637" strokeWidth={3} dot={{ fill: '#72AD43', r: 5 }} />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </section>
+                            
+                            {/* Chart 6: Pertumbuhan Pelanggan Baru (Member Growth) */}
+                            <section className="rounded-[24px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                                <div className="mb-4">
+                                    <h3 className="font-gabriela text-xl text-[#176637]">Member Baru</h3>
+                                    <p className="text-sm text-[#176637]/60">Registrasi pelanggan per minggu</p>
+                                </div>
+                                <div className="h-[250px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={dynamicMemberGrowth} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                            <defs>
+                                                <linearGradient id="colorMember" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#72AD43" stopOpacity={0.5}/>
+                                                    <stop offset="95%" stopColor="#72AD43" stopOpacity={0}/>
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                            <XAxis dataKey="week" tick={{fill: '#176637', fontSize: 12}} tickLine={false} axisLine={false} />
+                                            <YAxis tick={{fill: '#176637', fontSize: 12}} tickLine={false} axisLine={false} />
+                                            <RechartsTooltip formatter={(value) => `${value} orang`} />
+                                            <Area type="step" dataKey="baru" stroke="#72AD43" strokeWidth={3} fillOpacity={1} fill="url(#colorMember)" />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </section>
+
+                            {/* Chart 7: Metode Pembayaran (Fills the empty grid slot) */}
+                            <section className="flex flex-col rounded-[24px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                                <h3 className="font-gabriela text-xl text-[#176637] mb-2">Metode Pembayaran</h3>
+                                <p className="text-sm text-[#176637]/60">Preferensi transaksi pelanggan</p>
+                                <div className="h-[230px] w-full flex-1">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie data={basePaymentMethod} innerRadius={50} outerRadius={70} paddingAngle={5} dataKey="value">
+                                                {basePaymentMethod.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={['#72AD43', '#FF901A', '#FFB74D'][index % 3]} />
+                                                ))}
+                                            </Pie>
+                                            <RechartsTooltip />
+                                            <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </section>
+                            </div>
+                            </>
+                        )}
+
+                        {activeTab === 'report' && (() => {
+                            const currentOutletLabel = selectedOutlet === 'Semua Outlet' ? 'Konsolidasi seluruh outlet' : selectedOutlet;
+                            return (
+                                <div className="animate-slide-up space-y-8 mt-2">
+                                    <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                                        <div>
+                                            <h2 className="font-gabriela text-4xl text-[#176637]">Rekap Laporan</h2>
+                                            <p className="mt-2 text-base text-[#176637]/70">Fokus investor hanya pada performa finansial, outlet, dan riwayat transaksi.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid gap-6 xl:grid-cols-2">
+                                        <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                                            <h3 className="font-gabriela text-2xl text-[#176637]">Preview Print</h3>
+                                            <p className="mt-2 text-sm leading-7 text-[#176637]/70">
+                                                Ringkasan singkat untuk periode {currentOutletLabel.toLowerCase()} sebelum cetak atau ekspor.
+                                            </p>
+                                            <div className="mt-4 rounded-[22px] border border-dashed border-[#176637]/15 bg-[#FFF6DB] p-4 text-sm text-[#176637]/70">
+                                                Periode aktif: <strong className="text-[#176637]">2026</strong>
+                                                <br />
+                                                Outlet dipilih: <strong className="text-[#176637]">{currentOutletLabel}</strong>
+                                            </div>
+                                        </section>
+
+                                        <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                                            <h3 className="font-gabriela text-2xl text-[#176637]">Ekspor Cepat</h3>
+                                            <div className="mt-4 grid gap-3">
+                                                <button onClick={() => printReport(reportTables)} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Semua PDF</button>
+                                                <button onClick={() => exportReportCsv('investor-rekap-laporan.csv', reportTables)} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Semua Excel</button>
+                                                <button onClick={() => printReport(reportTables)} className="rounded-2xl bg-[#176637] px-4 py-3 text-sm font-bold text-[#FFF6DB]">
+                                                    Cetak Semua
+                                                </button>
+                                            </div>
+                                        </section>
+                                    </div>
+
+                                    <div className="grid gap-6 xl:grid-cols-2">
+                                        <ReportSectionTable
+                                            title="Finance Harian"
+                                            rows={financeDailyRows}
+                                            columns={['Item', 'Nilai', 'Catatan']}
+                                            pageSize={10}
+                                            actions={[
+                                                { label: 'PDF', onClick: () => printReport([{ title: 'Finance Harian', headers: ['Item', 'Nilai', 'Catatan'], rows: financeDailyRows.map((row) => [row.label, row.value, row.note]) }]) },
+                                                { label: 'Excel', onClick: () => downloadCsvFile('investor-finance-harian.csv', ['Item', 'Nilai', 'Catatan'], financeDailyRows.map((row) => [row.label, row.value, row.note])) },
+                                                { label: 'Print', onClick: () => printReport([{ title: 'Finance Harian', headers: ['Item', 'Nilai', 'Catatan'], rows: financeDailyRows.map((row) => [row.label, row.value, row.note]) }]) },
+                                            ]}
+                                            renderRow={(row) => (
+                                                <>
+                                                    <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{row.label}</td>
+                                                    <td className="p-4 text-sm font-semibold text-[#176637]">{row.value}</td>
+                                                    <td className="p-4 text-sm text-[#176637]/70">{row.note}</td>
+                                                </>
+                                            )}
+                                        />
+
+                                        <ReportSectionTable
+                                            title="Performa Antar Outlet"
+                                            rows={outletRows}
+                                            columns={['Outlet', 'Omzet', 'Status']}
+                                            pageSize={10}
+                                            actions={[
+                                                { label: 'PDF', onClick: () => printReport([{ title: 'Performa Antar Outlet', headers: ['Outlet', 'Omzet', 'Status'], rows: outletRows.map((row) => [row.name, row.omzet, row.status]) }]) },
+                                                { label: 'Excel', onClick: () => downloadCsvFile('investor-performa-outlet.csv', ['Outlet', 'Omzet', 'Status'], outletRows.map((row) => [row.name, row.omzet, row.status])) },
+                                                { label: 'Print', onClick: () => printReport([{ title: 'Performa Antar Outlet', headers: ['Outlet', 'Omzet', 'Status'], rows: outletRows.map((row) => [row.name, row.omzet, row.status]) }]) },
+                                            ]}
+                                            renderRow={(row) => (
+                                                <>
+                                                    <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{row.name}</td>
+                                                    <td className="p-4 text-sm text-[#176637]/70">{row.omzet}</td>
+                                                    <td className="p-4 text-sm font-semibold text-[#176637]">
+                                                        <span className={`rounded-full px-2 py-1 text-[10px] uppercase tracking-wider ${
+                                                            row.status === 'Sangat Baik' ? 'bg-[#72AD43]/10 text-[#72AD43]' :
+                                                            row.status === 'Baik' ? 'bg-[#176637]/10 text-[#176637]' :
+                                                            'bg-[#FF901A]/10 text-[#FF901A]'
+                                                        }`}>
+                                                            {row.status}
+                                                        </span>
+                                                    </td>
+                                                </>
+                                            )}
+                                        />
+
+                                        <ReportSectionTable
+                                            title="Finance Bulanan"
+                                            rows={financeMonthlyRows}
+                                            columns={['Periode', 'Omzet', 'Laba', 'Margin']}
+                                            pageSize={10}
+                                            actions={[
+                                                { label: 'PDF', onClick: () => printReport([{ title: 'Finance Bulanan', headers: ['Periode', 'Omzet', 'Laba', 'Margin'], rows: financeMonthlyRows.map((row) => [row.periode, row.omzet, row.laba, row.margin]) }]) },
+                                                { label: 'Excel', onClick: () => downloadCsvFile('investor-finance-bulanan.csv', ['Periode', 'Omzet', 'Laba', 'Margin'], financeMonthlyRows.map((row) => [row.periode, row.omzet, row.laba, row.margin])) },
+                                                { label: 'Print', onClick: () => printReport([{ title: 'Finance Bulanan', headers: ['Periode', 'Omzet', 'Laba', 'Margin'], rows: financeMonthlyRows.map((row) => [row.periode, row.omzet, row.laba, row.margin]) }]) },
+                                            ]}
+                                            renderRow={(row) => (
+                                                <>
+                                                    <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{row.periode}</td>
+                                                    <td className="p-4 text-sm text-[#176637]/70">{row.omzet}</td>
+                                                    <td className="p-4 text-sm font-semibold text-[#72AD43]">{row.laba}</td>
+                                                    <td className="p-4 text-sm text-[#176637]/70">{row.margin}</td>
+                                                </>
+                                            )}
+                                        />
+
+                                        <ReportSectionTable
+                                            title="Riwayat Transaksi"
+                                            rows={transactionRows}
+                                            columns={['ID', 'Outlet', 'Jenis', 'Pembayaran', 'Total', 'Status']}
+                                            pageSize={10}
+                                            actions={[
+                                                { label: 'PDF', onClick: () => printReport([{ title: 'Riwayat Transaksi', headers: ['ID', 'Outlet', 'Jenis', 'Pembayaran', 'Total', 'Status'], rows: transactionRows.map((row) => [row.id, row.outlet, row.type, row.payment, row.total, row.status]) }]) },
+                                                { label: 'Excel', onClick: () => downloadCsvFile('investor-riwayat-transaksi.csv', ['ID', 'Outlet', 'Jenis', 'Pembayaran', 'Total', 'Status'], transactionRows.map((row) => [row.id, row.outlet, row.type, row.payment, row.total, row.status])) },
+                                                { label: 'Print', onClick: () => printReport([{ title: 'Riwayat Transaksi', headers: ['ID', 'Outlet', 'Jenis', 'Pembayaran', 'Total', 'Status'], rows: transactionRows.map((row) => [row.id, row.outlet, row.type, row.payment, row.total, row.status]) }]) },
+                                            ]}
+                                            renderRow={(row) => (
+                                                <>
+                                                    <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{row.id}</td>
+                                                    <td className="p-4 text-sm text-[#176637]/70">{row.outlet}</td>
+                                                    <td className="p-4 text-sm text-[#176637]/70">{row.type}</td>
+                                                    <td className="p-4 text-sm text-[#176637]/70">{row.payment}</td>
+                                                    <td className="p-4 text-sm font-semibold text-[#176637]">{row.total}</td>
+                                                    <td className="p-4 text-sm text-[#176637]/70">{row.status}</td>
+                                                </>
+                                            )}
+                                        />
+
+                                        <ReportSectionTable
+                                            title="Finance Tahunan"
+                                            rows={financeYearlyRows}
+                                            columns={['Periode', 'Omzet', 'Laba', 'Margin']}
+                                            pageSize={10}
+                                            actions={[
+                                                { label: 'PDF', onClick: () => printReport([{ title: 'Finance Tahunan', headers: ['Periode', 'Omzet', 'Laba', 'Margin'], rows: financeYearlyRows.map((row) => [row.periode, row.omzet, row.laba, row.margin]) }]) },
+                                                { label: 'Excel', onClick: () => downloadCsvFile('investor-finance-tahunan.csv', ['Periode', 'Omzet', 'Laba', 'Margin'], financeYearlyRows.map((row) => [row.periode, row.omzet, row.laba, row.margin])) },
+                                                { label: 'Print', onClick: () => printReport([{ title: 'Finance Tahunan', headers: ['Periode', 'Omzet', 'Laba', 'Margin'], rows: financeYearlyRows.map((row) => [row.periode, row.omzet, row.laba, row.margin]) }]) },
+                                            ]}
+                                            renderRow={(row) => (
+                                                <>
+                                                    <td className="p-4 pl-6 text-sm font-bold text-[#176637]">{row.periode}</td>
+                                                    <td className="p-4 text-sm text-[#176637]/70">{row.omzet}</td>
+                                                    <td className="p-4 text-sm font-semibold text-[#72AD43]">{row.laba}</td>
+                                                    <td className="p-4 text-sm text-[#176637]/70">{row.margin}</td>
+                                                </>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })()}
+                    </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
