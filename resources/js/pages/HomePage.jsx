@@ -133,27 +133,16 @@ function Navbar({ scrolled = false, onJoinUsClick, data = {} }) {
 
             {/* Mobile Menu Overlay */}
             {isMobileMenuOpen && (
-                <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-[#176637]/10 flex flex-col py-4 px-6 gap-4 text-[#176637] font-medium">
+                <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-[#176637]/10 flex flex-col py-4 px-6 gap-4 text-[#176637] font-medium pb-20">
                     {navigation.map((item) => (
                         <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#FF901A]">
                             {item}
                         </a>
                     ))}
-                    <button onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/order'; }} className="text-left font-bold text-[#FF901A] hover:opacity-80">
+                    <button onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/order'; }} className="text-left font-bold text-[#176637] hover:text-[#FF901A]">
                         Order Sekarang
                     </button>
                     <hr className="border-[#176637]/10" />
-                    {data.user ? (
-                        <>
-                            <a href={data.user.dashboardUrl} onClick={() => setIsMobileMenuOpen(false)}>Dashboard</a>
-                            <form action="/logout" method="POST">
-                                <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
-                                <button type="submit" className="text-red-500 font-bold">Logout</button>
-                            </form>
-                        </>
-                    ) : (
-                        <a href="/login" onClick={() => setIsMobileMenuOpen(false)}>Login</a>
-                    )}
                     <button onClick={() => { setIsMobileMenuOpen(false); onJoinUsClick(); }} className="mt-2 w-full rounded-full bg-[#176637] px-6 py-3 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#FF901A]">
                         Join Us
                     </button>
@@ -163,14 +152,43 @@ function Navbar({ scrolled = false, onJoinUsClick, data = {} }) {
     );
 }
 
+function MobileBottomNav({ data }) {
+    const isOrder = window.location.pathname === '/order';
+    return (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-[#176637]/10 pb-safe shadow-[0_-4px_20px_rgba(23,102,55,0.05)]">
+            <div className="flex justify-around items-center h-16">
+                <a href="/" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${!isOrder ? 'text-[#FF901A]' : 'text-[#176637]/40 hover:text-[#176637]'}`}>
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    <span className="text-[10px] font-bold">Beranda</span>
+                </a>
+                <a href="/order" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isOrder ? 'text-[#FF901A]' : 'text-[#176637]/40 hover:text-[#176637]'}`}>
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17 18c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zM7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm0-3l1.1-2h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/></svg>
+                    <span className="text-[10px] font-bold">Pesan</span>
+                </a>
+                {data.user ? (
+                    <a href={data.user.dashboardUrl} className="flex flex-col items-center justify-center w-full h-full space-y-1 text-[#176637]/40 hover:text-[#176637]">
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span className="text-[10px] font-bold">Akun</span>
+                    </a>
+                ) : (
+                    <a href="/login" className="flex flex-col items-center justify-center w-full h-full space-y-1 text-[#176637]/40 hover:text-[#176637]">
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></svg>
+                        <span className="text-[10px] font-bold">Login</span>
+                    </a>
+                )}
+            </div>
+        </div>
+    );
+}
+
 function SectionTitle({ eyebrow, title, align = 'left' }) {
     const alignment = align === 'center' ? 'items-center text-center' : 'items-start text-left';
     return (
-        <div className={`flex flex-col gap-4 ${alignment}`}>
-            <span className="inline-flex rounded-full border border-[#176637]/20 bg-white/70 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#176637]">
+        <div className={`flex flex-col gap-3 md:gap-4 ${alignment}`}>
+            <span className="inline-flex rounded-full border border-[#176637]/20 bg-white/70 px-3 py-1.5 md:px-4 md:py-2 text-[9px] md:text-[11px] font-semibold uppercase tracking-[0.28em] text-[#176637]">
                 {eyebrow}
             </span>
-            <h2 className="font-gabriela text-4xl leading-tight text-[#176637] md:text-5xl">{title}</h2>
+            <h2 className="font-gabriela text-3xl leading-tight text-[#176637] md:text-5xl">{title}</h2>
         </div>
     );
 }
@@ -246,29 +264,29 @@ function Hero({ brand }) {
             <LeafArt className="left-[-120px] top-[-60px] hidden h-[460px] w-[460px] md:block" crop="left" opacityClass="opacity-[0.08]" />
             <LeafArt className="right-[-90px] top-10 hidden h-[260px] w-[260px] lg:block" crop="right" flip opacityClass="opacity-[0.07]" />
 
-            <div className="relative z-10 mx-auto grid min-h-[780px] xl:min-h-[850px] max-w-7xl items-center gap-14 px-6 pb-24 pt-32 md:px-8 lg:grid-cols-2 lg:gap-10">
+            <div className="relative z-10 mx-auto grid min-h-[500px] md:min-h-[780px] xl:min-h-[850px] max-w-7xl items-center gap-10 md:gap-14 px-6 pb-20 pt-28 md:pb-24 md:pt-32 md:px-8 lg:grid-cols-2 lg:gap-10">
                 <div className="relative z-10 text-center lg:text-left">
-                    <h1 className="reveal font-gabriela mt-6 text-5xl leading-tight text-[#FFF6DB] drop-shadow-md md:text-6xl lg:text-7xl">
+                    <h1 className="reveal font-gabriela mt-4 md:mt-6 text-4xl leading-tight text-[#FFF6DB] drop-shadow-md md:text-6xl lg:text-7xl">
                         Start your day the Lattea way.
                     </h1>
-                    <p className="reveal mx-auto mt-6 max-w-xl text-base leading-8 text-[#FFF6DB]/90 drop-shadow-sm lg:mx-0 lg:text-lg" style={{ animationDelay: '0.08s' }}>
+                    <p className="reveal mx-auto mt-4 md:mt-6 max-w-xl text-sm leading-relaxed md:text-base md:leading-8 text-[#FFF6DB]/90 drop-shadow-sm lg:mx-0 lg:text-lg" style={{ animationDelay: '0.08s' }}>
                         Nikmati perpaduan teh premium dan bahan organik terbaik untuk gaya hidup sehatmu. Rasakan kemurnian alam dalam gelas yang menyegarkan
                         hari-harimu.
                     </p>
-                    <div className="reveal mt-8 flex flex-col justify-center gap-4 sm:flex-row lg:justify-start" style={{ animationDelay: '0.16s' }}>
-                        <button onClick={(e) => { e.preventDefault(); window.location.href = '/order'; }} className="rounded-br-3xl rounded-tl-3xl bg-[#FF901A] px-8 py-3.5 font-semibold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:-translate-y-0.5 hover:bg-[#e68217] hover:shadow-[2px_2px_0px_#176637]">
+                    <div className="reveal mt-6 md:mt-8 flex flex-row flex-wrap justify-center gap-3 md:gap-4 lg:justify-start" style={{ animationDelay: '0.16s' }}>
+                        <button onClick={(e) => { e.preventDefault(); window.location.href = '/order'; }} className="rounded-br-3xl rounded-tl-3xl bg-[#FF901A] px-6 py-3 md:px-8 md:py-3.5 text-sm md:text-base font-semibold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:-translate-y-0.5 hover:bg-[#e68217] hover:shadow-[2px_2px_0px_#176637]">
                             Pesan Sekarang
                         </button>
-                        <button onClick={(e) => { e.preventDefault(); document.getElementById('varian').scrollIntoView({ behavior: 'smooth' }); }} className="rounded-bl-3xl rounded-tr-3xl border-2 border-[#FFF6DB] px-8 py-3.5 font-semibold text-[#FFF6DB] transition hover:bg-[#FFF6DB] hover:text-[#176637]">
+                        <button onClick={(e) => { e.preventDefault(); document.getElementById('varian').scrollIntoView({ behavior: 'smooth' }); }} className="rounded-bl-3xl rounded-tr-3xl border-2 border-[#FFF6DB] px-6 py-3 md:px-8 md:py-3.5 text-sm md:text-base font-semibold text-[#FFF6DB] transition hover:bg-[#FFF6DB] hover:text-[#176637]">
                             Lihat Menu
                         </button>
                     </div>
 
-                    <div className="reveal mt-12 grid grid-cols-3 gap-3" style={{ animationDelay: '0.24s' }}>
+                    <div className="reveal mt-8 md:mt-12 grid grid-cols-3 gap-2 md:gap-3" style={{ animationDelay: '0.24s' }}>
                         {['12K+ cup served', '98% happy customer', '4.9/5 taste rating'].map((item) => (
-                            <div key={item} className="rounded-[28px] border border-[#FFF6DB]/30 bg-[#176637]/40 px-4 py-5 text-center shadow-lg backdrop-blur-md">
-                                <div className="font-gabriela text-2xl text-[#FFF6DB]">{item.split(' ')[0]}</div>
-                                <div className="mt-1 text-[11px] uppercase tracking-[0.2em] text-[#FFF6DB]/90">{item.split(' ').slice(1).join(' ')}</div>
+                            <div key={item} className="rounded-[20px] md:rounded-[28px] border border-[#FFF6DB]/30 bg-[#176637]/40 px-2 py-4 md:px-4 md:py-5 text-center shadow-lg backdrop-blur-md">
+                                <div className="font-gabriela text-xl md:text-2xl text-[#FFF6DB]">{item.split(' ')[0]}</div>
+                                <div className="mt-1 text-[9px] md:text-[11px] uppercase tracking-[0.1em] md:tracking-[0.2em] text-[#FFF6DB]/90">{item.split(' ').slice(1).join(' ')}</div>
                             </div>
                         ))}
                     </div>
@@ -304,18 +322,18 @@ function PromoSection({ promos = [], onNotificationAction }) {
     const featured = promoItems[0];
 
     return (
-        <section className="mx-auto max-w-7xl px-6 py-16 md:px-8" id="promo">
+        <section className="mx-auto max-w-7xl px-6 py-12 md:py-16 md:px-8" id="promo">
             <SectionTitle eyebrow="Promo Spesial" title="Bundling hangat & tenang" />
-            <div className="relative mt-8 overflow-hidden rounded-tr-[60px] rounded-bl-[60px] border-2 border-[#176637] bg-[#FF901A] p-8 text-[#FFF6DB] shadow-lg md:p-12">
+            <div className="relative mt-6 md:mt-8 overflow-hidden rounded-tr-[40px] rounded-bl-[40px] md:rounded-tr-[60px] md:rounded-bl-[60px] border-2 border-[#176637] bg-[#FF901A] p-6 text-[#FFF6DB] shadow-lg md:p-12">
                 <LeafArt className="left-[-70px] top-[-70px] h-44 w-44" crop="top" opacityClass="opacity-15" />
                 <LeafArt className="right-[-20px] bottom-[-30px] h-52 w-52" crop="bottom" flip opacityClass="opacity-20" />
                 <div className="relative z-10 flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
                     <div className="max-w-2xl">
-                        <span className="mb-4 inline-flex rounded-full bg-[#FFF6DB] px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#FF901A]">
+                        <span className="mb-3 md:mb-4 inline-flex rounded-full bg-[#FFF6DB] px-3 py-1 text-[10px] md:text-xs font-bold uppercase tracking-wide text-[#FF901A]">
                             {featured?.badge ?? 'Bulan ini'}
                         </span>
-                        <h3 className="font-gabriela text-3xl md:text-4xl">{featured?.title ?? 'Bundling Hangat & Tenang'}</h3>
-                        <p className="mt-3 text-lg opacity-90">{featured?.summary ?? 'Promo dibuat untuk tampil jelas, berani, dan tetap sesuai palet brand yang hangat.'}</p>
+                        <h3 className="font-gabriela text-2xl md:text-4xl">{featured?.title ?? 'Bundling Hangat & Tenang'}</h3>
+                        <p className="mt-2 md:mt-3 text-sm md:text-lg opacity-90">{featured?.summary ?? 'Promo dibuat untuk tampil jelas, berani, dan tetap sesuai palet brand yang hangat.'}</p>
                         <div className="mt-4 flex flex-wrap gap-3 text-sm">
                             <span className="rounded-full bg-[#FFF6DB]/20 px-3 py-1 font-semibold text-[#FFF6DB]">{featured?.code ?? 'PROMO CODE'}</span>
                             <span className="rounded-full bg-[#FFF6DB]/20 px-3 py-1 font-semibold text-[#FFF6DB]">{featured?.period ?? 'Periode promo'}</span>
@@ -328,13 +346,13 @@ function PromoSection({ promos = [], onNotificationAction }) {
             </div>
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
                 {promoItems.slice(1).map((promo) => (
-                    <article key={promo.code} className="rounded-[28px] border border-[#176637]/10 bg-white/85 p-5 shadow-sm">
+                    <article key={promo.code} className="rounded-[20px] md:rounded-[28px] border border-[#176637]/10 bg-white/85 p-4 md:p-5 shadow-sm">
                         <div className="mb-2 flex items-center justify-between">
-                            <span className="rounded-full bg-[#176637]/10 px-3 py-1 text-xs font-bold text-[#176637]">{promo.badge}</span>
-                            <span className="text-xs font-semibold text-[#176637]/50">{promo.code}</span>
+                            <span className="rounded-full bg-[#176637]/10 px-2 md:px-3 py-1 text-[10px] md:text-xs font-bold text-[#176637]">{promo.badge}</span>
+                            <span className="text-[10px] md:text-xs font-semibold text-[#176637]/50">{promo.code}</span>
                         </div>
-                        <h4 className="font-gabriela text-2xl text-[#176637]">{promo.title}</h4>
-                        <p className="mt-2 text-sm leading-7 text-[#176637]/75">{promo.summary}</p>
+                        <h4 className="font-gabriela text-xl md:text-2xl text-[#176637]">{promo.title}</h4>
+                        <p className="mt-1 md:mt-2 text-xs md:text-sm leading-6 md:leading-7 text-[#176637]/75">{promo.summary}</p>
                         <div className="mt-4 flex items-center justify-between text-xs text-[#176637]/60">
                             <span>{promo.period}</span>
                             <span className="font-semibold text-[#FF901A]">{promo.cta}</span>
@@ -388,7 +406,7 @@ function ProductSection({ items, onNotificationAction }) {
     const visibleProducts = activeCategory === 'Semua Menu' ? products : products.filter((item) => item.category === activeCategory);
 
     return (
-        <section className="mx-auto max-w-7xl px-6 py-16 md:px-8" id="varian">
+        <section className="mx-auto max-w-7xl px-6 py-12 md:py-16 md:px-8" id="varian">
             <div className="text-center">
                 <SectionTitle eyebrow="Pilihan Rasa" title="Diramu dengan daun teh pilihan dan susu segar." align="center" />
             </div>
@@ -411,13 +429,13 @@ function ProductSection({ items, onNotificationAction }) {
                 ))}
             </div>
 
-            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6">
+            <div className="mt-8 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4 md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 md:overflow-visible md:pb-0 scrollbar-hide px-4 md:px-0 -mx-4 md:mx-0">
                 {visibleProducts.map((item) => {
                     const isHabis = item.status === 'Habis';
                     return (
                         <article
                             key={item.id}
-                            className={`group relative overflow-hidden rounded-[20px] border border-[#176637]/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col ${isHabis ? 'opacity-70 grayscale-[50%]' : 'hover:border-[#72AD43]'}`}
+                            className={`snap-center shrink-0 w-[42vw] sm:w-[35vw] md:w-auto group relative overflow-hidden rounded-[20px] border border-[#176637]/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col ${isHabis ? 'opacity-70 grayscale-[50%]' : 'hover:border-[#72AD43]'}`}
                         >
                             <div className="absolute right-0 top-0 h-9 w-9 rounded-bl-[20px] bg-[#72AD43]/10" />
                             <LeafArt className="left-[-20px] top-[-14px] h-14 w-14" crop="left" opacityClass="opacity-[0.05]" />
@@ -465,10 +483,10 @@ function ProductSection({ items, onNotificationAction }) {
 
 function OutletSection({ onNotificationAction }) {
     return (
-        <section id="outlet" className="mx-auto grid max-w-7xl gap-16 px-6 py-20 md:px-8 lg:grid-cols-2">
+        <section id="outlet" className="mx-auto grid max-w-7xl gap-10 md:gap-16 px-6 py-12 md:py-20 md:px-8 lg:grid-cols-2">
             <div>
                 <SectionTitle eyebrow="Lokasi Kami" title="Outlet pusat - Harmoni" />
-                <div className="relative mt-8 overflow-hidden rounded-tr-[50px] rounded-bl-[50px] border border-[#176637]/10 bg-white p-6 shadow-lg md:p-8">
+                <div className="relative mt-6 md:mt-8 overflow-hidden rounded-tr-[40px] rounded-bl-[40px] md:rounded-tr-[50px] md:rounded-bl-[50px] border border-[#176637]/10 bg-white p-5 shadow-lg md:p-8">
                     <LeafArt className="left-[-55px] top-[-40px] h-36 w-36" crop="left" opacityClass="opacity-[0.08]" />
                     <div className="mb-4 flex items-start gap-3">
                         <svg viewBox="0 0 24 24" className="mt-1 h-5 w-5 shrink-0 fill-[#FF901A]">
@@ -500,12 +518,12 @@ function OutletSection({ onNotificationAction }) {
                     <div className="border-l-4 border-[#176637] bg-white p-5 font-medium shadow-sm">1. Pilih Outlet terdekat dan produk varian favoritmu dari menu.</div>
                     <div className="border-l-4 border-[#72AD43] bg-white p-5 font-medium shadow-sm">2. Selesaikan formulir pesanan dan tunggu konfirmasi Mitra.</div>
                     <div className="flex flex-col gap-5 rounded-r-xl border-l-4 border-[#FF901A] bg-white p-6 shadow-md">
-                        <span className="font-bold text-[#176637]">3. Lakukan pembayaran saat tiba di lokasi / Outlet:</span>
-                        <div className="flex flex-col gap-4 sm:flex-row">
-                            <button onClick={(e) => { e.preventDefault(); window.location.href = '/order'; }} className="flex-1 rounded-xl border-2 border-[#176637] py-3 font-bold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]">
+                        <span className="text-sm md:text-base font-bold text-[#176637]">3. Lakukan pembayaran saat tiba di lokasi / Outlet:</span>
+                        <div className="flex flex-col gap-3 sm:flex-row">
+                            <button onClick={(e) => { e.preventDefault(); window.location.href = '/order'; }} className="flex-1 rounded-xl border-2 border-[#176637] py-2 md:py-3 text-sm md:text-base font-bold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]">
                                 Ambil di Outlet
                             </button>
-                            <button onClick={() => onNotificationAction('Integrasi langsung dengan aplikasi Ojek Online pihak ketiga masih dalam proses penyesuaian API.')} className="flex-1 rounded-xl bg-[#72AD43] py-3 font-bold text-white shadow-[3px_3px_0px_#176637] transition hover:-translate-y-1">
+                            <button onClick={() => onNotificationAction('Integrasi langsung dengan aplikasi Ojek Online pihak ketiga masih dalam proses penyesuaian API.')} className="flex-1 rounded-xl bg-[#72AD43] py-2 md:py-3 text-sm md:text-base font-bold text-white shadow-[3px_3px_0px_#176637] transition hover:-translate-y-1">
                                 Pesan via Grab / GoFood
                             </button>
                         </div>
@@ -595,7 +613,7 @@ export default function HomePage({ data = {} }) {
 
 
     return (
-        <div className="min-h-screen bg-[#FFF6DB] text-[#176637]">
+        <div className="min-h-screen bg-[#FFF6DB] text-[#176637] pb-16 md:pb-0">
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Gabriela&family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -673,9 +691,9 @@ export default function HomePage({ data = {} }) {
                 </div>
             </div>
 
-            <NotificationModal isOpen={modalState.isOpen} title={modalState.title} message={modalState.message} onClose={() => setModalState({ isOpen: false, message: '' })} />
-            
+            <NotificationModal isOpen={modalState.isOpen} title={modalState.title} message={modalState.message} onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))} />
             <JoinUsModal isOpen={isJoinUsModalOpen} onClose={() => setIsJoinUsModalOpen(false)} />
+            <MobileBottomNav data={data} />
             
             <Navbar scrolled={scrolled} onJoinUsClick={() => setIsJoinUsModalOpen(true)} data={data} />
             <main>
@@ -687,16 +705,16 @@ export default function HomePage({ data = {} }) {
                     onNotificationAction={handleNotificationAction} 
                 />
                 <OutletSection onNotificationAction={handleNotificationAction} />
-                <section className="mx-auto max-w-7xl px-6 py-10 md:px-8">
+                <section className="mx-auto max-w-7xl px-6 py-8 md:py-10 md:px-8">
                     <SectionTitle eyebrow="Testimoni" title="Cerita dari pelanggan" align="center" />
-                    <div className="mt-10 grid gap-6 md:grid-cols-3">
+                    <div className="mt-6 md:mt-10 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 md:grid md:grid-cols-3 md:overflow-visible md:pb-0 scrollbar-hide">
                         {(testimonials.length ? testimonials : []).map((item) => (
-                            <article key={item.id ?? item.name} className="rounded-[32px] border border-[#176637]/12 bg-white/80 p-6 shadow-[0_20px_60px_rgba(15,95,67,0.08)]">
-                                <div className="text-[#8b5e34]">{'★'.repeat(Number(item.rating ?? 5))}</div>
-                                <p className="mt-5 leading-8 text-[#176637]/80">“{item.quote}”</p>
-                                <div className="mt-6">
-                                    <div className="font-gabriela text-xl text-[#176637]">{item.name}</div>
-                                    <div className="text-sm text-[#176637]/60">{item.role}</div>
+                            <article key={item.id ?? item.name} className="snap-center shrink-0 w-[80vw] sm:w-[60vw] md:w-auto rounded-[20px] md:rounded-[32px] border border-[#176637]/12 bg-white/80 p-5 md:p-6 shadow-[0_20px_60px_rgba(15,95,67,0.08)]">
+                                <div className="text-[#8b5e34] text-sm md:text-base">{'★'.repeat(Number(item.rating ?? 5))}</div>
+                                <p className="mt-3 md:mt-5 text-sm md:text-base leading-7 md:leading-8 text-[#176637]/80">“{item.quote}”</p>
+                                <div className="mt-4 md:mt-6">
+                                    <div className="font-gabriela text-lg md:text-xl text-[#176637]">{item.name}</div>
+                                    <div className="text-[11px] md:text-sm text-[#176637]/60">{item.role}</div>
                                 </div>
                             </article>
                         ))}

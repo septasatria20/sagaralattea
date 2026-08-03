@@ -135,14 +135,21 @@ function GlobalStyles() {
     );
 }
 
-function Sidebar({ logoUrl, activeTab, setActiveTab }) {
+function Sidebar({ logoUrl, activeTab, setActiveTab, isMobileSidebarOpen, setIsMobileSidebarOpen }) {
     const navItems = [
-        { id: 'investor_dashboard', icon: 'dashboard', label: 'Dashboard Investor' },
+        { id: 'investor_dashboard', icon: 'dashboard', label: 'Dashboard' },
         { id: 'report', icon: 'report', label: 'Rekap Laporan' },
     ];
 
     return (
-        <aside className="relative flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl z-20">
+        <>
+            {isMobileSidebarOpen && (
+                <div 
+                    className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+                    onClick={() => setIsMobileSidebarOpen(false)}
+                />
+            )}
+            <aside className={`fixed inset-y-0 left-0 z-50 flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl transition-transform duration-300 md:relative md:translate-x-0 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
                 <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
             </svg>
@@ -157,7 +164,10 @@ function Sidebar({ logoUrl, activeTab, setActiveTab }) {
                     {navItems.map((item) => (
                         <button
                             key={item.id}
-                            onClick={() => setActiveTab(item.id)}
+                            onClick={() => {
+                                setActiveTab(item.id);
+                                setIsMobileSidebarOpen(false);
+                            }}
                             className={`relative flex w-[calc(100%+1.5rem)] items-center gap-3 px-4 py-3 text-left transition-all duration-300 ${
                                 activeTab === item.id
                                     ? 'translate-x-4 rounded-tl-xl rounded-bl-xl bg-[#FFF6DB] text-[#176637] shadow-[-4px_0_10px_rgba(0,0,0,0.1)]'
@@ -172,6 +182,7 @@ function Sidebar({ logoUrl, activeTab, setActiveTab }) {
                 </nav>
             </div>
         </aside>
+        </>
     );
 }
 
@@ -183,19 +194,19 @@ function StatCard({ metric }) {
     };
 
     return (
-        <div className="group relative flex min-h-[170px] flex-col overflow-hidden rounded-tr-[40px] rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white p-5 shadow-[4px_4px_0px_rgba(23,102,55,0.05)] transition-transform hover:-translate-y-1">
+        <div className="group relative flex min-h-[150px] md:min-h-[170px] flex-col overflow-hidden rounded-tr-[24px] md:rounded-tr-[40px] rounded-bl-[24px] md:rounded-bl-[40px] rounded-tl-xl rounded-br-xl border-2 border-[#176637]/10 bg-white p-4 md:p-5 shadow-[4px_4px_0px_rgba(23,102,55,0.05)] transition-transform hover:-translate-y-1">
             <svg className="absolute -right-4 -bottom-4 w-24 h-24 opacity-[0.03] group-hover:opacity-10 transition-opacity" viewBox="0 0 100 100" fill="#176637">
                 <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
             </svg>
-            <div className="relative z-10 mb-4 flex items-start justify-between">
-                <div className={`rounded-2xl p-2.5 bg-[#FFF6DB] ${palette[metric.accent] ?? palette.forest}`}>
-                    <Icon name={metric.icon} className="h-5 w-5" stroke />
+            <div className="relative z-10 mb-3 md:mb-4 flex items-start justify-between">
+                <div className={`rounded-2xl p-2 md:p-2.5 bg-[#FFF6DB] ${palette[metric.accent] ?? palette.forest}`}>
+                    <Icon name={metric.icon} className="h-4 w-4 md:h-5 md:w-5" stroke />
                 </div>
-                {metric.trend && <span className="rounded-lg bg-[#72AD43]/20 px-2 py-1 text-xs font-bold text-[#176637]">{metric.trend}</span>}
+                {metric.trend && <span className="rounded-lg bg-[#72AD43]/20 px-2 py-1 text-[10px] md:text-xs font-bold text-[#176637]">{metric.trend}</span>}
             </div>
-            <h3 className="relative z-10 mb-1 text-[13px] font-medium leading-snug text-[#176637]/70">{metric.title}</h3>
-            <p className="relative z-10 mt-auto whitespace-nowrap text-[clamp(1.05rem,1.8vw,1.45rem)] font-bold leading-none tracking-tight text-[#176637]">{metric.value}</p>
-            {metric.sub && <p className="relative z-10 mt-2 text-xs text-[#176637]/50">{metric.sub}</p>}
+            <h3 className="relative z-10 mb-1 text-xs md:text-[13px] font-medium leading-snug text-[#176637]/70">{metric.title}</h3>
+            <p className="relative z-10 mt-auto whitespace-nowrap text-lg md:text-[clamp(1.05rem,1.8vw,1.45rem)] font-bold leading-none tracking-tight text-[#176637]">{metric.value}</p>
+            {metric.sub && <p className="relative z-10 mt-2 text-[10px] md:text-xs text-[#176637]/50">{metric.sub}</p>}
         </div>
     );
 }
@@ -207,9 +218,9 @@ function ReportSectionTable({ title, rows, columns, renderRow, actions = [], pag
     const pageRows = rows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     return (
-        <section className="flex h-full min-h-[460px] flex-col overflow-hidden rounded-[28px] border-2 border-[#176637]/10 bg-white shadow-sm">
-            <div className="flex flex-col gap-4 border-b border-[#176637]/10 bg-[#FFF1C9] px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
-                <h3 className="font-gabriela text-2xl text-[#176637]">{title}</h3>
+        <section className="flex h-full min-h-[460px] flex-col overflow-hidden rounded-[20px] md:rounded-[28px] border-2 border-[#176637]/10 bg-white shadow-sm">
+            <div className="flex flex-col gap-4 border-b border-[#176637]/10 bg-[#FFF1C9] px-4 md:px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
+                <h3 className="font-gabriela text-xl md:text-2xl text-[#176637]">{title}</h3>
                 <div className="flex flex-wrap gap-2">
                     {actions.map((action) => (
                         <button
@@ -275,6 +286,7 @@ export default function InvestorDashboardPage({ data }) {
     const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const profileRef = useRef(null);
     const notifRef = useRef(null);
 
@@ -415,19 +427,25 @@ export default function InvestorDashboardPage({ data }) {
     const exportReportCsv = (filename, sections) => downloadCombinedCsv(filename, sections);
 
     return (
-        <div className="flex h-screen bg-[#FFF6DB] text-[#176637] font-sans overflow-hidden">
+        <div className="flex min-h-screen bg-[#FFF6DB] text-[#176637] font-sans overflow-hidden">
             <GlobalStyles />
-            <Sidebar logoUrl={data?.brand?.logoUrl || '/logosagaralattea.png'} activeTab={activeTab} setActiveTab={setActiveTab} />
+            <Sidebar logoUrl={data?.brand?.logoUrl || '/logosagaralattea.png'} activeTab={activeTab} setActiveTab={setActiveTab} isMobileSidebarOpen={isMobileSidebarOpen} setIsMobileSidebarOpen={setIsMobileSidebarOpen} />
             
             <div className="flex flex-1 flex-col overflow-hidden relative">
                 {/* Header (Same as POS/Admin) */}
-                <header className="flex h-20 items-center justify-between bg-[#FFF6DB]/80 px-6 backdrop-blur-sm border-b border-[#176637]/10 z-10 shrink-0">
-                    <div className="flex items-center gap-4">
-                        <h2 className="font-gabriela text-2xl text-[#176637] hidden sm:block">
+                <header className="flex h-16 md:h-20 items-center justify-between bg-[#FFF6DB]/80 px-4 md:px-6 backdrop-blur-sm border-b border-[#176637]/10 z-30 shrink-0">
+                    <div className="flex items-center gap-3">
+                        <button 
+                            onClick={() => setIsMobileSidebarOpen(true)}
+                            className="md:hidden p-2 text-[#176637] hover:bg-[#176637]/5 rounded-lg -ml-2"
+                        >
+                            <Icon name="menu" className="w-6 h-6" stroke />
+                        </button>
+                        <h2 className="font-gabriela text-xl md:text-2xl text-[#176637]">
                             {activeTab === 'investor_dashboard' ? 'Dashboard Investor' : 'Rekap Laporan'}
                         </h2>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 md:gap-4">
                         {/* Notifications */}
                         <div className="relative" ref={notifRef}>
                             <button onClick={() => setShowNotifications(!showNotifications)} className="p-2 rounded-full text-[#176637] hover:bg-white transition relative">
@@ -471,7 +489,7 @@ export default function InvestorDashboardPage({ data }) {
                     </div>
                 </header>
 
-                <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8 scrollbar-hide">
+                <div className="animate-slide-up flex-1 overflow-y-auto p-4 md:p-8 hide-scroll relative z-0">
                     <div className="absolute top-0 right-0 h-64 w-full opacity-5 pointer-events-none z-0">
                         <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="h-full w-full fill-[#176637]">
                             <path d="M0,60 C150,100 300,20 450,60 C600,100 750,20 900,60 C1050,100 1200,20 1200,60 L1200,120 L0,120 Z" />
@@ -518,7 +536,7 @@ export default function InvestorDashboardPage({ data }) {
                         {activeTab === 'investor_dashboard' && (
                             <>
                                 {/* Top Metrics Cards */}
-                        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                        <div className="mb-6 md:mb-8 grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-4">
                             {metrics.map((metric) => (
                                 <StatCard key={metric.title} metric={metric} />
                             ))}
@@ -661,7 +679,7 @@ export default function InvestorDashboardPage({ data }) {
                             </section>
 
                             {/* Chart 7: Metode Pembayaran (Fills the empty grid slot) */}
-                            <section className="flex flex-col rounded-[24px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
+                            <section className="flex flex-col rounded-[20px] md:rounded-[30px] border border-[#176637]/5 bg-white p-4 md:p-6 shadow-sm">
                                 <h3 className="font-gabriela text-xl text-[#176637] mb-2">Metode Pembayaran</h3>
                                 <p className="text-sm text-[#176637]/60">Preferensi transaksi pelanggan</p>
                                 <div className="h-[230px] w-full flex-1">
@@ -685,8 +703,9 @@ export default function InvestorDashboardPage({ data }) {
                         {activeTab === 'report' && (() => {
                             const currentOutletLabel = selectedOutlet === 'Semua Outlet' ? 'Konsolidasi seluruh outlet' : selectedOutlet;
                             return (
-                                <div className="animate-slide-up space-y-8 mt-2">
-                                    <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                                <div className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-3 xl:grid-cols-4 animate-slide-up mt-2">
+                                    <div className="flex flex-col gap-4 md:gap-6 lg:col-span-2 xl:col-span-3">
+                                        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
                                         <div>
                                             <h2 className="font-gabriela text-4xl text-[#176637]">Rekap Laporan</h2>
                                             <p className="mt-2 text-base text-[#176637]/70">Fokus investor hanya pada performa finansial, outlet, dan riwayat transaksi.</p>
@@ -706,8 +725,8 @@ export default function InvestorDashboardPage({ data }) {
                                             </div>
                                         </section>
 
-                                        <section className="rounded-[28px] border-2 border-[#176637]/10 bg-white p-6 shadow-sm">
-                                            <h3 className="font-gabriela text-2xl text-[#176637]">Ekspor Cepat</h3>
+                                        <section className="rounded-[20px] md:rounded-[28px] border-2 border-[#176637]/10 bg-white p-4 md:p-6 shadow-sm">
+                                            <h3 className="font-gabriela text-xl md:text-2xl text-[#176637]">Ekspor Cepat</h3>
                                             <div className="mt-4 grid gap-3">
                                                 <button onClick={() => printReport(reportTables)} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Semua PDF</button>
                                                 <button onClick={() => exportReportCsv('investor-rekap-laporan.csv', reportTables)} className="rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-sm font-bold text-[#176637]">Unduh Semua Excel</button>
@@ -826,6 +845,7 @@ export default function InvestorDashboardPage({ data }) {
                                                 </>
                                             )}
                                         />
+                                    </div>
                                     </div>
                                 </div>
                             );

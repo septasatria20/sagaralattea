@@ -113,6 +113,22 @@ export default function PublicOrderPage({ data = {} }) {
         }
     }, []);
 
+    // Validasi ulang promo jika keranjang berubah
+    useEffect(() => {
+        if (!appliedPromo) return;
+        let isValid = true;
+        if (appliedPromo.code === 'LATTEBUNDLE') {
+            isValid = cart.some(item => item.category === 'Signature');
+        } else if (appliedPromo.code === 'MATCHAHOUR') {
+            isValid = cart.some(item => item.name.toLowerCase().includes('matcha'));
+        }
+        if (!isValid) {
+            setAppliedPromo(null);
+            setPromoCode('');
+            alert(`Promo ${appliedPromo.code} dilepas karena syarat produk tidak lagi terpenuhi dalam keranjang.`);
+        }
+    }, [cart, appliedPromo]);
+
     const visibleProducts = activeCategory === 'Semua Menu' ? products : products.filter((item) => item.category === activeCategory);
 
     const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -165,12 +181,27 @@ export default function PublicOrderPage({ data = {} }) {
         const code = typeof codeToApply === 'string' ? codeToApply : promoCode;
         if (!code) return;
         const upperCode = code.toUpperCase();
+
         if (upperCode === 'LATTEBUNDLE') {
+            const hasSignature = cart.some(item => item.category === 'Signature');
+            if (!hasSignature) {
+                alert('Promo LATTEBUNDLE hanya berlaku jika ada produk Signature di keranjang.');
+                return;
+            }
             setAppliedPromo({ code: upperCode, discount: 15000, name: 'Bundling Hangat & Tenang' });
             setPromoCode(upperCode);
             alert('Promo berhasil diterapkan!');
         } else if (upperCode === 'MATCHAHOUR') {
+            const hasMatcha = cart.some(item => item.name.toLowerCase().includes('matcha'));
+            if (!hasMatcha) {
+                alert('Promo MATCHAHOUR hanya berlaku untuk pembelian menu Matcha.');
+                return;
+            }
             setAppliedPromo({ code: upperCode, discount: 10000, name: 'Happy Hour Matcha' });
+            setPromoCode(upperCode);
+            alert('Promo berhasil diterapkan!');
+        } else if (upperCode === 'SEMUABISA') {
+            setAppliedPromo({ code: upperCode, discount: 5000, name: 'Diskon Semua Menu' });
             setPromoCode(upperCode);
             alert('Promo berhasil diterapkan!');
         } else {
@@ -226,7 +257,7 @@ export default function PublicOrderPage({ data = {} }) {
     };
 
     return (
-        <div className="min-h-screen bg-[#FFF6DB] text-[#176637]">
+        <div className="min-h-screen bg-[#FFF6DB] text-[#176637] pb-16 md:pb-0">
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Gabriela&family=Inter:wght@400;500;600;700;800&display=swap');
                 body {
@@ -342,14 +373,14 @@ export default function PublicOrderPage({ data = {} }) {
                             ))}
                         </div>
 
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                        <div className="mt-8 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4 md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 md:overflow-visible md:pb-0 scrollbar-hide px-4 md:px-0 -mx-4 md:mx-0">
                             {visibleProducts.map((item) => {
                                 const isHabis = item.status === 'Habis';
                                 const cartItem = cart.find(c => c.id === item.id);
                                 return (
                                     <article
                                         key={item.id}
-                                        className={`group relative overflow-hidden rounded-[20px] border border-[#176637]/10 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col ${isHabis ? 'opacity-70 grayscale-[50%]' : 'hover:border-[#72AD43]'}`}
+                                        className={`snap-center shrink-0 w-[42vw] sm:w-[35vw] md:w-auto group relative overflow-hidden rounded-[20px] border border-[#176637]/10 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col ${isHabis ? 'opacity-70 grayscale-[50%]' : 'hover:border-[#72AD43]'}`}
                                     >
                                         <div className="absolute right-0 top-0 h-10 w-10 rounded-bl-[24px] bg-[#72AD43]/10" />
                                         <LeafArt className="left-[-20px] top-[-14px] h-16 w-16" crop="left" opacityClass="opacity-[0.05]" />
@@ -621,6 +652,30 @@ export default function PublicOrderPage({ data = {} }) {
                     </div>
                 </div>
             )}
+            
+            <MobileBottomNav />
+        </div>
+    );
+}
+
+function MobileBottomNav() {
+    const isOrder = window.location.pathname === '/order';
+    return (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-[#176637]/10 pb-safe shadow-[0_-4px_20px_rgba(23,102,55,0.05)]">
+            <div className="flex justify-around items-center h-16">
+                <a href="/" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${!isOrder ? 'text-[#FF901A]' : 'text-[#176637]/40 hover:text-[#176637]'}`}>
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    <span className="text-[10px] font-bold">Beranda</span>
+                </a>
+                <a href="/order" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isOrder ? 'text-[#FF901A]' : 'text-[#176637]/40 hover:text-[#176637]'}`}>
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17 18c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zM7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm0-3l1.1-2h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/></svg>
+                    <span className="text-[10px] font-bold">Pesan</span>
+                </a>
+                <a href="/login" className="flex flex-col items-center justify-center w-full h-full space-y-1 text-[#176637]/40 hover:text-[#176637]">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></svg>
+                    <span className="text-[10px] font-bold">Akun</span>
+                </a>
+            </div>
         </div>
     );
 }

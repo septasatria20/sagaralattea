@@ -9,6 +9,7 @@ export default function POSPage({ data }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const notifRef = useRef(null);
     const profileRef = useRef(null);
     const [receiptData, setReceiptData] = useState(null);
@@ -196,13 +197,20 @@ export default function POSPage({ data }) {
             setIsProcessing(false);
         }, 800);
     };
-
     return (
-        <div className="flex h-screen w-full bg-[#FFF6DB] font-sans overflow-hidden">
+        <div className="flex min-h-screen w-full bg-[#FFF6DB] font-sans overflow-hidden relative">
             
+            {/* Mobile Sidebar Overlay */}
+            {isMobileSidebarOpen && (
+                <div 
+                    className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+                    onClick={() => setIsMobileSidebarOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <div className={`flex flex-col bg-white border-r-2 border-[#176637]/10 transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'} z-20`}>
-                <div className="flex items-center justify-between p-4 border-b border-[#176637]/10 h-20">
+            <div className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-white border-r-2 border-[#176637]/10 transition-transform duration-300 md:relative md:translate-x-0 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
+                <div className="flex items-center justify-between p-4 border-b border-[#176637]/10 h-16 md:h-20">
                     {isSidebarOpen && <h1 className="font-gabriela text-xl font-bold text-[#176637] whitespace-nowrap">Sagara POS</h1>}
                     <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 rounded-xl text-[#176637] hover:bg-[#176637]/5 transition mx-auto">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -210,7 +218,10 @@ export default function POSPage({ data }) {
                 </div>
                 <div className="flex flex-col gap-2 p-4 flex-1">
                     <button 
-                        onClick={() => setActiveTab('kasir')}
+                        onClick={() => {
+                            setActiveTab('kasir');
+                            setIsMobileSidebarOpen(false);
+                        }}
                         className={`flex items-center gap-3 p-3 rounded-xl font-bold transition-all ${activeTab === 'kasir' ? 'bg-[#176637] text-white shadow-md' : 'text-[#176637]/60 hover:bg-[#176637]/5'}`}
                         title="Kasir"
                     >
@@ -218,7 +229,10 @@ export default function POSPage({ data }) {
                         {isSidebarOpen && <span>Kasir</span>}
                     </button>
                     <button 
-                        onClick={() => setActiveTab('pantau_meja')}
+                        onClick={() => {
+                            setActiveTab('pantau_meja');
+                            setIsMobileSidebarOpen(false);
+                        }}
                         className={`flex items-center gap-3 p-3 rounded-xl font-bold transition-all relative ${activeTab === 'pantau_meja' ? 'bg-[#176637] text-white shadow-md' : 'text-[#176637]/60 hover:bg-[#176637]/5'}`}
                         title="Pantau Meja"
                     >
@@ -238,25 +252,31 @@ export default function POSPage({ data }) {
             <div className="flex flex-1 flex-col overflow-hidden relative">
                 
                 {/* Header */}
-                <header className="flex h-20 items-center justify-between bg-[#FFF6DB]/80 px-6 backdrop-blur-sm border-b border-[#176637]/10 z-10">
-                    <div className="flex items-center gap-4">
-                        <h2 className="font-gabriela text-2xl text-[#176637] hidden sm:block">
+                <header className="flex h-16 md:h-20 items-center justify-between bg-[#FFF6DB]/80 px-4 md:px-6 backdrop-blur-sm border-b border-[#176637]/10 z-30 shrink-0">
+                    <div className="flex items-center gap-3">
+                        <button 
+                            onClick={() => setIsMobileSidebarOpen(true)}
+                            className="md:hidden p-2 text-[#176637] hover:bg-[#176637]/5 rounded-lg -ml-2"
+                        >
+                            <Icon name="menu" className="w-6 h-6" stroke />
+                        </button>
+                        <h2 className="font-gabriela text-xl md:text-2xl text-[#176637] hidden sm:block">
                             {activeTab === 'kasir' ? 'Kasir' : 'Pantau Meja'}
                         </h2>
                         {activeTab === 'kasir' && (
-                            <div className="relative w-48 sm:w-64">
-                                <Icon name="search" className="absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[#176637]/40" stroke />
+                            <div className="relative w-40 sm:w-64">
+                                <Icon name="search" className="absolute left-3 md:left-4 top-1/2 h-4 w-4 md:h-[18px] md:w-[18px] -translate-y-1/2 text-[#176637]/40" stroke />
                                 <input 
                                     value={searchMenu}
                                     onChange={(e) => setSearchMenu(e.target.value)}
                                     type="text" 
-                                    placeholder="Cari nama menu..." 
-                                    className="w-full rounded-full border-2 border-[#176637]/10 bg-white py-2 pl-12 pr-4 text-sm text-[#176637] transition-colors focus:border-[#72AD43] focus:outline-none" 
+                                    placeholder="Cari..." 
+                                    className="w-full rounded-full border-2 border-[#176637]/10 bg-white py-1.5 md:py-2 pl-9 md:pl-12 pr-4 text-[13px] md:text-sm text-[#176637] transition-colors focus:border-[#72AD43] focus:outline-none" 
                                 />
                             </div>
                         )}
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 md:gap-4">
                         {/* Notifications */}
                         <div className="relative" ref={notifRef}>
                             <button onClick={() => setShowNotifications(!showNotifications)} className="p-2 rounded-full text-[#176637] hover:bg-white transition relative">
@@ -315,11 +335,11 @@ export default function POSPage({ data }) {
                 </header>
 
                 {/* Tab Content */}
-                <div className="flex flex-1 overflow-hidden">
+                <div className="flex flex-1 flex-col lg:flex-row overflow-hidden">
                     {activeTab === 'kasir' && (
                         <>
                             {/* Main Kasir Content */}
-                            <div className="flex flex-1 flex-col overflow-y-auto p-6 scrollbar-hide">
+                            <div className="flex flex-1 flex-col overflow-y-auto p-4 md:p-6 scrollbar-hide">
                                 {/* Incoming Orders Notification Cards (User requested to keep this option) */}
                                 {incomingOrders.length > 0 && (
                                     <div className="mb-6 flex flex-col gap-3">
@@ -398,7 +418,7 @@ export default function POSPage({ data }) {
                             </div>
 
                             {/* Sidebar Cart for Kasir */}
-                            <div className="flex w-[350px] flex-col border-l-2 border-[#176637]/10 bg-white shadow-2xl xl:w-[400px]">
+                            <div className="flex w-full lg:w-[350px] flex-col border-t-2 lg:border-t-0 lg:border-l-2 border-[#176637]/10 bg-white shadow-2xl xl:w-[400px] h-1/2 lg:h-auto shrink-0">
                                 <div className="border-b border-[#176637]/10 p-6">
                                     <h3 className="font-gabriela text-2xl text-[#176637]">Pesanan Saat Ini</h3>
                                     <div className="mt-4 grid grid-cols-2 gap-3">
@@ -532,11 +552,11 @@ export default function POSPage({ data }) {
                     )}
 
                     {activeTab === 'pantau_meja' && (
-                        <div className="flex flex-1 p-6 h-full overflow-hidden">
+                        <div className="flex flex-col lg:flex-row flex-1 p-4 md:p-6 h-full overflow-hidden">
                             {/* Tables Grid */}
-                            <div className="flex-1 overflow-y-auto pr-6">
-                                <h3 className="font-gabriela text-3xl text-[#176637] mb-6">Pantau Meja</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            <div className="flex-1 overflow-y-auto pr-0 lg:pr-6 pb-4 lg:pb-0">
+                                <h3 className="font-gabriela text-xl md:text-3xl text-[#176637] mb-4 md:mb-6">Pantau Meja</h3>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                                     {tables.map(table => {
                                         const order = incomingOrders.find(o => o.table_number === table.table_number);
                                         const hasOrder = !!order;
@@ -546,7 +566,7 @@ export default function POSPage({ data }) {
                                             <button 
                                                 key={table.id}
                                                 onClick={() => hasOrder ? setSelectedOrder(order) : setSelectedOrder(null)}
-                                                className={`relative rounded-[28px] border-2 p-6 flex flex-col items-center justify-center text-center transition-all ${
+                                                className={`relative rounded-[20px] md:rounded-[28px] border-2 p-4 md:p-6 flex flex-col items-center justify-center text-center transition-all ${
                                                     isSelected ? 'border-[#176637] bg-[#176637] text-white shadow-xl scale-105' :
                                                     hasOrder ? 'border-red-400 bg-red-50 text-[#176637] animate-pulse hover:scale-105' : 
                                                     'border-[#176637]/10 bg-white text-[#176637] hover:bg-[#FFF6DB]/50'
@@ -558,9 +578,9 @@ export default function POSPage({ data }) {
                                                         <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
                                                     </span>
                                                 )}
-                                                <div className="text-xs font-bold uppercase tracking-[0.2em] opacity-60 mb-2">Meja</div>
-                                                <div className="font-gabriela text-6xl mb-4">{table.table_number}</div>
-                                                <div className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                                <div className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] opacity-60 mb-1 md:mb-2">Meja</div>
+                                                <div className="font-gabriela text-4xl md:text-6xl mb-2 md:mb-4">{table.table_number}</div>
+                                                <div className={`px-3 md:px-4 py-1.5 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-wider ${
                                                     isSelected ? 'bg-white/20 text-white' :
                                                     hasOrder ? 'bg-red-500 text-white shadow-md' : 
                                                     'bg-[#176637]/10 text-[#176637]'
@@ -575,9 +595,9 @@ export default function POSPage({ data }) {
                             
                             {/* Order Details Panel */}
                             {selectedOrder && (
-                                <div className="w-[350px] xl:w-[400px] h-full bg-white rounded-[32px] shadow-2xl border-2 border-[#176637]/10 flex flex-col overflow-hidden animate-slide-up">
-                                    <div className="bg-[#176637] p-6 text-white relative">
-                                        <button onClick={() => setSelectedOrder(null)} className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition">
+                                <div className="w-full lg:w-[350px] xl:w-[400px] h-1/2 lg:h-full shrink-0 bg-white rounded-[24px] md:rounded-[32px] shadow-2xl border-2 border-[#176637]/10 flex flex-col overflow-hidden animate-slide-up mt-4 lg:mt-0">
+                                    <div className="bg-[#176637] p-4 md:p-6 text-white relative shrink-0">
+                                        <button onClick={() => setSelectedOrder(null)} className="absolute top-3 md:top-4 right-3 md:right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition">
                                             <Icon name="minus" className="w-4 h-4" stroke />
                                         </button>
                                         <h3 className="font-gabriela text-2xl mb-1">Detail Pesanan</h3>
@@ -610,34 +630,34 @@ export default function POSPage({ data }) {
                                             ))}
                                         </div>
                                     </div>
-                                    <div className="p-6 bg-white border-t border-[#176637]/10">
-                                        <div className="flex justify-between items-center mb-6">
-                                            <span className="font-bold text-[#176637]">Total Tagihan</span>
-                                            <span className="font-gabriela text-2xl text-[#176637]">Rp {selectedOrder.total.toLocaleString('id-ID')}</span>
+                                    <div className="p-4 md:p-6 bg-white border-t border-[#176637]/10 shrink-0">
+                                        <div className="flex justify-between items-center mb-4 md:mb-6">
+                                            <span className="font-bold text-[#176637] text-sm md:text-base">Total Tagihan</span>
+                                            <span className="font-gabriela text-xl md:text-2xl text-[#176637]">Rp {selectedOrder.total.toLocaleString('id-ID')}</span>
                                         </div>
                                         <button 
                                             onClick={() => processIncomingOrder(selectedOrder.id)}
-                                            className="w-full rounded-2xl bg-[#FF901A] py-4 text-center font-bold text-[#176637] shadow-[0_8px_30px_rgba(255,144,26,0.4)] hover:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+                                            className="w-full rounded-2xl bg-[#FF901A] py-3 md:py-4 text-center text-sm md:text-base font-bold text-[#176637] shadow-[0_8px_30px_rgba(255,144,26,0.4)] hover:scale-[0.98] transition-transform flex items-center justify-center gap-2"
                                         >
                                             <Icon name="packageCheck" className="w-5 h-5" stroke />
-                                            Cetak Struk & Proses
+                                            Cetak & Proses
                                         </button>
                                     </div>
                                 </div>
                             )}
                             
                             {!selectedOrder && incomingOrders.length === 0 && (
-                                <div className="flex-1 flex flex-col items-center justify-center text-[#176637]/30 border-2 border-dashed border-[#176637]/20 rounded-[32px] ml-6 p-6 text-center">
-                                    <Icon name="store" className="w-16 h-16 mb-4 opacity-50" stroke />
-                                    <p className="font-bold text-lg">Belum ada pesanan masuk</p>
-                                    <p className="text-sm mt-1">Pesanan dari pelanggan via QR Code akan muncul di sini</p>
+                                <div className="h-1/2 lg:h-full lg:w-[350px] xl:w-[400px] shrink-0 flex flex-col items-center justify-center text-[#176637]/30 border-2 border-dashed border-[#176637]/20 rounded-[24px] md:rounded-[32px] mt-4 lg:mt-0 lg:ml-6 p-6 text-center">
+                                    <Icon name="store" className="w-12 md:w-16 h-12 md:h-16 mb-4 opacity-50" stroke />
+                                    <p className="font-bold text-base md:text-lg">Belum ada pesanan masuk</p>
+                                    <p className="text-xs md:text-sm mt-1">Pesanan dari pelanggan via QR Code akan muncul di sini</p>
                                 </div>
                             )}
                             {!selectedOrder && incomingOrders.length > 0 && (
-                                <div className="flex-1 flex flex-col items-center justify-center text-red-500/50 border-2 border-dashed border-red-500/20 bg-red-50/50 rounded-[32px] ml-6 p-6 text-center">
-                                    <Icon name="bell" className="w-16 h-16 mb-4 animate-bounce" stroke />
-                                    <p className="font-bold text-lg text-red-500">Ada pesanan baru!</p>
-                                    <p className="text-sm mt-1 text-red-500/70">Klik meja yang berkedip untuk melihat detail pesanan</p>
+                                <div className="h-1/2 lg:h-full lg:w-[350px] xl:w-[400px] shrink-0 flex flex-col items-center justify-center text-red-500/50 border-2 border-dashed border-red-500/20 bg-red-50/50 rounded-[24px] md:rounded-[32px] mt-4 lg:mt-0 lg:ml-6 p-6 text-center">
+                                    <Icon name="bell" className="w-12 md:w-16 h-12 md:h-16 mb-4 animate-bounce" stroke />
+                                    <p className="font-bold text-base md:text-lg text-red-500">Ada pesanan baru!</p>
+                                    <p className="text-xs md:text-sm mt-1 text-red-500/70">Klik meja yang berkedip untuk melihat detail pesanan</p>
                                 </div>
                             )}
                         </div>

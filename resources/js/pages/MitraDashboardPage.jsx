@@ -317,14 +317,14 @@ function StatCard({ stat }) {
     };
 
     return (
-        <div className={`group flex min-h-[170px] flex-col rounded-[30px] border border-[#176637]/5 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-[4px_4px_0px_#176637]`}>
-            <div className="mb-4 flex items-start justify-between">
-                <div className={`rounded-br-xl rounded-tl-xl p-2.5 ${palette[stat.accent] ?? palette.forest}`}>
-                    <Icon name={stat.icon} className="h-5 w-5" stroke />
+        <div className="group flex min-h-[150px] md:min-h-[170px] flex-col rounded-tr-[24px] md:rounded-tr-[30px] rounded-bl-[24px] md:rounded-bl-[30px] rounded-tl-lg rounded-br-lg border border-[#176637]/5 bg-white p-4 md:p-5 shadow-[2px_2px_15px_rgba(23,102,55,0.05)] transition-all duration-300 hover:shadow-[4px_4px_0px_#176637]">
+            <div className="mb-3 md:mb-4 flex items-start justify-between">
+                <div className={`rounded-br-xl rounded-tl-xl p-2 md:p-2.5 ${palette[stat.accent] ?? palette.forest} transition-transform group-hover:scale-110`}>
+                    <Icon name={stat.icon} className="h-4 w-4 md:h-5 md:w-5" stroke />
                 </div>
             </div>
-            <p className="mb-1 text-[13px] font-medium leading-snug text-[#176637]/70">{stat.title}</p>
-            <p className="mt-auto whitespace-nowrap text-[clamp(1.1rem,1.8vw,1.55rem)] font-bold leading-none tracking-tight text-[#176637]">{stat.value}</p>
+            <p className="mb-1 text-xs md:text-[13px] font-medium leading-snug text-[#176637]/70">{stat.title}</p>
+            <p className="mt-auto whitespace-nowrap text-lg md:text-[clamp(1.1rem,1.8vw,1.55rem)] font-bold leading-none tracking-tight text-[#176637]">{stat.value}</p>
         </div>
     );
 }
@@ -337,8 +337,8 @@ function CategoryDonutChart() {
     ];
 
     return (
-        <div className="flex flex-col rounded-[40px] border border-[#176637]/5 bg-white p-6 shadow-sm">
-            <h3 className="mb-2 font-gabriela text-xl text-[#176637]">Proporsi Penjualan</h3>
+        <div className="flex flex-col rounded-[24px] md:rounded-[30px] border border-[#176637]/5 bg-white p-4 md:p-6 shadow-sm">
+            <h3 className="mb-2 font-gabriela text-lg md:text-xl text-[#176637]">Proporsi Penjualan</h3>
             <p className="mb-4 text-xs text-[#176637]/60">Berdasarkan kategori produk</p>
             <div className="relative flex h-[250px] w-full items-center justify-center">
                 <ResponsiveContainer width="100%" height="100%">
@@ -384,7 +384,7 @@ function CategoryDonutChart() {
     );
 }
 
-function Sidebar({ activeTab, setActiveTab, logoUrl, user }) {
+function Sidebar({ activeTab, setActiveTab, logoUrl, user, isMobileSidebarOpen, setIsMobileSidebarOpen }) {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const items = [
         { id: 'dashboard', icon: 'dashboard', label: 'Dashboard' },
@@ -395,7 +395,14 @@ function Sidebar({ activeTab, setActiveTab, logoUrl, user }) {
     ];
 
     return (
-        <aside className="relative flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl">
+        <>
+            {isMobileSidebarOpen && (
+                <div 
+                    className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+                    onClick={() => setIsMobileSidebarOpen(false)}
+                />
+            )}
+            <aside className={`fixed inset-y-0 left-0 z-50 flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl transition-transform duration-300 md:relative md:translate-x-0 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
                 <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
             </svg>
@@ -461,10 +468,11 @@ function Sidebar({ activeTab, setActiveTab, logoUrl, user }) {
             </div>
 
         </aside>
+        </>
     );
 }
 
-function Header({ title, user, setActiveMenu }) {
+function Header({ title, user, setActiveMenu, setIsMobileSidebarOpen }) {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [notifMenuOpen, setNotifMenuOpen] = useState(false);
 
@@ -486,7 +494,15 @@ function Header({ title, user, setActiveMenu }) {
 
     return (
         <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 border-b border-[#176637]/10 bg-[#FFF6DB]/80 px-4 py-4 backdrop-blur-md md:px-8 md:py-5">
-            <h1 className="font-gabriela flex items-center gap-3 text-2xl text-[#176637]">{title}</h1>
+            <div className="flex items-center gap-3">
+                <button 
+                    onClick={() => setIsMobileSidebarOpen(true)}
+                    className="md:hidden p-2 text-[#176637] hover:bg-[#176637]/5 rounded-lg -ml-2"
+                >
+                    <Icon name="menu" className="w-6 h-6" stroke />
+                </button>
+                <h1 className="font-gabriela flex items-center gap-3 text-xl md:text-2xl text-[#176637]">{title}</h1>
+            </div>
             <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                 <div className="relative" ref={notifRef}>
                     <button 
@@ -626,8 +642,8 @@ function DashboardView() {
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-                <section className="relative overflow-hidden rounded-tl-[40px] rounded-br-[40px] border border-[#176637]/5 bg-white p-6 shadow-sm xl:col-span-2">
+            <div className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-4">
+                <div className="relative overflow-hidden rounded-tl-[30px] rounded-br-[30px] md:rounded-tl-[40px] md:rounded-br-[40px] border border-[#176637]/5 bg-white p-4 md:p-6 shadow-sm lg:col-span-2">
                     <div className="absolute right-6 top-4 opacity-10">
                         <svg width="48" height="36" viewBox="0 0 48 36" fill="#176637">
                             <path d="M24 36C24 18 12 12 0 18C6 6 18 6 24 18C30 6 42 6 48 18C36 12 24 18 24 36Z" />
@@ -674,7 +690,7 @@ function DashboardView() {
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
-                </section>
+                </div>
 
                 <aside className="flex flex-col rounded-tr-[40px] rounded-bl-[40px] border border-[#176637]/5 bg-white p-6 shadow-sm">
                     <div className="mb-6 flex items-center justify-between">
@@ -1344,14 +1360,16 @@ export default function MitraDashboardPage({ data = {} }) {
         'report': 'Rekap Laporan',
     };
 
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
     return (
         <>
             <GlobalStyles />
-            <div className="flex h-screen overflow-hidden bg-[#FFF6DB]">
-                {!isPos && <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} logoUrl={logoUrl} user={pageData.user} />}
+            <div className="flex min-h-screen bg-[#FFF6DB] text-[#176637]">
+                {!isPos && <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} logoUrl={logoUrl} user={pageData.user} isMobileSidebarOpen={isMobileSidebarOpen} setIsMobileSidebarOpen={setIsMobileSidebarOpen} />}
                 <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
-                    <Header title={titles[activeTab]} setActiveMenu={setActiveTab} user={pageData.user} />
-                    <div className="relative z-0 flex-1 overflow-y-auto">
+                    <Header title={titles[activeTab]} setActiveMenu={setActiveTab} user={pageData.user} setIsMobileSidebarOpen={setIsMobileSidebarOpen} />
+                    <div className="relative z-0 flex-1 overflow-y-auto p-4 md:p-8">
                         <div className="pointer-events-none absolute bottom-[-20px] right-[-50px] z-[-1] h-32 w-96 opacity-[0.05]">
                             <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="h-full w-full stroke-[#176637] stroke-[3px] fill-transparent">
                                 <path d="M0,10 Q25,20 50,10 T100,10" />
