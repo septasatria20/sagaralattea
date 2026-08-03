@@ -9,6 +9,7 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class);
+Route::get('/order', [\App\Http\Controllers\PublicOrderPageController::class, '__invoke']);
 
 Route::get('/meja/{table}', function ($table) {
     return view('app', [
@@ -58,6 +59,8 @@ Route::middleware('auth')->group(function () {
     });
     
     Route::prefix('api')->group(function () {
+        Route::post('/public/checkout', [\App\Http\Controllers\Api\PublicOrderController::class, 'checkout']);
+        
         Route::get('/admin/dashboard/stats', [\App\Http\Controllers\Api\DashboardController::class, 'stats']);
         
         Route::middleware('role:Admin')->group(function () {

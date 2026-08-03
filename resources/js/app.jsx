@@ -7,6 +7,7 @@ import MitraDashboardPage from './pages/MitraDashboardPage';
 import POSPage from './pages/POSPage';
 import InvestorDashboardPage from './pages/InvestorDashboardPage';
 import CustomerOrderPage from './pages/CustomerOrderPage';
+import PublicOrderPage from './pages/PublicOrderPage';
 
 const root = createRoot(document.getElementById('app'));
 const pageData = window.__INITIAL_PAGE_DATA__ ?? {};
@@ -21,6 +22,8 @@ const PageComponent = page === 'admin-dashboard'
         ? POSPage
     : page === 'customer-order'
         ? CustomerOrderPage
+    : page === 'public-order'
+        ? PublicOrderPage
     : page === 'investor-dashboard'
         ? InvestorDashboardPage
         : HomePage;

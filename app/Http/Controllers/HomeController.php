@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MenuItem;
+use App\Models\Promo;
 use App\Models\Testimonial;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
@@ -22,6 +23,8 @@ class HomeController extends Controller
             else $dashboardUrl = '/';
         }
 
+        $outlets = \App\Models\Outlet::where('status', 'Aktif')->get();
+
         return view('app', [
             'pageData' => [
                 'user' => $user ? ['name' => $user->name, 'dashboardUrl' => $dashboardUrl] : null,
@@ -35,11 +38,28 @@ class HomeController extends Controller
                     ['value' => '98%', 'label' => 'happy customer'],
                     ['value' => '4.9/5', 'label' => 'taste rating'],
                 ],
-                'promos' => $this->fallbackPromotions(),
+                'outlets' => $outlets,
+                'promos' => $this->promotions()->values()->all(),
                 'menuItems' => $this->menuItems()->values()->all(),
                 'testimonials' => $this->testimonials()->values()->all(),
             ],
         ]);
+    }
+
+    protected function promotions(): Collection
+    {
+        if (! Schema::hasTable('promos')) {
+            return collect($this->fallbackPromotions());
+        }
+
+        $items = Promo::query()
+            ->where('status', 'Aktif')
+            ->orderByDesc('is_featured') // Featured first
+            ->latest()
+            ->limit(4)
+            ->get();
+
+        return $items->isNotEmpty() ? $items : collect($this->fallbackPromotions());
     }
 
     protected function menuItems(): Collection

@@ -43,7 +43,39 @@ function NotificationModal({ isOpen, title = 'Pemberitahuan', message, onClose }
     );
 }
 
-function Navbar({ scrolled = false, onNotificationAction, data = {} }) {
+function JoinUsModal({ isOpen, onClose }) {
+    if (!isOpen) return null;
+
+    const adminWa = '6281122334455';
+    const messageMitra = encodeURIComponent('Halo Admin Sagara Lattea, saya tertarik untuk bergabung mendaftar sebagai Mitra/Outlet. Mohon info lebih lanjut.');
+    const messageKaryawan = encodeURIComponent('Halo Admin Sagara Lattea, saya tertarik untuk mendaftar sebagai Karyawan/Barista. Mohon info lowongan yang tersedia.');
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-[#176637]/60 px-4 py-4 backdrop-blur-sm" onClick={onClose}>
+            <div className="reveal relative w-full max-w-md rounded-[32px] border border-[#72AD43]/20 bg-white p-8 text-center shadow-2xl" onClick={e => e.stopPropagation()}>
+                <button onClick={onClose} className="absolute right-6 top-6 text-[#176637]/40 hover:text-[#FF901A]">
+                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                <h3 className="font-gabriela text-3xl text-[#176637]">Bergabung Bersama Kami</h3>
+                <p className="mt-3 text-sm text-[#176637]/80 leading-relaxed">Pilih opsi di bawah ini untuk terhubung langsung dengan WhatsApp tim Admin Sagara Lattea.</p>
+                
+                <div className="mt-8 flex flex-col gap-4">
+                    <a href={`https://wa.me/${adminWa}?text=${messageMitra}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 rounded-2xl border-2 border-[#176637] bg-white p-4 font-bold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]">
+                        <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.441-1.273.606-1.446c.166-.173.359-.217.479-.217.119 0 .24-.002.346-.002.106-.002.253-.04.394.303.144.351.488 1.196.532 1.284.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564c.173.087.289.129.332.202.043.073.043.423-.101.827z"/></svg>
+                        Daftar Mitra / Outlet
+                    </a>
+                    <a href={`https://wa.me/${adminWa}?text=${messageKaryawan}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 rounded-2xl bg-[#FF901A] p-4 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_#176637]">
+                        <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.441-1.273.606-1.446c.166-.173.359-.217.479-.217.119 0 .24-.002.346-.002.106-.002.253-.04.394.303.144.351.488 1.196.532 1.284.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564c.173.087.289.129.332.202.043.073.043.423-.101.827z"/></svg>
+                        Daftar Karyawan
+                    </a>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function Navbar({ scrolled = false, onJoinUsClick, data = {} }) {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navClass = scrolled
         ? 'bg-[#FFF6DB]/92 text-[#176637] shadow-[0_10px_30px_rgba(23,102,55,0.08)] backdrop-blur-md'
         : 'bg-transparent text-[#FFF6DB]';
@@ -54,12 +86,17 @@ function Navbar({ scrolled = false, onNotificationAction, data = {} }) {
         <header className={`fixed left-0 top-0 z-50 w-full transition-all duration-300 ${navClass}`}>
             <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 md:px-8">
                 <LogoMark variant={scrolled ? 'dark' : 'light'} />
+                
+                {/* Desktop Menu */}
                 <div className="hidden items-center gap-8 font-medium md:flex">
                     {navigation.map((item) => (
                         <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} className={`transition ${linkClass}`}>
                             {item}
                         </a>
                     ))}
+                    <button onClick={() => window.location.href = '/order'} className={`transition font-bold ${linkClass}`}>
+                        Order Sekarang
+                    </button>
                     <div className={`h-4 w-px ${dividerClass}`} />
                     {data.user ? (
                         <>
@@ -78,19 +115,50 @@ function Navbar({ scrolled = false, onNotificationAction, data = {} }) {
                             Login
                         </a>
                     )}
-                    <button onClick={() => onNotificationAction('Formulir pendaftaran kemitraan sedang dalam tahap pengembangan.')} className="rounded-full bg-[#FF901A] px-6 py-2 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#176637]">
+                    <button onClick={onJoinUsClick} className="rounded-full bg-[#FF901A] px-6 py-2 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#176637]">
                         Join Us
                     </button>
                 </div>
-                <button className="md:hidden">
+
+                {/* Mobile Hamburger */}
+                <button className="md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
                     <span className="sr-only">Open navigation</span>
                     <div className="space-y-1.5">
-                        <span className="block h-0.5 w-6 bg-[#176637]" />
-                        <span className="block h-0.5 w-5 bg-[#176637]" />
-                        <span className="block h-0.5 w-4 bg-[#176637]" />
+                        <span className={`block h-0.5 w-6 transition-colors ${scrolled ? 'bg-[#176637]' : 'bg-[#FFF6DB]'}`} />
+                        <span className={`block h-0.5 w-5 transition-colors ${scrolled ? 'bg-[#176637]' : 'bg-[#FFF6DB]'}`} />
+                        <span className={`block h-0.5 w-4 transition-colors ${scrolled ? 'bg-[#176637]' : 'bg-[#FFF6DB]'}`} />
                     </div>
                 </button>
             </nav>
+
+            {/* Mobile Menu Overlay */}
+            {isMobileMenuOpen && (
+                <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-[#176637]/10 flex flex-col py-4 px-6 gap-4 text-[#176637] font-medium">
+                    {navigation.map((item) => (
+                        <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#FF901A]">
+                            {item}
+                        </a>
+                    ))}
+                    <button onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/order'; }} className="text-left font-bold text-[#FF901A] hover:opacity-80">
+                        Order Sekarang
+                    </button>
+                    <hr className="border-[#176637]/10" />
+                    {data.user ? (
+                        <>
+                            <a href={data.user.dashboardUrl} onClick={() => setIsMobileMenuOpen(false)}>Dashboard</a>
+                            <form action="/logout" method="POST">
+                                <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
+                                <button type="submit" className="text-red-500 font-bold">Logout</button>
+                            </form>
+                        </>
+                    ) : (
+                        <a href="/login" onClick={() => setIsMobileMenuOpen(false)}>Login</a>
+                    )}
+                    <button onClick={() => { setIsMobileMenuOpen(false); onJoinUsClick(); }} className="mt-2 w-full rounded-full bg-[#176637] px-6 py-3 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#FF901A]">
+                        Join Us
+                    </button>
+                </div>
+            )}
         </header>
     );
 }
@@ -178,7 +246,7 @@ function Hero({ brand }) {
             <LeafArt className="left-[-120px] top-[-60px] hidden h-[460px] w-[460px] md:block" crop="left" opacityClass="opacity-[0.08]" />
             <LeafArt className="right-[-90px] top-10 hidden h-[260px] w-[260px] lg:block" crop="right" flip opacityClass="opacity-[0.07]" />
 
-            <div className="relative z-10 mx-auto grid min-h-[720px] max-w-7xl items-center gap-14 px-6 pb-24 pt-32 md:px-8 lg:grid-cols-2 lg:gap-10">
+            <div className="relative z-10 mx-auto grid min-h-[780px] xl:min-h-[850px] max-w-7xl items-center gap-14 px-6 pb-24 pt-32 md:px-8 lg:grid-cols-2 lg:gap-10">
                 <div className="relative z-10 text-center lg:text-left">
                     <h1 className="reveal font-gabriela mt-6 text-5xl leading-tight text-[#FFF6DB] drop-shadow-md md:text-6xl lg:text-7xl">
                         Start your day the Lattea way.
@@ -188,7 +256,7 @@ function Hero({ brand }) {
                         hari-harimu.
                     </p>
                     <div className="reveal mt-8 flex flex-col justify-center gap-4 sm:flex-row lg:justify-start" style={{ animationDelay: '0.16s' }}>
-                        <button onClick={(e) => { e.preventDefault(); document.getElementById('varian').scrollIntoView({ behavior: 'smooth' }); }} className="rounded-br-3xl rounded-tl-3xl bg-[#FF901A] px-8 py-3.5 font-semibold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:-translate-y-0.5 hover:bg-[#e68217] hover:shadow-[2px_2px_0px_#176637]">
+                        <button onClick={(e) => { e.preventDefault(); window.location.href = '/order'; }} className="rounded-br-3xl rounded-tl-3xl bg-[#FF901A] px-8 py-3.5 font-semibold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:-translate-y-0.5 hover:bg-[#e68217] hover:shadow-[2px_2px_0px_#176637]">
                             Pesan Sekarang
                         </button>
                         <button onClick={(e) => { e.preventDefault(); document.getElementById('varian').scrollIntoView({ behavior: 'smooth' }); }} className="rounded-bl-3xl rounded-tr-3xl border-2 border-[#FFF6DB] px-8 py-3.5 font-semibold text-[#FFF6DB] transition hover:bg-[#FFF6DB] hover:text-[#176637]">
@@ -285,95 +353,37 @@ function ProductSection({ items, onNotificationAction }) {
             id: 1,
             name: 'Matcha Lattea Signature',
             desc: 'Paduan matcha Jepang dan susu creamy.',
-            price: '25.000',
+            price: 25000,
             color: '#72AD43',
             image: '/minum2.png',
             category: 'Signature',
+            status: 'Tersedia'
         },
         {
             id: 2,
             name: 'Houjicha Roasted Calm',
             desc: 'Teh panggang yang kaya rasa dengan sentuhan karamel.',
-            price: '28.000',
+            price: 28000,
             color: '#FF901A',
             image: '/minum2.png',
             category: 'Signature',
-        },
-        {
-            id: 3,
-            name: 'Earl Grey Citrus Splash',
-            desc: 'Kesegaran earl grey klasik berpadu creamy milk.',
-            price: '26.000',
-            color: '#176637',
-            image: '/minum2.png',
-            category: 'Tea Series',
-        },
-        {
-            id: 4,
-            name: 'Jasmine Glow',
-            desc: 'Jasmine tea yang ringan dan bersih.',
-            price: '27.000',
-            color: '#72AD43',
-            image: '/minum2.png',
-            category: 'Tea Series',
-        },
-        {
-            id: 5,
-            name: 'Oolong Breeze',
-            desc: 'Oolong halus dengan aftertaste lembut.',
-            price: '30.000',
-            color: '#176637',
-            image: '/minum2.png',
-            category: 'Tea Series',
-        },
-        {
-            id: 6,
-            name: 'Honey Milk Tea',
-            desc: 'Teh susu hangat dengan sentuhan madu.',
-            price: '31.000',
-            color: '#FF901A',
-            image: '/minum2.png',
-            category: 'Milk Tea',
-        },
-        {
-            id: 7,
-            name: 'Caramel Foam',
-            desc: 'Lembut, manis, dan creamy di satu tegukan.',
-            price: '33.000',
-            color: '#a56a3a',
-            image: '/minum2.png',
-            category: 'Signature',
-        },
-        {
-            id: 8,
-            name: 'Citrus Tea Spark',
-            desc: 'Segar, ringan, dan cocok diminum siang hari.',
-            price: '28.000',
-            color: '#5f8f2d',
-            image: '/minum2.png',
-            category: 'Fresh Pick',
-        },
-        {
-            id: 9,
-            name: 'Aren Cloud',
-            desc: 'Espresso, palm sugar, dan silky milk seimbang.',
-            price: '29.000',
-            color: '#8b5e34',
-            image: '/minum2.png',
-            category: 'Best Seller',
+            status: 'Tersedia'
         },
     ];
+    
     const products = items?.length
         ? items.map((item, index) => ({
               id: item.id ?? index,
               name: item.name,
               desc: item.tagline ?? item.description ?? '',
-              price: Number(item.price).toLocaleString('id-ID'),
+              price: item.price,
               color: item.accent_color ?? fallback[index % fallback.length].color,
               image: item.image ?? fallback[index % fallback.length].image,
               category: item.category ?? fallback[index % fallback.length].category,
+              status: item.status ?? 'Tersedia',
           }))
         : fallback;
+        
     const categories = ['Semua Menu', ...new Set(products.map((item) => item.category).filter(Boolean))];
     const visibleProducts = activeCategory === 'Semua Menu' ? products : products.filter((item) => item.category === activeCategory);
 
@@ -382,6 +392,8 @@ function ProductSection({ items, onNotificationAction }) {
             <div className="text-center">
                 <SectionTitle eyebrow="Pilihan Rasa" title="Diramu dengan daun teh pilihan dan susu segar." align="center" />
             </div>
+
+
 
             <div className="mt-8 flex flex-wrap justify-center gap-2">
                 {categories.map((category) => (
@@ -400,42 +412,56 @@ function ProductSection({ items, onNotificationAction }) {
             </div>
 
             <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6">
-                {visibleProducts.map((item) => (
-                    <article
-                        key={item.id}
-                        className="group relative overflow-hidden rounded-[20px] border border-[#176637]/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#72AD43] hover:shadow-lg"
-                    >
-                        <div className="absolute right-0 top-0 h-9 w-9 rounded-bl-[20px] bg-[#72AD43]/10" />
-                        <LeafArt className="left-[-20px] top-[-14px] h-14 w-14" crop="left" opacityClass="opacity-[0.05]" />
-                        <div className="relative z-10 mb-2.5 flex h-28 items-center justify-center overflow-hidden rounded-[16px] border border-[#176637]/5 bg-[#FFF6DB]/55">
-                            <img
-                                src={item.image ?? '/minum2.png'}
-                                alt={item.name}
-                                className="h-full w-full object-contain object-bottom p-1.5 drop-shadow-[0_10px_16px_rgba(23,102,55,0.14)] transition duration-300 group-hover:scale-[1.03]"
-                            />
-                            <div className="absolute inset-x-8 bottom-2 h-7 rounded-full opacity-20 blur-xl" style={{ background: item.color }} />
-                        </div>
-                        <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0">
-                                <h3 className="truncate text-[14px] font-bold leading-4 text-[#176637]">{item.name}</h3>
-                                <p className="mt-1 h-9 overflow-hidden text-[10px] leading-4 text-[#176637]/68">{item.desc}</p>
+                {visibleProducts.map((item) => {
+                    const isHabis = item.status === 'Habis';
+                    return (
+                        <article
+                            key={item.id}
+                            className={`group relative overflow-hidden rounded-[20px] border border-[#176637]/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col ${isHabis ? 'opacity-70 grayscale-[50%]' : 'hover:border-[#72AD43]'}`}
+                        >
+                            <div className="absolute right-0 top-0 h-9 w-9 rounded-bl-[20px] bg-[#72AD43]/10" />
+                            <LeafArt className="left-[-20px] top-[-14px] h-14 w-14" crop="left" opacityClass="opacity-[0.05]" />
+                            <div className="relative z-10 mb-2.5 flex h-28 items-center justify-center overflow-hidden rounded-[16px] border border-[#176637]/5 bg-[#FFF6DB]/55">
+                                <img
+                                    src={item.image ?? '/minum2.png'}
+                                    alt={item.name}
+                                    className={`h-full w-full object-contain object-bottom p-1.5 drop-shadow-[0_10px_16px_rgba(23,102,55,0.14)] transition duration-300 ${isHabis ? '' : 'group-hover:scale-[1.03]'}`}
+                                />
+                                <div className="absolute inset-x-8 bottom-2 h-7 rounded-full opacity-20 blur-xl" style={{ background: item.color }} />
                             </div>
-                            <div className="shrink-0 rounded-full bg-[#176637]/8 px-2 py-0.5 text-[9px] font-bold text-[#176637]">
-                                Menu
+                            <div className="flex-1 flex flex-col">
+                                <div className="flex items-start justify-between gap-2">
+                                    <div className="min-w-0">
+                                        <h3 className="truncate text-[14px] font-bold leading-4 text-[#176637]">{item.name}</h3>
+                                        <p className="mt-1 h-9 overflow-hidden text-[10px] leading-4 text-[#176637]/68">{item.desc}</p>
+                                    </div>
+                                    <div className="shrink-0 rounded-full bg-[#176637]/8 px-2 py-0.5 text-[9px] font-bold text-[#176637]">
+                                        Menu
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div className="relative z-10 mt-2.5 flex items-center justify-between border-t border-[#176637]/10 pt-2">
-                            <span className="text-[13px] font-bold tabular-nums text-[#FF901A]">Rp {item.price}</span>
-                            <button onClick={() => onNotificationAction('Integrasi keranjang belanja & pemesanan online sedang dalam tahap pengembangan.')} className="rounded-full bg-[#176637] px-2 py-0.5 text-[10px] font-semibold text-[#FFF6DB] shadow-sm transition hover:bg-[#72AD43]">
-                                Pesan
-                            </button>
-                        </div>
-                    </article>
-                ))}
+                            <div className="relative z-10 mt-2.5 flex flex-col gap-2 border-t border-[#176637]/10 pt-2.5">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[13px] font-bold tabular-nums text-[#FF901A]">Rp {Number(item.price).toLocaleString('id-ID')}</span>
+                                    {isHabis && <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[9px] font-bold text-red-600 uppercase tracking-widest">Habis</span>}
+                                </div>
+                                <button 
+                                    onClick={() => window.location.href = '/order'}
+                                    disabled={isHabis}
+                                    className={`w-full rounded-lg py-2 text-xs font-bold shadow-sm transition ${isHabis ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#176637] text-[#FFF6DB] hover:bg-[#72AD43] shadow-[2px_2px_0px_#FF901A] hover:-translate-y-px hover:shadow-[1px_1px_0px_#FF901A]'}`}
+                                >
+                                    {isHabis ? 'Habis' : 'Pesan'}
+                                </button>
+                            </div>
+                        </article>
+                    );
+                })}
             </div>
         </section>
     );
 }
+
+
 
 function OutletSection({ onNotificationAction }) {
     return (
@@ -449,13 +475,13 @@ function OutletSection({ onNotificationAction }) {
                             <path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z" />
                         </svg>
                         <div>
-                            <h3 className="text-xl font-bold text-[#176637]">Jl. Ketenangan No. 1, Kota Harmoni</h3>
-                            <p className="mt-1 text-sm text-[#176637]/80">Buka: 09.00 - 22.00</p>
+                            <h3 className="text-xl font-bold text-[#176637]">Politeknik Negeri Malang</h3>
+                            <p className="mt-1 text-sm text-[#176637]/80">Buka: 09.00 - 20.00</p>
                         </div>
                     </div>
                     <div className="mt-6 flex h-48 items-center justify-center rounded-tr-2xl rounded-bl-2xl border border-[#176637]/20 bg-[#FFF6DB]">
                         <iframe
-                            src="https://maps.google.com/maps?q=Jakarta%20Pusat&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                            src="https://maps.google.com/maps?q=Politeknik%20Negeri%20Malang&t=&z=15&ie=UTF8&iwloc=&output=embed"
                             width="100%"
                             height="100%"
                             style={{ border: 0, borderTopRightRadius: '1rem', borderBottomLeftRadius: '1rem' }}
@@ -471,12 +497,12 @@ function OutletSection({ onNotificationAction }) {
             <div className="flex flex-col justify-center">
                 <SectionTitle eyebrow="Cara Pemesanan" title="Langkah beli yang simple" />
                 <div className="mt-8 space-y-6">
-                    <div className="border-l-4 border-[#176637] bg-white p-5 font-medium shadow-sm">1. Pilih produk & varian favoritmu dari menu.</div>
-                    <div className="border-l-4 border-[#72AD43] bg-white p-5 font-medium shadow-sm">2. Selesaikan pembayaran dengan aman.</div>
+                    <div className="border-l-4 border-[#176637] bg-white p-5 font-medium shadow-sm">1. Pilih Outlet terdekat dan produk varian favoritmu dari menu.</div>
+                    <div className="border-l-4 border-[#72AD43] bg-white p-5 font-medium shadow-sm">2. Selesaikan formulir pesanan dan tunggu konfirmasi Mitra.</div>
                     <div className="flex flex-col gap-5 rounded-r-xl border-l-4 border-[#FF901A] bg-white p-6 shadow-md">
-                        <span className="font-bold text-[#176637]">3. Pilih metode pengambilan / pengiriman:</span>
+                        <span className="font-bold text-[#176637]">3. Lakukan pembayaran saat tiba di lokasi / Outlet:</span>
                         <div className="flex flex-col gap-4 sm:flex-row">
-                            <button onClick={() => onNotificationAction('Fitur pemesanan pick-up mandiri (Self Pick-up) akan segera hadir.')} className="flex-1 rounded-xl border-2 border-[#176637] py-3 font-bold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]">
+                            <button onClick={(e) => { e.preventDefault(); window.location.href = '/order'; }} className="flex-1 rounded-xl border-2 border-[#176637] py-3 font-bold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]">
                                 Ambil di Outlet
                             </button>
                             <button onClick={() => onNotificationAction('Integrasi langsung dengan aplikasi Ojek Online pihak ketiga masih dalam proses penyesuaian API.')} className="flex-1 rounded-xl bg-[#72AD43] py-3 font-bold text-white shadow-[3px_3px_0px_#176637] transition hover:-translate-y-1">
@@ -550,11 +576,14 @@ export default function HomePage({ data = {} }) {
     const menuItems = data.menuItems ?? [];
     const testimonials = data.testimonials ?? [];
     const promos = data.promos ?? [];
+    const outlets = data.outlets ?? [];
+    
     const [scrolled, setScrolled] = useState(false);
-    const [modalState, setModalState] = useState({ isOpen: false, message: '' });
+    const [modalState, setModalState] = useState({ isOpen: false, message: '', title: 'Pemberitahuan' });
+    const [isJoinUsModalOpen, setIsJoinUsModalOpen] = useState(false);
 
-    const handleNotificationAction = (message) => {
-        setModalState({ isOpen: true, message });
+    const handleNotificationAction = (message, title = 'Pemberitahuan') => {
+        setModalState({ isOpen: true, message, title });
     };
 
     useEffect(() => {
@@ -563,6 +592,7 @@ export default function HomePage({ data = {} }) {
         window.addEventListener('scroll', updateScroll, { passive: true });
         return () => window.removeEventListener('scroll', updateScroll);
     }, []);
+
 
     return (
         <div className="min-h-screen bg-[#FFF6DB] text-[#176637]">
@@ -643,13 +673,19 @@ export default function HomePage({ data = {} }) {
                 </div>
             </div>
 
-            <NotificationModal isOpen={modalState.isOpen} message={modalState.message} onClose={() => setModalState({ isOpen: false, message: '' })} />
-            <Navbar scrolled={scrolled} onNotificationAction={handleNotificationAction} data={data} />
+            <NotificationModal isOpen={modalState.isOpen} title={modalState.title} message={modalState.message} onClose={() => setModalState({ isOpen: false, message: '' })} />
+            
+            <JoinUsModal isOpen={isJoinUsModalOpen} onClose={() => setIsJoinUsModalOpen(false)} />
+            
+            <Navbar scrolled={scrolled} onJoinUsClick={() => setIsJoinUsModalOpen(true)} data={data} />
             <main>
                 <Hero brand={data.brand} />
                 <SproutDivider />
                 <PromoSection promos={promos} onNotificationAction={handleNotificationAction} />
-                <ProductSection items={menuItems} onNotificationAction={handleNotificationAction} />
+                <ProductSection 
+                    items={menuItems} 
+                    onNotificationAction={handleNotificationAction} 
+                />
                 <OutletSection onNotificationAction={handleNotificationAction} />
                 <section className="mx-auto max-w-7xl px-6 py-10 md:px-8">
                     <SectionTitle eyebrow="Testimoni" title="Cerita dari pelanggan" align="center" />

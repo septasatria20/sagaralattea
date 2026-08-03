@@ -25,7 +25,10 @@ class AdminPromoController extends Controller
             'target' => 'nullable|string|in:Semua Orang,Khusus Member',
             'applicable_products' => 'nullable|array',
             'status' => 'required|string|in:Aktif,Jadwal,Selesai',
+            'is_featured' => 'boolean',
         ]);
+
+        $validated['is_featured'] = $request->boolean('is_featured');
 
         $promo = Promo::create($validated);
 
@@ -44,7 +47,10 @@ class AdminPromoController extends Controller
             'target' => 'nullable|string|in:Semua Orang,Khusus Member',
             'applicable_products' => 'nullable|array',
             'status' => 'required|string|in:Aktif,Jadwal,Selesai',
+            'is_featured' => 'boolean',
         ]);
+
+        $validated['is_featured'] = $request->boolean('is_featured');
 
         $promo->update($validated);
 
