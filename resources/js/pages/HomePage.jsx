@@ -84,51 +84,51 @@ function Navbar({ scrolled = false, onJoinUsClick, data = {} }) {
 
     return (
         <header className={`fixed left-0 top-0 z-50 w-full transition-all duration-300 ${navClass}`}>
-            <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 md:px-8">
+            <nav className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 md:gap-4 md:px-8">
                 <LogoMark variant={scrolled ? 'dark' : 'light'} />
                 
-                {/* Desktop Menu */}
-                <div className="hidden items-center gap-8 font-medium md:flex">
-                    {navigation.map((item) => (
-                        <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} className={`transition ${linkClass}`}>
-                            {item}
-                        </a>
-                    ))}
-                    <button onClick={() => window.location.href = '/order'} className={`transition font-bold ${linkClass}`}>
+                <div className="flex items-center gap-3 md:gap-6 ml-auto">
+                    {/* Desktop Menu */}
+                    <div className="hidden items-center gap-6 font-medium md:flex">
+                        {navigation.map((item) => (
+                            <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} className={`transition ${linkClass}`}>
+                                {item}
+                            </a>
+                        ))}
+                        <div className={`h-4 w-px ${dividerClass}`} />
+                        {data.user ? (
+                            <>
+                                <a href={data.user.dashboardUrl} className={`transition ${linkClass}`}>
+                                    Dashboard
+                                </a>
+                                <form action="/logout" method="POST" className="inline">
+                                    <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
+                                    <button type="submit" className={`transition ${linkClass}`}>
+                                        Logout
+                                    </button>
+                                </form>
+                            </>
+                        ) : (
+                            <a href="/login" className={`transition ${linkClass}`}>
+                                Login
+                            </a>
+                        )}
+                    </div>
+
+                    <button onClick={() => window.location.href = '/order'} className="hidden md:block rounded-full bg-[#FF901A] px-5 py-2 font-bold text-[#176637] shadow-[4px_4px_0px_#176637] transition hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_#176637]">
                         Order Sekarang
                     </button>
-                    <div className={`h-4 w-px ${dividerClass}`} />
-                    {data.user ? (
-                        <>
-                            <a href={data.user.dashboardUrl} className={`transition ${linkClass}`}>
-                                Dashboard
-                            </a>
-                            <form action="/logout" method="POST" className="inline">
-                                <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
-                                <button type="submit" className={`transition ${linkClass}`}>
-                                    Logout
-                                </button>
-                            </form>
-                        </>
-                    ) : (
-                        <a href="/login" className={`transition ${linkClass}`}>
-                            Login
-                        </a>
-                    )}
-                    <button onClick={onJoinUsClick} className="rounded-full bg-[#FF901A] px-6 py-2 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#176637]">
-                        Join Us
+
+                    {/* Mobile Hamburger */}
+                    <button className="md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                        <span className="sr-only">Open navigation</span>
+                        <div className="space-y-1.5">
+                            <span className={`block h-0.5 w-6 transition-colors ${scrolled ? 'bg-[#176637]' : 'bg-[#FFF6DB]'}`} />
+                            <span className={`block h-0.5 w-5 transition-colors ${scrolled ? 'bg-[#176637]' : 'bg-[#FFF6DB]'}`} />
+                            <span className={`block h-0.5 w-4 transition-colors ${scrolled ? 'bg-[#176637]' : 'bg-[#FFF6DB]'}`} />
+                        </div>
                     </button>
                 </div>
-
-                {/* Mobile Hamburger */}
-                <button className="md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-                    <span className="sr-only">Open navigation</span>
-                    <div className="space-y-1.5">
-                        <span className={`block h-0.5 w-6 transition-colors ${scrolled ? 'bg-[#176637]' : 'bg-[#FFF6DB]'}`} />
-                        <span className={`block h-0.5 w-5 transition-colors ${scrolled ? 'bg-[#176637]' : 'bg-[#FFF6DB]'}`} />
-                        <span className={`block h-0.5 w-4 transition-colors ${scrolled ? 'bg-[#176637]' : 'bg-[#FFF6DB]'}`} />
-                    </div>
-                </button>
             </nav>
 
             {/* Mobile Menu Overlay */}
@@ -139,13 +139,27 @@ function Navbar({ scrolled = false, onJoinUsClick, data = {} }) {
                             {item}
                         </a>
                     ))}
-                    <button onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/order'; }} className="text-left font-bold text-[#176637] hover:text-[#FF901A]">
+                    <button onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/order'; }} className="w-full text-center rounded-full bg-[#FF901A] px-6 py-3 font-bold text-[#176637] shadow-[4px_4px_0px_#176637]">
                         Order Sekarang
                     </button>
                     <hr className="border-[#176637]/10" />
-                    <button onClick={() => { setIsMobileMenuOpen(false); onJoinUsClick(); }} className="mt-2 w-full rounded-full bg-[#176637] px-6 py-3 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#FF901A]">
-                        Join Us
-                    </button>
+                    {data.user ? (
+                        <>
+                            <a href={data.user.dashboardUrl} className="hover:text-[#FF901A]">
+                                Dashboard
+                            </a>
+                            <form action="/logout" method="POST" className="inline">
+                                <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
+                                <button type="submit" className="text-left w-full hover:text-[#FF901A]">
+                                    Logout
+                                </button>
+                            </form>
+                        </>
+                    ) : (
+                        <a href="/login" className="hover:text-[#FF901A]">
+                            Login
+                        </a>
+                    )}
                 </div>
             )}
         </header>
@@ -590,6 +604,84 @@ function Footer({ onNotificationAction }) {
     );
 }
 
+function ChatbotWidget() {
+    const [isOpen, setIsOpen] = useState(false);
+    const [messages, setMessages] = useState([
+        { sender: 'bot', text: 'Halo! Saya Lattela. Ada yang bisa saya bantu hari ini?' }
+    ]);
+
+    const qna = [
+        { q: 'Apa menu best seller?', a: 'Menu best seller kami adalah Matcha Lattea dan Hojicha, lho! Seger banget buat nemenin harimu.' },
+        { q: 'Lokasi outlet dimana saja?', a: 'Saat ini Sagara Lattea ada di Kota Harmoni, Malang, dan sekitarnya. Yuk mampir!' },
+        { q: 'Buka jam berapa?', a: 'Outlet kami buka setiap hari mulai pukul 09.00 hingga 20.00 malam.' },
+        { q: 'Cara daftar mitra?', a: 'Keren! Kamu bisa klik tombol "Bergabung Bersama Kami" di menu atas untuk info lebih lanjut ya.' }
+    ];
+
+    const handleQuestion = (q, a) => {
+        setMessages(prev => [...prev, { sender: 'user', text: q }]);
+        setTimeout(() => {
+            setMessages(prev => [...prev, { sender: 'bot', text: a }]);
+        }, 500);
+    };
+
+    return (
+        <div className="fixed bottom-4 right-4 z-[9999] flex flex-col items-end">
+            {isOpen && (
+                <div className="mb-4 w-[300px] sm:w-[350px] overflow-hidden rounded-2xl border-2 border-[#176637]/20 bg-white shadow-2xl reveal flex flex-col h-[400px]">
+                    <div className="flex items-center justify-between bg-[#176637] p-4 text-[#FFF6DB]">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FF901A] font-bold text-[#176637]">L</div>
+                            <div>
+                                <h4 className="font-gabriela font-bold leading-tight">Lattela Bot</h4>
+                                <p className="text-[10px] opacity-80">Online</p>
+                            </div>
+                        </div>
+                        <button onClick={() => setIsOpen(false)} className="opacity-80 hover:opacity-100">
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto p-4 bg-[#FFF6DB]/30 space-y-3 scrollbar-hide">
+                        {messages.map((msg, idx) => (
+                            <div key={idx} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ${msg.sender === 'user' ? 'bg-[#FF901A] text-white rounded-tr-sm' : 'bg-white border border-[#176637]/10 text-[#176637] rounded-tl-sm'}`}>
+                                    {msg.text}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="border-t border-[#176637]/10 bg-white p-3">
+                        <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#176637]/50">Pilih Pertanyaan:</p>
+                        <div className="flex flex-wrap gap-2">
+                            {qna.map((item, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => handleQuestion(item.q, item.a)}
+                                    className="rounded-full border border-[#72AD43]/30 bg-[#72AD43]/10 px-3 py-1.5 text-[11px] font-semibold text-[#176637] transition hover:bg-[#72AD43] hover:text-white"
+                                >
+                                    {item.q}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            <button 
+                onClick={() => setIsOpen(!isOpen)}
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-[#176637] text-[#FFF6DB] shadow-[0_8px_30px_rgba(23,102,55,0.4)] transition hover:-translate-y-1 hover:bg-[#FF901A] hover:text-[#176637]"
+            >
+                {isOpen ? (
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                ) : (
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                )}
+            </button>
+        </div>
+    );
+}
+
 export default function HomePage({ data = {} }) {
     const menuItems = data.menuItems ?? [];
     const testimonials = data.testimonials ?? [];
@@ -613,49 +705,27 @@ export default function HomePage({ data = {} }) {
 
 
     return (
-        <div className="min-h-screen bg-[#FFF6DB] text-[#176637] pb-16 md:pb-0">
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Gabriela&family=Inter:wght@400;500;600;700;800&display=swap');
-
-                :root {
-                    --cream: #FFF6DB;
-                    --forest: #176637;
-                    --orange: #FF901A;
-                    --green-light: #72AD43;
-                }
-
-                body {
-                    margin: 0;
-                    overflow-x: hidden;
-                    font-family: 'Inter', sans-serif;
-                    background: var(--cream);
-                    color: var(--forest);
-                }
-
-                .font-gabriela {
-                    font-family: 'Gabriela', serif;
-                }
-
+        <div className="relative min-h-screen bg-[#FFF6DB] font-sans text-[#176637] overflow-x-hidden">
+            <style dangerouslySetInnerHTML={{__html: `
                 @keyframes steamRise {
-                    0% { transform: translateY(0) scaleX(1); opacity: 0; }
-                    20% { opacity: 0.6; }
-                    50% { transform: translateY(-20px) scaleX(1.2); opacity: 0.3; }
-                    100% { transform: translateY(-40px) scaleX(1); opacity: 0; }
+                    0% { transform: translateY(0) scale(1); opacity: 0; }
+                    50% { opacity: 0.6; }
+                    100% { transform: translateY(-20px) scale(1.5); opacity: 0; }
                 }
 
                 @keyframes waveFlow {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
+                    0% { background-position-x: 0; }
+                    100% { background-position-x: 1000px; }
                 }
 
                 @keyframes floatSoft {
                     0%, 100% { transform: translateY(0); }
                     50% { transform: translateY(-8px); }
                 }
-
-                @keyframes fadeUp {
-                    from { opacity: 0; transform: translateY(16px); }
-                    to { opacity: 1; transform: translateY(0); }
+                
+                @keyframes bounceHorizontal {
+                    0%, 100% { transform: translateX(0); }
+                    50% { transform: translateX(-12px); }
                 }
 
                 .animate-steam {
@@ -669,27 +739,28 @@ export default function HomePage({ data = {} }) {
                 .animate-float {
                     animation: floatSoft 4s ease-in-out infinite;
                 }
+                
+                .animate-bounce-horizontal {
+                    animation: bounceHorizontal 2.5s infinite;
+                }
 
                 .reveal {
                     animation: fadeUp 0.6s ease both;
                 }
-            `}</style>
+            `}} />
             
-            {/* Quick Dev Login Panel - Only visible for development */}
-            <div className="fixed bottom-4 right-4 z-[9999] rounded-2xl border-2 border-[#176637]/20 bg-white/90 p-4 shadow-2xl backdrop-blur-md">
-                <div className="mb-2 text-xs font-bold uppercase tracking-wider text-[#176637]">Dev Quick Login</div>
-                <div className="flex gap-2">
-                    {['admin', 'mitra', 'pos', 'investor'].map(role => (
-                        <a 
-                            key={role} 
-                            href={`/dev/login/${role}`}
-                            className="rounded-lg bg-[#FF901A] px-3 py-1.5 text-xs font-bold text-[#FFF6DB] shadow-[2px_2px_0px_#176637] transition hover:-translate-y-0.5 hover:shadow-[1px_1px_0px_#176637]"
-                        >
-                            {role.toUpperCase()}
-                        </a>
-                    ))}
+            <button 
+                onClick={() => setIsJoinUsModalOpen(true)}
+                className="fixed right-0 top-32 z-[9998] flex items-center gap-2 rounded-l-2xl bg-[#FF901A] pl-4 pr-3 py-3 font-gabriela text-sm md:text-base font-bold text-[#176637] shadow-[-4px_4px_20px_rgba(23,102,55,0.2)] hover:bg-[#FFF6DB] animate-bounce-horizontal cursor-pointer group"
+            >
+                <div className="flex flex-col text-left leading-tight">
+                    <span>Join Us</span>
+                    <span className="text-[10px] uppercase tracking-wider opacity-70 group-hover:text-[#FF901A]">Mitra & Karir</span>
                 </div>
-            </div>
+                <svg className="h-5 w-5 opacity-50 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
+            </button>
+
+            <ChatbotWidget />
 
             <NotificationModal isOpen={modalState.isOpen} title={modalState.title} message={modalState.message} onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))} />
             <JoinUsModal isOpen={isJoinUsModalOpen} onClose={() => setIsJoinUsModalOpen(false)} />
