@@ -1,3 +1,17 @@
+# Sagara Lattea Project
+
+## Deployment & Troubleshooting Notes
+
+Jika Anda melakukan instalasi atau update di *Shared Hosting* (seperti Hostinger) dan mengalami masalah terkait ketidaksesuaian versi PHP di terminal/SSH (`composer` gagal jalan karena butuh versi PHP lebih tinggi), Anda dapat menggunakan perintah *bypass* berikut:
+
+```bash
+composer install --optimize-autoloader --no-dev --ignore-platform-reqs
+```
+
+*Flag* `--ignore-platform-reqs` ini akan memaksa Composer untuk melanjutkan instalasi tanpa mempedulikan versi PHP yang aktif di CLI (sangat berguna untuk *shared hosting*).
+
+---
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">

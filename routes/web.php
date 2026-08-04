@@ -107,7 +107,7 @@ if (app()->environment('local')) {
     });
 }
 
-require __DIR__.'/auth.php';
+
 
 // --- TAMBAHAN: RUTE KHUSUS UNTUK MENAMPILKAN GAMBAR (Start) ---
 use Illuminate\Support\Facades\Response;
