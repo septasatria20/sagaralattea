@@ -6,6 +6,7 @@ import {
 import { downloadCombinedCsv, downloadCsvFile, openPrintableWindow } from '../utils/reportExport';
 
 const iconPaths = {
+    menu: 'M4 7h16M4 12h16M4 17h16',
     dashboard: 'M4 13.5V6a2 2 0 0 1 2-2h4v9.5H4Zm0 2.5h6V20H6a2 2 0 0 1-2-2v-2Zm8 4V4h6a2 2 0 0 1 2 2v14h-8Zm8 0h2a2 2 0 0 0 2-2v-5h-4v7Z',
     store: 'M3 7h18l-1 5H4L3 7Zm2 6h14v7H5v-7Zm1-9h12l1 2H5l1-2Z',
     users: 'M9 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm7 1a3 3 0 1 0-3-3 3 3 0 0 0 3 3ZM2 20a7 7 0 0 1 14 0Zm14 0a5 5 0 0 1 6 0v0Z',
@@ -42,9 +43,8 @@ const baseCategoryData = [
 ];
 
 const baseOutletPerformance = [
-    { name: 'Harmoni', omzet: 28500000, pengunjung: 1200 },
-    { name: 'Sudirman', omzet: 24200000, pengunjung: 950 },
-    { name: 'Senayan', omzet: 22300000, pengunjung: 1090 },
+    { name: 'Poli9', omzet: 28500000, pengunjung: 1200 },
+    { name: 'Polinema', omzet: 24200000, pengunjung: 950 },
 ];
 
 const baseTopProducts = [
@@ -108,6 +108,24 @@ function GlobalStyles() {
 
             .font-gabriela {
                 font-family: 'Gabriela', serif;
+            }
+
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+            
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #72AD43;
+                border-radius: 10px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #176637;
             }
 
             .hide-scroll::-webkit-scrollbar {
@@ -218,7 +236,7 @@ function ReportSectionTable({ title, rows, columns, renderRow, actions = [], pag
     const pageRows = rows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     return (
-        <section className="flex h-full min-h-[460px] flex-col overflow-hidden rounded-[20px] md:rounded-[28px] border-2 border-[#176637]/10 bg-white shadow-sm">
+        <section className="flex min-h-[460px] flex-col overflow-hidden rounded-[20px] md:rounded-[28px] border-2 border-[#176637]/10 bg-white shadow-sm">
             <div className="flex flex-col gap-4 border-b border-[#176637]/10 bg-[#FFF1C9] px-4 md:px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
                 <h3 className="font-gabriela text-xl md:text-2xl text-[#176637]">{title}</h3>
                 <div className="flex flex-wrap gap-2">
@@ -301,8 +319,8 @@ export default function InvestorDashboardPage({ data }) {
 
     // Filter scaling logic based on selected outlet to simulate interactive charts
     const scaleFactor = selectedOutlet === 'Semua Outlet' ? 1 : 
-                        selectedOutlet === 'Outlet Harmoni' ? 0.38 : 
-                        selectedOutlet === 'Outlet Sudirman' ? 0.32 : 0.30;
+                        selectedOutlet === 'Poli9' ? 0.38 : 
+                        selectedOutlet === 'Polinema' ? 0.32 : 0.30;
 
     const dynamicPerformance = useMemo(() => basePerformanceData.map(d => ({...d, omzet: d.omzet * scaleFactor, laba: d.laba * scaleFactor})), [scaleFactor]);
     const dynamicTopProducts = useMemo(() => baseTopProducts.map(d => ({...d, terjual: Math.round(d.terjual * scaleFactor)})), [scaleFactor]);
@@ -311,9 +329,8 @@ export default function InvestorDashboardPage({ data }) {
 
     // Outlet stats for the dropdown and report
     const outletStats = [
-        { name: 'Outlet Harmoni', omzet: 'Rp 28.500.000', trend: '+12%', status: 'Sangat Baik' },
-        { name: 'Outlet Sudirman', omzet: 'Rp 24.200.000', trend: '+5%', status: 'Baik' },
-        { name: 'Outlet Senayan', omzet: 'Rp 22.300.000', trend: '-2%', status: 'Perlu Perhatian' },
+        { name: 'Poli9', omzet: 'Rp 28.500.000', trend: '+12%', status: 'Sangat Baik' },
+        { name: 'Polinema', omzet: 'Rp 24.200.000', trend: '+5%', status: 'Baik' },
     ];
     
     // Derived Metrics for Header
@@ -377,11 +394,10 @@ export default function InvestorDashboardPage({ data }) {
     }, [scaleFactor]);
 
     const transactionRows = useMemo(() => ([
-        { id: 'TRX-091', outlet: 'Outlet Harmoni', type: 'Dine In', payment: 'QRIS', total: 'Rp 245.000', status: 'Selesai' },
-        { id: 'TRX-092', outlet: 'Outlet Sudirman', type: 'Take Away', payment: 'Tunai', total: 'Rp 128.000', status: 'Selesai' },
-        { id: 'TRX-093', outlet: 'Outlet Senayan', type: 'Delivery', payment: 'Kartu', total: 'Rp 187.000', status: 'Diproses' },
-        { id: 'TRX-094', outlet: 'Outlet Harmoni', type: 'Dine In', payment: 'QRIS', total: 'Rp 312.000', status: 'Selesai' },
-        { id: 'TRX-095', outlet: 'Outlet Sudirman', type: 'Take Away', payment: 'QRIS', total: 'Rp 96.000', status: 'Selesai' },
+        { id: 'TRX-091', outlet: 'Poli9', type: 'Dine In', payment: 'QRIS', total: 'Rp 245.000', status: 'Selesai' },
+        { id: 'TRX-092', outlet: 'Polinema', type: 'Take Away', payment: 'Tunai', total: 'Rp 128.000', status: 'Selesai' },
+        { id: 'TRX-094', outlet: 'Poli9', type: 'Dine In', payment: 'QRIS', total: 'Rp 312.000', status: 'Selesai' },
+        { id: 'TRX-095', outlet: 'Polinema', type: 'Take Away', payment: 'QRIS', total: 'Rp 96.000', status: 'Selesai' },
     ]), []);
 
     const outletRows = useMemo(() => outletStats.map((item) => ({
@@ -427,7 +443,7 @@ export default function InvestorDashboardPage({ data }) {
     const exportReportCsv = (filename, sections) => downloadCombinedCsv(filename, sections);
 
     return (
-        <div className="flex min-h-screen bg-[#FFF6DB] text-[#176637] font-sans overflow-hidden">
+        <div className="flex h-screen bg-[#FFF6DB] text-[#176637] font-sans overflow-hidden">
             <GlobalStyles />
             <Sidebar logoUrl={data?.brand?.logoUrl || '/logosagaralattea.png'} activeTab={activeTab} setActiveTab={setActiveTab} isMobileSidebarOpen={isMobileSidebarOpen} setIsMobileSidebarOpen={setIsMobileSidebarOpen} />
             
@@ -489,7 +505,7 @@ export default function InvestorDashboardPage({ data }) {
                     </div>
                 </header>
 
-                <div className="animate-slide-up flex-1 overflow-y-auto p-4 md:p-8 hide-scroll relative z-0">
+                <div className="animate-slide-up flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar relative z-0">
                     <div className="absolute top-0 right-0 h-64 w-full opacity-5 pointer-events-none z-0">
                         <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="h-full w-full fill-[#176637]">
                             <path d="M0,60 C150,100 300,20 450,60 C600,100 750,20 900,60 C1050,100 1200,20 1200,60 L1200,120 L0,120 Z" />
@@ -508,9 +524,8 @@ export default function InvestorDashboardPage({ data }) {
                                     className="cursor-pointer appearance-none rounded-full border-2 border-[#176637]/20 bg-white py-2 pl-4 pr-10 font-bold text-[#176637] shadow-[2px_2px_0px_rgba(23,102,55,0.1)] focus:border-[#72AD43] focus:outline-none"
                                 >
                                     <option>Semua Outlet</option>
-                                    <option>Outlet Harmoni</option>
-                                    <option>Outlet Sudirman</option>
-                                    <option>Outlet Senayan</option>
+                                    <option>Poli9</option>
+                                    <option>Polinema</option>
                                 </select>
                                 <Icon name="chevronRight" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-[#176637]" stroke />
                             </div>

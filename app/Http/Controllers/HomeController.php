@@ -69,7 +69,7 @@ class HomeController extends Controller
         }
 
         $items = MenuItem::query()
-            ->where('is_featured', true)
+            ->whereIn('status', ['Aktif', 'Habis'])
             ->orderBy('sort_order')
             ->limit(9)
             ->get();
@@ -199,22 +199,31 @@ class HomeController extends Controller
     {
         return [
             [
-                'title' => 'Bundling Hangat & Tenang',
-                'summary' => 'Beli 2 varian latte, gratis 1 pastry pilihan.',
-                'badge' => 'Bulan Ini',
+                'title' => 'Sunset Latte Glow',
+                'summary' => 'Diskon 25% untuk semua varian Latte setiap pembelian di jam 16.00 - 18.00.',
+                'badge' => 'Happy Hour',
                 'cta' => 'Klaim Promo',
                 'accent_color' => '#FF901A',
-                'code' => 'LATTEBUNDLE',
-                'period' => '01 Jul - 31 Jul 2026',
+                'code' => 'SUNSETGLOW',
+                'period' => 'Selama Agustus 2026',
             ],
             [
-                'title' => 'Happy Hour Matcha',
-                'summary' => 'Diskon 20% untuk Matcha Latte ukuran regular.',
-                'badge' => 'Senin-Jumat',
+                'title' => 'Matcha & Pastry Bliss',
+                'summary' => 'Gratis 1 Croissant Butter untuk pembelian 2 Matcha Bloom ukuran Grande.',
+                'badge' => 'Bundling Spesial',
                 'cta' => 'Lihat Detail',
                 'accent_color' => '#72AD43',
-                'code' => 'MATCHAHH',
-                'period' => '14.00 - 17.00',
+                'code' => 'MATCHABLISS',
+                'period' => 'Khusus Akhir Pekan',
+            ],
+            [
+                'title' => 'Student Chill Break',
+                'summary' => 'Tunjukkan ID Mahasiswa dan nikmati Potongan Rp 5.000 untuk Sea Salt Latte.',
+                'badge' => 'Khusus Mahasiswa',
+                'cta' => 'Ambil Voucher',
+                'accent_color' => '#0f5f43',
+                'code' => 'STUDENTCHILL',
+                'period' => 'Berlaku Setiap Hari',
             ],
         ];
     }

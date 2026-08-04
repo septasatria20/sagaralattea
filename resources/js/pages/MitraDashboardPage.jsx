@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsToolti
 import { downloadCombinedCsv, downloadCsvFile, openPrintableWindow } from '../utils/reportExport';
 
 const iconPaths = {
+    menu: 'M4 7h16M4 12h16M4 17h16',
     dashboard: 'M4 13.5V6a2 2 0 0 1 2-2h4v9.5H4Zm0 2.5h6V20H6a2 2 0 0 1-2-2v-2Zm8 4V4h6a2 2 0 0 1 2 2v14h-8Zm8 0h2a2 2 0 0 0 2-2v-5h-4v7Z',
     store: 'M3 7h18l-1 5H4L3 7Zm2 6h14v7H5v-7Zm1-9h12l1 2H5l1-2Z',
     users: 'M9 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm7 1a3 3 0 1 0-3-3 3 3 0 0 0 3 3ZM2 20a7 7 0 0 1 14 0Zm14 0a5 5 0 0 1 6 0v0Z',
@@ -99,7 +100,7 @@ const stockMovements = [
 
 const complaints = [
     { id: 'TKT-091', outlet: 'Sagara Sudirman', issue: 'Pesanan Gofood tumpah', status: 'Baru', date: 'Hari ini, 14:30' },
-    { id: 'TKT-090', outlet: 'Harmoni Pusat', issue: 'Poin member tidak bertambah', status: 'Diproses', date: 'Hari ini, 11:15' },
+    { id: 'TKT-090', outlet: 'Polinema', issue: 'Poin member tidak bertambah', status: 'Diproses', date: 'Hari ini, 11:15' },
     { id: 'TKT-088', outlet: 'Senja Kopi', issue: 'Karyawan kurang ramah', status: 'Selesai', date: 'Kemarin' },
 ];
 
@@ -272,6 +273,24 @@ function GlobalStyles() {
 
             .font-gabriela {
                 font-family: 'Gabriela', serif;
+            }
+
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+            
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #72AD43;
+                border-radius: 10px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #176637;
             }
 
             .hide-scroll::-webkit-scrollbar {
@@ -624,9 +643,9 @@ function DashboardView() {
     }, [startDate, endDate]);
 
     return (
-        <div className="animate-slide-up flex-1 overflow-y-auto p-6 pr-6 lg:p-8 lg:pr-10">
+        <div className="animate-slide-up flex-1">
             <div className="mb-6">
-                <p className="text-sm font-medium text-[#72AD43]">Outlet Harmoni - Ringkasan Hari Ini</p>
+                <p className="text-sm font-medium text-[#72AD43]">Polinema - Ringkasan Hari Ini</p>
             </div>
 
             <div className={`mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
@@ -949,10 +968,10 @@ function EmployeesView() {
     const [members, setMembers] = useState(teamMembers);
 
     return (
-        <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
+        <div className="animate-slide-up flex-1">
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <p className="text-sm font-medium text-[#72AD43]">Daftar Karyawan Outlet Harmoni</p>
+                    <p className="text-sm font-medium text-[#72AD43]">Daftar Karyawan Polinema</p>
                 </div>
             </div>
 
@@ -1041,7 +1060,7 @@ function SupplyView() {
     };
 
     return (
-        <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
+        <div className="animate-slide-up flex-1">
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <p className="text-sm font-medium text-[#72AD43]">Pemantauan Stok & Bahan Baku</p>
@@ -1194,7 +1213,7 @@ function ReportView() {
     });
 
     return (
-        <div className="animate-slide-up flex-1 overflow-y-auto p-6 lg:p-8">
+        <div className="animate-slide-up flex-1">
             <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
                 <div>
                     <p className="text-sm font-medium text-[#72AD43]">Finance, order, stok, karyawan, dan laporan outlet</p>
@@ -1206,7 +1225,7 @@ function ReportView() {
                     <h3 className="font-gabriela text-2xl text-[#176637]">Preview Print</h3>
                     <div className="mt-4 rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB] p-4">
                         <div className="rounded-[20px] bg-white p-4 shadow-sm">
-                            <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Outlet Harmoni</div>
+                            <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#176637]/55">Polinema</div>
                             <div className="mt-2 font-gabriela text-2xl text-[#176637]">Ringkasan Laporan Hari Ini</div>
                             <div className="mt-4 space-y-3">
                                 {financeReports.map((item) => (
@@ -1365,11 +1384,11 @@ export default function MitraDashboardPage({ data = {} }) {
     return (
         <>
             <GlobalStyles />
-            <div className="flex min-h-screen bg-[#FFF6DB] text-[#176637]">
+            <div className="flex h-screen bg-[#FFF6DB] text-[#176637]">
                 {!isPos && <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} logoUrl={logoUrl} user={pageData.user} isMobileSidebarOpen={isMobileSidebarOpen} setIsMobileSidebarOpen={setIsMobileSidebarOpen} />}
                 <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
                     <Header title={titles[activeTab]} setActiveMenu={setActiveTab} user={pageData.user} setIsMobileSidebarOpen={setIsMobileSidebarOpen} />
-                    <div className="relative z-0 flex-1 overflow-y-auto p-4 md:p-8">
+                    <div className="relative z-0 flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
                         <div className="pointer-events-none absolute bottom-[-20px] right-[-50px] z-[-1] h-32 w-96 opacity-[0.05]">
                             <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="h-full w-full stroke-[#176637] stroke-[3px] fill-transparent">
                                 <path d="M0,10 Q25,20 50,10 T100,10" />

@@ -9,7 +9,7 @@ const apiFetch = async (url, options = {}) => {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
         };
     }
-    
+
     try {
         const response = await window.fetch(url, options);
         if (!response.ok) {
@@ -65,9 +65,8 @@ const salesData = [
 ];
 
 const outletFallback = [
-    { id: 1, name: 'Harmoni Pusat', location: 'Kota Harmoni', account: 'harmoni.pusat@sagaralattea.id', omzet: 'Rp 28.5M', status: 'Aktif' },
-    { id: 2, name: 'Senja Kopi & Teh', location: 'Bandung', account: 'senja.kopi@sagaralattea.id', omzet: 'Rp 14.2M', status: 'Aktif' },
-    { id: 3, name: 'Sagara Sudirman', location: 'Jakarta', account: 'sudirman@sagaralattea.id', omzet: 'Rp 21.0M', status: 'Aktif' },
+    { id: 1, name: 'Politeknik Negeri Malang (Sipil)', location: 'Jl Soekarno Hatta No 9', account: 'polinema@sagaralattea.id', omzet: 'Rp 28.5M', status: 'Aktif' },
+    { id: 2, name: 'Poli9', location: 'Graha Politeknik Negeri Malang', account: 'poli9@sagaralattea.id', omzet: 'Rp 14.2M', status: 'Aktif' },
 ];
 
 const promoFallback = [
@@ -77,9 +76,8 @@ const promoFallback = [
 ];
 
 const complaintFallback = [
-    { id: 'TKT-091', outlet: 'Sagara Sudirman', issue: 'Pesanan Gofood tumpah', status: 'Baru', date: 'Hari ini, 14:30' },
-    { id: 'TKT-090', outlet: 'Harmoni Pusat', issue: 'Poin member tidak bertambah', status: 'Diproses', date: 'Hari ini, 11:15' },
-    { id: 'TKT-088', outlet: 'Senja Kopi', issue: 'Karyawan kurang ramah', status: 'Selesai', date: 'Kemarin' },
+    { id: 'TKT-091', outlet: 'Poli9', issue: 'Pesanan Gofood tumpah', status: 'Baru', date: 'Hari ini, 14:30' },
+    { id: 'TKT-090', outlet: 'Polinema', issue: 'Poin member tidak bertambah', status: 'Diproses', date: 'Hari ini, 11:15' },
 ];
 
 const iconPaths = {
@@ -129,49 +127,48 @@ function Sidebar({ activeMenu, setActiveMenu, logoUrl, isMobileSidebarOpen, setI
     return (
         <>
             {isMobileSidebarOpen && (
-                <div 
+                <div
                     className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
                     onClick={() => setIsMobileSidebarOpen(false)}
                 />
             )}
             <aside className={`fixed inset-y-0 left-0 z-50 flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl transition-transform duration-300 md:relative md:translate-x-0 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-            <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
-                <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
-            </svg>
+                <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
+                    <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
+                </svg>
 
-            <div className="relative z-10 p-6">
-                <div className="mb-8 inline-flex rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg bg-[#FFF6DB] px-4 py-3 shadow-[2px_2px_15px_rgba(23,102,55,0.18)]">
-                    <img src={logoUrl} alt="Sagara Lattea" className="h-16 w-auto object-contain drop-shadow-[0_2px_2px_rgba(0,0,0,0.08)]" />
-                </div>
-                <div className="mb-4 pl-2 text-xs font-bold uppercase tracking-[0.32em] text-[#72AD43]">Admin Panel</div>
-                <nav className="flex flex-col gap-2">
-                    {navigation.map((item) => {
-                        const active = activeMenu === item.id;
-                        return (
-                            <button
-                                key={item.id}
-                                onClick={() => setActiveMenu(item.id)}
-                                className={`relative flex w-[calc(100%+1.5rem)] items-center gap-3 px-4 py-3 text-left transition-all duration-300 ${
-                                    active
+                <div className="relative z-10 p-6">
+                    <div className="mb-8 inline-flex rounded-tr-[30px] rounded-bl-[30px] rounded-tl-lg rounded-br-lg bg-[#FFF6DB] px-4 py-3 shadow-[2px_2px_15px_rgba(23,102,55,0.18)]">
+                        <img src={logoUrl} alt="Sagara Lattea" className="h-16 w-auto object-contain drop-shadow-[0_2px_2px_rgba(0,0,0,0.08)]" />
+                    </div>
+                    <div className="mb-4 pl-2 text-xs font-bold uppercase tracking-[0.32em] text-[#72AD43]">Admin Panel</div>
+                    <nav className="flex flex-col gap-2">
+                        {navigation.map((item) => {
+                            const active = activeMenu === item.id;
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() => setActiveMenu(item.id)}
+                                    className={`relative flex w-[calc(100%+1.5rem)] items-center gap-3 px-4 py-3 text-left transition-all duration-300 ${active
                                         ? 'translate-x-4 rounded-tl-xl rounded-bl-xl bg-[#FFF6DB] text-[#176637] shadow-[-4px_0_10px_rgba(0,0,0,0.1)]'
                                         : 'text-[#FFF6DB]/72 hover:bg-[#FFF6DB]/10 hover:text-[#FFF6DB]'
-                                }`}
-                            >
-                                <Icon name={item.icon} stroke={item.stroke} className={`h-5 w-5 ${active ? 'text-[#FF901A]' : ''}`} />
-                                <span className="text-sm font-medium">{item.label}</span>
-                                {active && <span className="absolute right-0 top-0 h-full w-2 bg-[#FF901A]" />}
-                            </button>
-                        );
-                    })}
-                </nav>
-            </div>
+                                        }`}
+                                >
+                                    <Icon name={item.icon} stroke={item.stroke} className={`h-5 w-5 ${active ? 'text-[#FF901A]' : ''}`} />
+                                    <span className="text-sm font-medium">{item.label}</span>
+                                    {active && <span className="absolute right-0 top-0 h-full w-2 bg-[#FF901A]" />}
+                                </button>
+                            );
+                        })}
+                    </nav>
+                </div>
 
-            <div className="mt-auto opacity-20">
-                <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="h-8 w-full stroke-[#FFF6DB] stroke-[2px] fill-transparent">
-                    <path d="M0,10 Q25,20 50,10 T100,10" />
-                </svg>
-            </div>
-        </aside>
+                <div className="mt-auto opacity-20">
+                    <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="h-8 w-full stroke-[#FFF6DB] stroke-[2px] fill-transparent">
+                        <path d="M0,10 Q25,20 50,10 T100,10" />
+                    </svg>
+                </div>
+            </aside>
         </>
     );
 }
@@ -199,7 +196,7 @@ function Header({ title, setActiveMenu, setIsMobileSidebarOpen }) {
     return (
         <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 border-b border-[#176637]/10 bg-[#FFF6DB]/80 px-4 py-4 backdrop-blur-md md:px-8 md:py-5">
             <div className="flex items-center gap-3">
-                <button 
+                <button
                     onClick={() => setIsMobileSidebarOpen(true)}
                     className="md:hidden p-2 text-[#176637] hover:bg-[#176637]/5 rounded-lg -ml-2"
                 >
@@ -209,7 +206,7 @@ function Header({ title, setActiveMenu, setIsMobileSidebarOpen }) {
             </div>
             <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                 <div className="relative" ref={notifRef}>
-                    <button 
+                    <button
                         onClick={() => setNotifMenuOpen((value) => !value)}
                         className="relative text-[#176637] transition-colors hover:text-[#FF901A] p-2"
                     >
@@ -220,7 +217,7 @@ function Header({ title, setActiveMenu, setIsMobileSidebarOpen }) {
                         <div className="absolute right-0 top-[calc(100%+10px)] w-72 rounded-[22px] border border-[#176637]/10 bg-white p-4 shadow-[0_18px_50px_rgba(23,102,55,0.14)] z-50">
                             <h3 className="mb-3 font-gabriela text-lg text-[#176637]">Notifikasi</h3>
                             <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
-                                <button 
+                                <button
                                     onClick={() => { setNotifMenuOpen(false); setActiveMenu('komplain'); }}
                                     className="rounded-xl bg-[#FFF6DB]/50 p-3 text-left transition hover:bg-[#FFF6DB]"
                                 >
@@ -228,7 +225,7 @@ function Header({ title, setActiveMenu, setIsMobileSidebarOpen }) {
                                     <p className="mt-1 text-xs text-[#176637]/70">Ada 3 komplain pelanggan baru yang belum ditangani.</p>
                                     <p className="mt-2 text-[10px] text-[#176637]/40">10 Menit yang lalu</p>
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => { setNotifMenuOpen(false); setActiveMenu('stok'); }}
                                     className="rounded-xl bg-red-50 p-3 text-left transition hover:bg-red-100"
                                 >
@@ -236,7 +233,7 @@ function Header({ title, setActiveMenu, setIsMobileSidebarOpen }) {
                                     <p className="mt-1 text-xs text-red-500/80">Stok Cup Reguler di Sagara Lattea - Selatan sisa 50 pcs.</p>
                                     <p className="mt-2 text-[10px] text-red-500/50">1 Jam yang lalu</p>
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => { setNotifMenuOpen(false); setActiveMenu('outlet'); }}
                                     className="rounded-xl bg-[#FFF6DB]/50 p-3 text-left transition hover:bg-[#FFF6DB]"
                                 >
@@ -260,33 +257,33 @@ function Header({ title, setActiveMenu, setIsMobileSidebarOpen }) {
                         </div>
                         <Icon name="chevronDown" className="h-4 w-4 text-[#176637]/50" stroke />
                     </button>
-                            {userMenuOpen && (
-                                <div className="absolute right-0 top-[calc(100%+10px)] w-48 rounded-[22px] border border-[#176637]/10 bg-white p-2 shadow-[0_18px_50px_rgba(23,102,55,0.14)]">
-                                    <button 
-                                        onClick={() => {
-                                            setUserMenuOpen(false);
-                                            window.Swal?.fire({
-                                                title: 'Pengaturan Akun',
-                                                text: 'Menu pengaturan profil saat ini sedang dalam pemeliharaan.',
-                                                icon: 'info',
-                                                confirmButtonColor: '#176637'
-                                            });
-                                        }}
-                                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]"
-                                    >
-                                        <Icon name="settings" className="h-4 w-4" stroke />
-                                        Pengaturan
-                                    </button>
-                                    <form action="/logout" method="POST" className="w-full">
-                                        <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
-                                        <button type="submit" className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]">
-                                            <Icon name="logout" className="h-4 w-4" stroke />
-                                            Logout
-                                        </button>
-                                    </form>
-                                </div>
-                            )}
+                    {userMenuOpen && (
+                        <div className="absolute right-0 top-[calc(100%+10px)] w-48 rounded-[22px] border border-[#176637]/10 bg-white p-2 shadow-[0_18px_50px_rgba(23,102,55,0.14)]">
+                            <button
+                                onClick={() => {
+                                    setUserMenuOpen(false);
+                                    window.Swal?.fire({
+                                        title: 'Pengaturan Akun',
+                                        text: 'Menu pengaturan profil saat ini sedang dalam pemeliharaan.',
+                                        icon: 'info',
+                                        confirmButtonColor: '#176637'
+                                    });
+                                }}
+                                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]"
+                            >
+                                <Icon name="settings" className="h-4 w-4" stroke />
+                                Pengaturan
+                            </button>
+                            <form action="/logout" method="POST" className="w-full">
+                                <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
+                                <button type="submit" className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]">
+                                    <Icon name="logout" className="h-4 w-4" stroke />
+                                    Logout
+                                </button>
+                            </form>
                         </div>
+                    )}
+                </div>
             </div>
         </header>
     );
@@ -320,18 +317,18 @@ function SalesChart({ data }) {
                 <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <defs>
                         <linearGradient id="colorOmzet" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#72AD43" stopOpacity={0.8}/>
-                            <stop offset="95%" stopColor="#72AD43" stopOpacity={0}/>
+                            <stop offset="5%" stopColor="#72AD43" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="#72AD43" stopOpacity={0} />
                         </linearGradient>
                         <linearGradient id="colorLaba" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#FF901A" stopOpacity={0.8}/>
-                            <stop offset="95%" stopColor="#FF901A" stopOpacity={0}/>
+                            <stop offset="5%" stopColor="#FF901A" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="#FF901A" stopOpacity={0} />
                         </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#176637" strokeOpacity="0.1" />
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} dx={-10} tickFormatter={(val) => `Rp${(val/1000000)}M`} />
-                    <RechartsTooltip 
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} dx={-10} tickFormatter={(val) => `Rp${(val / 1000000)}M`} />
+                    <RechartsTooltip
                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: '#FFF6DB' }}
                         itemStyle={{ color: '#176637', fontWeight: 'bold' }}
                         formatter={(value) => [`Rp ${value.toLocaleString('id-ID')}`, '']}
@@ -373,7 +370,7 @@ function CategoryDonutChart() {
                                 <Cell key={`cell-${index}`} fill={entry.color} opacity={entry.name === 'Pure Tea' ? 0.4 : 1} />
                             ))}
                         </Pie>
-                        <RechartsTooltip 
+                        <RechartsTooltip
                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: '#FFF6DB' }}
                             itemStyle={{ color: '#176637', fontWeight: 'bold' }}
                             formatter={(value) => [`${value}%`, '']}
@@ -389,7 +386,7 @@ function CategoryDonutChart() {
                 {data.map((item) => (
                     <div key={item.name} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <span className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color, opacity: item.name === 'Pure Tea' ? 0.4 : 1 }} /> 
+                            <span className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color, opacity: item.name === 'Pure Tea' ? 0.4 : 1 }} />
                             {item.name}
                         </div>
                         <span className="font-bold text-[#176637]">{item.value}%</span>
@@ -408,7 +405,7 @@ function TopProductsChart() {
         { name: 'Croissant', sold: 200 },
         { name: 'Red Velvet', sold: 180 },
     ];
-    
+
     return (
         <div className="flex flex-col rounded-[24px] md:rounded-[30px] border border-[#176637]/5 bg-white p-4 md:p-6 shadow-sm">
             <h3 className="mb-2 font-gabriela text-lg md:text-xl text-[#176637]">Produk Terlaris</h3>
@@ -419,8 +416,8 @@ function TopProductsChart() {
                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#176637" strokeOpacity={0.1} />
                         <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} />
                         <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, fontWeight: 'bold' }} dx={-10} />
-                        <RechartsTooltip 
-                            cursor={{fill: 'transparent'}}
+                        <RechartsTooltip
+                            cursor={{ fill: 'transparent' }}
                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: '#FFF6DB' }}
                             itemStyle={{ color: '#176637', fontWeight: 'bold' }}
                             formatter={(value) => [`${value} Porsi`, 'Terjual']}
@@ -491,8 +488,8 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
                         <div className="flex flex-col gap-1">
                             <h3 className="font-gabriela text-xl text-[#176637]">Grafik Penjualan & Laba</h3>
                             <div className="relative">
-                                <select 
-                                    value={selectedOutlet} 
+                                <select
+                                    value={selectedOutlet}
                                     onChange={(e) => setSelectedOutlet(e.target.value)}
                                     className="w-full appearance-none rounded-xl border border-[#176637]/15 bg-white py-1.5 pl-3 pr-8 text-xs font-semibold text-[#176637] outline-none transition focus:border-[#72AD43]"
                                 >
@@ -505,18 +502,18 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
                             </div>
                         </div>
                         <div className="flex items-center gap-2 rounded-xl bg-[#FFF6DB] p-2">
-                            <input 
-                                type="date" 
+                            <input
+                                type="date"
                                 value={startDate}
                                 onChange={e => setStartDate(e.target.value)}
-                                className="cursor-pointer rounded-lg border-none bg-transparent px-2 py-1 text-sm font-medium text-[#176637] outline-none" 
+                                className="cursor-pointer rounded-lg border-none bg-transparent px-2 py-1 text-sm font-medium text-[#176637] outline-none"
                             />
                             <span className="text-xs text-[#176637]/50">-</span>
-                            <input 
-                                type="date" 
+                            <input
+                                type="date"
                                 value={endDate}
                                 onChange={e => setEndDate(e.target.value)}
-                                className="cursor-pointer rounded-lg border-none bg-transparent px-2 py-1 text-sm font-medium text-[#176637] outline-none" 
+                                className="cursor-pointer rounded-lg border-none bg-transparent px-2 py-1 text-sm font-medium text-[#176637] outline-none"
                             />
                         </div>
                     </div>
@@ -537,8 +534,8 @@ function OverviewTab({ stats: initialStats, salesData: initialSalesData, recentC
                                 item.status === 'Baru'
                                     ? 'bg-red-100 text-red-600'
                                     : item.status === 'Diproses'
-                                      ? 'bg-[#FF901A]/20 text-[#FF901A]'
-                                      : 'bg-[#72AD43]/20 text-[#176637]';
+                                        ? 'bg-[#FF901A]/20 text-[#FF901A]'
+                                        : 'bg-[#72AD43]/20 text-[#176637]';
 
                             return (
                                 <div key={index} className="cursor-pointer rounded-xl border-2 border-[#FFF6DB] bg-[#FFF6DB]/20 p-4 transition-colors hover:border-[#72AD43]/30">
@@ -587,9 +584,9 @@ function TopOutletsBarChart() {
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data} layout="vertical" margin={{ top: 0, right: 30, left: 10, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#176637" strokeOpacity="0.1" />
-                        <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} tickFormatter={(val) => `Rp${(val/1000000)}M`} />
+                        <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 12, opacity: 0.7 }} tickFormatter={(val) => `Rp${(val / 1000000)}M`} />
                         <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#176637', fontSize: 11, fontWeight: 'bold' }} width={140} />
-                        <RechartsTooltip 
+                        <RechartsTooltip
                             cursor={{ fill: 'transparent' }}
                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: '#FFF6DB' }}
                             itemStyle={{ color: '#176637', fontWeight: 'bold' }}
@@ -633,15 +630,15 @@ function OutletTab() {
 
     const openEdit = (outlet) => {
         setEditingId(outlet.id);
-        setFormData({ 
-            name: outlet.name, 
-            location: outlet.location || '', 
-            address: outlet.address || '', 
-            maps_url: outlet.maps_url || '', 
-            status: outlet.status, 
-            mitra_name: outlet.mitra_name || '', 
-            mitra_email: outlet.mitra_email || '', 
-            mitra_password: '' 
+        setFormData({
+            name: outlet.name,
+            location: outlet.location || '',
+            address: outlet.address || '',
+            maps_url: outlet.maps_url || '',
+            status: outlet.status,
+            mitra_name: outlet.mitra_name || '',
+            mitra_email: outlet.mitra_email || '',
+            mitra_password: ''
         });
         setViewMode('form');
     };
@@ -690,23 +687,23 @@ function OutletTab() {
                         <div className="flex flex-col gap-5">
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Nama Outlet</label>
-                                <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Lokasi (Kota)</label>
-                                <input value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Alamat Lengkap</label>
-                                <textarea value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows="5" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <textarea value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} rows="5" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Link Google Maps</label>
-                                <input value={formData.maps_url} onChange={e => setFormData({...formData, maps_url: e.target.value})} placeholder="https://maps.google.com/..." className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input value={formData.maps_url} onChange={e => setFormData({ ...formData, maps_url: e.target.value })} placeholder="https://maps.google.com/..." className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
-                                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
                                     <option value="Aktif">Aktif</option>
                                     <option value="Tidak Aktif">Tidak Aktif</option>
                                 </select>
@@ -719,15 +716,15 @@ function OutletTab() {
                                 <div className="flex flex-col gap-4">
                                     <div>
                                         <label className="mb-1 block text-sm font-bold text-[#176637]">Nama PIC Mitra</label>
-                                        <input required value={formData.mitra_name} onChange={e => setFormData({...formData, mitra_name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                        <input required value={formData.mitra_name} onChange={e => setFormData({ ...formData, mitra_name: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                                     </div>
                                     <div>
                                         <label className="mb-1 block text-sm font-bold text-[#176637]">Email Akun Mitra</label>
-                                        <input required type="email" value={formData.mitra_email} onChange={e => setFormData({...formData, mitra_email: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                        <input required type="email" value={formData.mitra_email} onChange={e => setFormData({ ...formData, mitra_email: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                                     </div>
                                     <div>
                                         <label className="mb-1 block text-sm font-bold text-[#176637]">Password {editingId && <span className="text-xs font-normal text-gray-500">(Kosongkan jika tidak diubah)</span>}</label>
-                                        <input type="password" required={!editingId} value={formData.mitra_password} onChange={e => setFormData({...formData, mitra_password: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                        <input type="password" required={!editingId} value={formData.mitra_password} onChange={e => setFormData({ ...formData, mitra_password: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                                     </div>
                                 </div>
                             </div>
@@ -847,14 +844,14 @@ function PromoTab() {
 
     const openEdit = (promo) => {
         setEditingId(promo.id);
-        setFormData({ 
-            title: promo.title, 
-            code: promo.code || '', 
-            summary: promo.summary || '', 
+        setFormData({
+            title: promo.title,
+            code: promo.code || '',
+            summary: promo.summary || '',
             discount_percentage: promo.discount_percentage || 0,
-            start_date: promo.start_date || '', 
-            end_date: promo.end_date || '', 
-            target: promo.target || 'Semua Orang', 
+            start_date: promo.start_date || '',
+            end_date: promo.end_date || '',
+            target: promo.target || 'Semua Orang',
             applicable_products: promo.applicable_products || [],
             status: promo.status,
             is_featured: promo.is_featured || false
@@ -866,7 +863,7 @@ function PromoTab() {
         e.preventDefault();
         const url = editingId ? `/api/admin/promos/${editingId}` : '/api/admin/promos';
         const method = editingId ? 'PUT' : 'POST';
-        
+
         const payload = { ...formData };
         if (!payload.start_date) payload.start_date = null;
         if (!payload.end_date) payload.end_date = null;
@@ -905,33 +902,33 @@ function PromoTab() {
                     <form id="promoForm" onSubmit={handleSubmit} className="flex flex-col gap-5">
                         <div>
                             <label className="mb-1 block text-sm font-bold text-[#176637]">Judul Promo</label>
-                            <input required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                            <input required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                         </div>
                         <div>
                             <label className="mb-1 block text-sm font-bold text-[#176637]">Kode Promo</label>
-                            <input value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                            <input value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                         </div>
                         <div>
                             <label className="mb-1 block text-sm font-bold text-[#176637]">Ringkasan</label>
-                            <textarea required value={formData.summary} onChange={e => setFormData({...formData, summary: e.target.value})} rows="5" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                            <textarea required value={formData.summary} onChange={e => setFormData({ ...formData, summary: e.target.value })} rows="5" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                         </div>
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Tgl Mulai</label>
-                                <input type="date" value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input type="date" value={formData.start_date} onChange={e => setFormData({ ...formData, start_date: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Tgl Selesai</label>
-                                <input type="date" value={formData.end_date} onChange={e => setFormData({...formData, end_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input type="date" value={formData.end_date} onChange={e => setFormData({ ...formData, end_date: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <input 
-                                type="checkbox" 
+                            <input
+                                type="checkbox"
                                 id="is_featured"
                                 className="h-5 w-5 rounded border-gray-300 text-[#FF901A] focus:ring-[#FF901A]"
                                 checked={formData.is_featured}
-                                onChange={e => setFormData({...formData, is_featured: e.target.checked})}
+                                onChange={e => setFormData({ ...formData, is_featured: e.target.checked })}
                             />
                             <label htmlFor="is_featured" className="text-sm font-bold text-[#176637] cursor-pointer">
                                 Jadikan Promo Utama (Ditampilkan paling atas/besar)
@@ -939,19 +936,19 @@ function PromoTab() {
                         </div>
                         <div>
                             <label className="mb-1 block text-sm font-bold text-[#176637]">Persentase Diskon (%)</label>
-                            <input type="number" min="0" max="100" value={formData.discount_percentage} onChange={e => setFormData({...formData, discount_percentage: parseInt(e.target.value) || 0})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                            <input type="number" min="0" max="100" value={formData.discount_percentage} onChange={e => setFormData({ ...formData, discount_percentage: parseInt(e.target.value) || 0 })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                         </div>
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Target Audiens</label>
-                                <select value={formData.target} onChange={e => setFormData({...formData, target: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                <select value={formData.target} onChange={e => setFormData({ ...formData, target: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
                                     <option value="Semua Orang">Semua Orang</option>
                                     <option value="Khusus Member">Khusus Member</option>
                                 </select>
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
-                                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
                                     <option value="Aktif">Aktif</option>
                                     <option value="Jadwal">Jadwal</option>
                                     <option value="Selesai">Selesai</option>
@@ -967,8 +964,8 @@ function PromoTab() {
                                     <div className="grid gap-2 sm:grid-cols-2">
                                         {menus.map(menu => (
                                             <label key={menu.id} className="flex cursor-pointer items-start gap-2 rounded-lg p-2 transition hover:bg-[#FFF6DB]/50">
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     className="mt-1 h-4 w-4 rounded border-gray-300 text-[#72AD43] focus:ring-[#72AD43]"
                                                     checked={(formData.applicable_products || []).includes(menu.id) || (formData.applicable_products || []).includes(String(menu.id))}
                                                     onChange={e => {
@@ -994,19 +991,18 @@ function PromoTab() {
                             </div>
                         </div>
                     </form>
-                    
+
                     <aside className="rounded-[24px] border border-dashed border-[#176637]/15 bg-[#FFF6DB]/35 p-5">
                         <h4 className="font-gabriela text-xl text-[#176637]">Preview Promo</h4>
                         <p className="mt-2 text-xs text-[#176637]/60">Tampilan simulasi kartu promo yang akan dilihat oleh pelanggan.</p>
-                        
+
                         <div className="mt-6 overflow-hidden rounded-2xl border border-[#176637]/10 bg-white shadow-lg">
                             <div className="relative bg-[#FF901A]/10 p-5 pb-8">
                                 <div className="absolute right-4 top-4">
-                                    <span className={`inline-block rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                                        formData.status === 'Aktif' ? 'bg-[#72AD43]/20 text-[#72AD43]' :
+                                    <span className={`inline-block rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${formData.status === 'Aktif' ? 'bg-[#72AD43]/20 text-[#72AD43]' :
                                         formData.status === 'Jadwal' ? 'bg-[#FF901A]/20 text-[#FF901A]' :
-                                        'bg-gray-200 text-gray-500'
-                                    }`}>
+                                            'bg-gray-200 text-gray-500'
+                                        }`}>
                                         {formData.status}
                                     </span>
                                 </div>
@@ -1019,7 +1015,7 @@ function PromoTab() {
                             </div>
                             <div className="p-5">
                                 <p className="text-sm font-medium leading-relaxed text-[#176637]/80">{formData.summary || 'Ringkasan promo akan tampil di sini.'}</p>
-                                
+
                                 <div className="mt-4 flex flex-col gap-2 text-xs font-medium text-[#176637]/70">
                                     <div className="flex items-center gap-2">
                                         <Icon name="tag" className="h-4 w-4" stroke />
@@ -1087,53 +1083,53 @@ function PromoTab() {
         <>
             <div className="animate-slide-up">
                 <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                <div>
-                    <h2 className="mb-1 font-gabriela text-xl text-[#176637]">Manajemen Promo</h2>
-                    <p className="text-sm text-[#176637]/70">Promo yang dibuat di sini akan tampil di landing page.</p>
+                    <div>
+                        <h2 className="mb-1 font-gabriela text-xl text-[#176637]">Manajemen Promo</h2>
+                        <p className="text-sm text-[#176637]/70">Promo yang dibuat di sini akan tampil di landing page.</p>
+                    </div>
+                    <button onClick={openCreate} className="flex items-center gap-2 rounded-xl bg-[#FF901A] px-5 py-2.5 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-1 hover:shadow-[1px_1px_0px_#176637]">
+                        <Icon name="plus" className="h-4 w-4" stroke />
+                        Tambah Promo
+                    </button>
                 </div>
-                <button onClick={openCreate} className="flex items-center gap-2 rounded-xl bg-[#FF901A] px-5 py-2.5 font-bold text-[#FFF6DB] shadow-[3px_3px_0px_#176637] transition-all hover:translate-y-1 hover:shadow-[1px_1px_0px_#176637]">
-                    <Icon name="plus" className="h-4 w-4" stroke />
-                    Tambah Promo
-                </button>
-            </div>
 
-            <div className={`grid grid-cols-1 gap-6 lg:grid-cols-3 transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
-                {promos.map((promo) => (
-                    <article key={promo.id} className="relative rounded-tr-[36px] rounded-bl-[36px] rounded-tl-xl rounded-br-xl border border-[#176637]/10 bg-white p-5 shadow-sm">
-                        {promo.is_featured && (
-                            <div className="absolute top-0 right-0 rounded-bl-[36px] rounded-tr-[36px] bg-[#FF901A] px-4 py-1.5 text-[10px] font-bold text-[#FFF6DB] uppercase tracking-wider">
-                                Utama
+                <div className={`grid grid-cols-1 gap-6 lg:grid-cols-3 transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
+                    {promos.map((promo) => (
+                        <article key={promo.id} className="relative rounded-tr-[36px] rounded-bl-[36px] rounded-tl-xl rounded-br-xl border border-[#176637]/10 bg-white p-5 shadow-sm">
+                            {promo.is_featured && (
+                                <div className="absolute top-0 right-0 rounded-bl-[36px] rounded-tr-[36px] bg-[#FF901A] px-4 py-1.5 text-[10px] font-bold text-[#FFF6DB] uppercase tracking-wider">
+                                    Utama
+                                </div>
+                            )}
+                            <div className="mb-4 flex items-start justify-between gap-4">
+                                <div>
+                                    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${promo.status === 'Aktif' ? 'bg-[#72AD43]/20 text-[#176637]' : 'bg-[#FF901A]/20 text-[#FF901A]'}`}>{promo.status}</span>
+                                    <h3 className="mt-3 font-gabriela text-xl text-[#176637]">{promo.title}</h3>
+                                </div>
+                                <span className="rounded-xl bg-[#176637]/10 px-3 py-2 text-xs font-bold text-[#176637]">{promo.code || '-'}</span>
                             </div>
-                        )}
-                        <div className="mb-4 flex items-start justify-between gap-4">
-                            <div>
-                                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${promo.status === 'Aktif' ? 'bg-[#72AD43]/20 text-[#176637]' : 'bg-[#FF901A]/20 text-[#FF901A]'}`}>{promo.status}</span>
-                                <h3 className="mt-3 font-gabriela text-xl text-[#176637]">{promo.title}</h3>
+                            <p className="text-sm leading-7 text-[#176637]/75">{promo.summary}</p>
+                            <div className="mt-5 space-y-2 text-sm">
+                                <div className="flex justify-between gap-4">
+                                    <span className="text-[#176637]/60">Periode</span>
+                                    <span className="text-right font-semibold text-[#176637]">{(promo.start_date && promo.end_date) ? `${promo.start_date} - ${promo.end_date}` : 'Tidak ditentukan'}</span>
+                                </div>
+                                <div className="flex justify-between gap-4">
+                                    <span className="text-[#176637]/60">Target</span>
+                                    <span className="text-right font-semibold text-[#176637]">{promo.target || '-'}</span>
+                                </div>
                             </div>
-                            <span className="rounded-xl bg-[#176637]/10 px-3 py-2 text-xs font-bold text-[#176637]">{promo.code || '-'}</span>
-                        </div>
-                        <p className="text-sm leading-7 text-[#176637]/75">{promo.summary}</p>
-                        <div className="mt-5 space-y-2 text-sm">
-                            <div className="flex justify-between gap-4">
-                                <span className="text-[#176637]/60">Periode</span>
-                                <span className="text-right font-semibold text-[#176637]">{(promo.start_date && promo.end_date) ? `${promo.start_date} - ${promo.end_date}` : 'Tidak ditentukan'}</span>
+                            <div className="mt-6 flex gap-3">
+                                <button onClick={() => openEdit(promo)} className="flex-1 rounded-xl border-2 border-[#176637] py-2.5 text-sm font-bold text-[#176637] transition-colors hover:bg-[#176637] hover:text-[#FFF6DB]">
+                                    Edit
+                                </button>
+                                <button onClick={() => handleDelete(promo.id)} className="flex-1 rounded-xl bg-red-100 py-2.5 text-sm font-bold text-red-600 shadow-[3px_3px_0px_#F87171] transition-all hover:translate-y-0.5">
+                                    Hapus
+                                </button>
                             </div>
-                            <div className="flex justify-between gap-4">
-                                <span className="text-[#176637]/60">Target</span>
-                                <span className="text-right font-semibold text-[#176637]">{promo.target || '-'}</span>
-                            </div>
-                        </div>
-                        <div className="mt-6 flex gap-3">
-                            <button onClick={() => openEdit(promo)} className="flex-1 rounded-xl border-2 border-[#176637] py-2.5 text-sm font-bold text-[#176637] transition-colors hover:bg-[#176637] hover:text-[#FFF6DB]">
-                                Edit
-                            </button>
-                            <button onClick={() => handleDelete(promo.id)} className="flex-1 rounded-xl bg-red-100 py-2.5 text-sm font-bold text-red-600 shadow-[3px_3px_0px_#F87171] transition-all hover:translate-y-0.5">
-                                Hapus
-                            </button>
-                        </div>
-                    </article>
-                ))}
-            </div>
+                        </article>
+                    ))}
+                </div>
             </div>
 
             {isModalOpen && (
@@ -1153,33 +1149,33 @@ function PromoTab() {
                         <form id="promoForm" onSubmit={handleSubmit} className="flex flex-col gap-5">
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Judul Promo</label>
-                                <input required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Kode Promo</label>
-                                <input value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Ringkasan</label>
-                                <textarea required value={formData.summary} onChange={e => setFormData({...formData, summary: e.target.value})} rows="4" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <textarea required value={formData.summary} onChange={e => setFormData({ ...formData, summary: e.target.value })} rows="4" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
                                     <label className="mb-1 block text-sm font-bold text-[#176637]">Tgl Mulai</label>
-                                    <input type="date" value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                    <input type="date" value={formData.start_date} onChange={e => setFormData({ ...formData, start_date: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                                 </div>
                                 <div>
                                     <label className="mb-1 block text-sm font-bold text-[#176637]">Tgl Selesai</label>
-                                    <input type="date" value={formData.end_date} onChange={e => setFormData({...formData, end_date: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                    <input type="date" value={formData.end_date} onChange={e => setFormData({ ...formData, end_date: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                                 </div>
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Target Audiens</label>
-                                <input value={formData.target} onChange={e => setFormData({...formData, target: e.target.value})} placeholder="Cth: Semua Outlet" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input value={formData.target} onChange={e => setFormData({ ...formData, target: e.target.value })} placeholder="Cth: Semua Outlet" className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
-                                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
                                     <option value="Aktif">Aktif</option>
                                     <option value="Jadwal">Jadwal</option>
                                     <option value="Selesai">Selesai</option>
@@ -1269,15 +1265,15 @@ function EmployeeTab() {
 
     const openEdit = (emp) => {
         setSelectedId(emp.id);
-        setFormData({ 
-            name: emp.name, 
-            email: emp.email, 
-            phone: emp.phone || '', 
-            nik: emp.nik || '', 
-            password: '', 
-            outlet_id: emp.outlet_id || '', 
-            job_title: emp.job_title || 'Barista', 
-            employee_status: emp.employee_status || 'Aktif' 
+        setFormData({
+            name: emp.name,
+            email: emp.email,
+            phone: emp.phone || '',
+            nik: emp.nik || '',
+            password: '',
+            outlet_id: emp.outlet_id || '',
+            job_title: emp.job_title || 'Barista',
+            employee_status: emp.employee_status || 'Aktif'
         });
     };
 
@@ -1297,7 +1293,7 @@ function EmployeeTab() {
         const isEditing = selectedId !== 'new';
         const url = isEditing ? `/api/admin/employees/${selectedId}` : '/api/admin/employees';
         const method = isEditing ? 'PUT' : 'POST';
-        
+
         apiFetch(url, {
             method,
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -1336,25 +1332,25 @@ function EmployeeTab() {
                         <div className="flex flex-col gap-5">
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Nama Karyawan</label>
-                                <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Email</label>
-                                <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div className="flex gap-4">
                                 <div className="flex-1">
                                     <label className="mb-1 block text-sm font-bold text-[#176637]">No. Handphone</label>
-                                    <input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                    <input value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                                 </div>
                                 <div className="flex-1">
                                     <label className="mb-1 block text-sm font-bold text-[#176637]">NIK KTP</label>
-                                    <input value={formData.nik} onChange={e => setFormData({...formData, nik: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                    <input value={formData.nik} onChange={e => setFormData({ ...formData, nik: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                                 </div>
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Password {selectedId !== 'new' && <span className="text-xs font-normal text-gray-500">(Kosongkan jika tidak diubah)</span>}</label>
-                                <input type="password" required={selectedId === 'new'} value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input type="password" required={selectedId === 'new'} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                         </div>
 
@@ -1362,7 +1358,7 @@ function EmployeeTab() {
                             <h4 className="font-gabriela text-lg text-[#176637]">Penempatan & Status</h4>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Peran / Jabatan</label>
-                                <select value={formData.job_title} onChange={e => setFormData({...formData, job_title: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                <select value={formData.job_title} onChange={e => setFormData({ ...formData, job_title: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
                                     <option value="Manager">Manager</option>
                                     <option value="Barista">Barista</option>
                                     <option value="Kasir">Kasir</option>
@@ -1371,7 +1367,7 @@ function EmployeeTab() {
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Outlet Penempatan</label>
-                                <select value={formData.outlet_id} onChange={e => setFormData({...formData, outlet_id: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                <select value={formData.outlet_id} onChange={e => setFormData({ ...formData, outlet_id: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
                                     <option value="">Pilih Outlet</option>
                                     {outletsData.map(o => (
                                         <option key={o.id} value={o.id}>{o.name}</option>
@@ -1380,7 +1376,7 @@ function EmployeeTab() {
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Status Karyawan</label>
-                                <select value={formData.employee_status} onChange={e => setFormData({...formData, employee_status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                <select value={formData.employee_status} onChange={e => setFormData({ ...formData, employee_status: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
                                     <option value="Aktif">Aktif</option>
                                     <option value="Tidak Aktif">Tidak Aktif</option>
                                     <option value="Blacklist">Blacklist</option>
@@ -1410,9 +1406,8 @@ function EmployeeTab() {
                 <div className="flex flex-wrap gap-3">
                     <button
                         onClick={() => setShowBlacklistOnly((value) => !value)}
-                        className={`flex items-center gap-2 rounded-xl border-2 px-5 py-3 font-bold transition-all ${
-                            showBlacklistOnly ? 'border-[#176637] bg-[#176637] text-[#FFF6DB]' : 'border-[#176637] bg-white text-[#176637] hover:bg-[#176637]/5'
-                        }`}
+                        className={`flex items-center gap-2 rounded-xl border-2 px-5 py-3 font-bold transition-all ${showBlacklistOnly ? 'border-[#176637] bg-[#176637] text-[#FFF6DB]' : 'border-[#176637] bg-white text-[#176637] hover:bg-[#176637]/5'
+                            }`}
                     >
                         <Icon name="alert" className="h-4 w-4" stroke />
                         Cek Blacklist
@@ -1493,11 +1488,10 @@ function EmployeeTab() {
                                     <td className="p-4 text-[13px] font-medium text-[#176637]">{emp.roles?.[0]?.name ?? emp.job_title}</td>
                                     <td className="p-4 text-[13px] text-[#176637]">{emp.outlet?.name ?? '-'}</td>
                                     <td className="p-4">
-                                        <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
-                                            emp.employee_status === 'Aktif' ? 'bg-[#72AD43]/15 text-[#176637]' :
+                                        <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${emp.employee_status === 'Aktif' ? 'bg-[#72AD43]/15 text-[#176637]' :
                                             emp.employee_status === 'Blacklist' ? 'bg-red-100 text-red-600' :
-                                            'bg-gray-100 text-gray-600'
-                                        }`}>
+                                                'bg-gray-100 text-gray-600'
+                                            }`}>
                                             {emp.employee_status}
                                         </span>
                                     </td>
@@ -1567,11 +1561,11 @@ function MembershipTab() {
 
     const openEdit = (member) => {
         setSelectedId(member.id);
-        setFormData({ 
-            name: member.name, 
-            phone: member.phone, 
-            points: member.points, 
-            status: member.status 
+        setFormData({
+            name: member.name,
+            phone: member.phone,
+            points: member.points,
+            status: member.status
         });
     };
 
@@ -1615,20 +1609,20 @@ function MembershipTab() {
                         <div className="flex flex-col gap-5">
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Nama Pelanggan</label>
-                                <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">No. Handphone (WhatsApp)</label>
-                                <input required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="08..." className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input required value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} placeholder="08..." className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div className="flex gap-4">
                                 <div className="flex-1">
                                     <label className="mb-1 block text-sm font-bold text-[#176637]">Poin</label>
-                                    <input type="number" min="0" required value={formData.points} onChange={e => setFormData({...formData, points: parseInt(e.target.value) || 0})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                    <input type="number" min="0" required value={formData.points} onChange={e => setFormData({ ...formData, points: parseInt(e.target.value) || 0 })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                                 </div>
                                 <div className="flex-1">
                                     <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
-                                    <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
+                                    <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]">
                                         <option value="Aktif">Aktif</option>
                                         <option value="Tidak Aktif">Tidak Aktif</option>
                                     </select>
@@ -1721,11 +1715,10 @@ function MembershipTab() {
                                     <td className="p-4 text-[13px] font-bold text-[#176637]">{member.points} pts</td>
                                     <td className="p-4 text-[13px] text-[#176637]/70">{new Date(member.created_at).toLocaleDateString()}</td>
                                     <td className="p-4">
-                                        <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
-                                            member.status === 'Aktif'
-                                                ? 'bg-[#72AD43]/15 text-[#176637]'
-                                                : 'bg-gray-100 text-gray-600'
-                                        }`}>
+                                        <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${member.status === 'Aktif'
+                                            ? 'bg-[#72AD43]/15 text-[#176637]'
+                                            : 'bg-gray-100 text-gray-600'
+                                            }`}>
                                             {member.status}
                                         </span>
                                     </td>
@@ -2023,7 +2016,7 @@ function MenuTab() {
         e.preventDefault();
         const isEditing = selectedId !== 'new';
         const url = isEditing ? `/api/admin/menus/${selectedId}` : '/api/admin/menus';
-        
+
         const payload = new FormData();
         payload.append('name', formData.name);
         payload.append('category', formData.category);
@@ -2074,9 +2067,8 @@ function MenuTab() {
                         <button
                             key={category}
                             onClick={() => setActiveCategory(category)}
-                            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                                activeCategory === category ? 'bg-[#176637] text-[#FFF6DB]' : 'border border-[#176637]/10 bg-[#FFF6DB] text-[#176637] hover:border-[#72AD43]'
-                            }`}
+                            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeCategory === category ? 'bg-[#176637] text-[#FFF6DB]' : 'border border-[#176637]/10 bg-[#FFF6DB] text-[#176637] hover:border-[#72AD43]'
+                                }`}
                         >
                             {category}
                         </button>
@@ -2106,9 +2098,8 @@ function MenuTab() {
                                 <button
                                     key={item.id}
                                     onClick={() => openEdit(item)}
-                                    className={`group flex min-h-[220px] flex-col justify-between rounded-[26px] border p-4 text-left transition ${
-                                        active ? 'border-[#176637] bg-[#FFF6DB] shadow-[3px_3px_0px_#176637]' : 'border-[#176637]/10 bg-white hover:border-[#72AD43] hover:shadow-sm'
-                                    }`}
+                                    className={`group flex min-h-[220px] flex-col justify-between rounded-[26px] border p-4 text-left transition ${active ? 'border-[#176637] bg-[#FFF6DB] shadow-[3px_3px_0px_#176637]' : 'border-[#176637]/10 bg-white hover:border-[#72AD43] hover:shadow-sm'
+                                        }`}
                                 >
                                     <div className="space-y-3">
                                         <div className="flex h-28 items-center justify-center rounded-[20px] bg-[#FFF6DB]/55">
@@ -2167,16 +2158,16 @@ function MenuTab() {
                                         <input
                                             required
                                             value={formData.name}
-                                            onChange={e => setFormData({...formData, name: e.target.value})}
+                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
                                             className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
                                         />
                                     </div>
                                     <div>
                                         <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Kategori</label>
-                                        <input 
+                                        <input
                                             required
                                             value={formData.category}
-                                            onChange={e => setFormData({...formData, category: e.target.value})}
+                                            onChange={e => setFormData({ ...formData, category: e.target.value })}
                                             className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
                                         />
                                     </div>
@@ -2184,10 +2175,11 @@ function MenuTab() {
                                         <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Status Landing</label>
                                         <select
                                             value={formData.status}
-                                            onChange={e => setFormData({...formData, status: e.target.value})}
+                                            onChange={e => setFormData({ ...formData, status: e.target.value })}
                                             className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] text-[#176637] outline-none focus:border-[#72AD43]"
                                         >
                                             <option value="Aktif">Aktif</option>
+                                            <option value="Habis">Habis (Sold Out)</option>
                                             <option value="Tidak Aktif">Tidak Aktif</option>
                                         </select>
                                     </div>
@@ -2195,14 +2187,14 @@ function MenuTab() {
                                         <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Harga Jual</label>
                                         <div className="flex items-center gap-2 rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3">
                                             <span className="text-[13px] font-bold text-[#176637]">Rp</span>
-                                            <input required type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="w-full bg-transparent text-[13px] text-[#176637] outline-none" />
+                                            <input required type="number" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} className="w-full bg-transparent text-[13px] text-[#176637] outline-none" />
                                         </div>
                                     </div>
                                     <div>
                                         <label className="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-[#176637]/55">Deskripsi</label>
                                         <textarea
                                             value={formData.summary}
-                                            onChange={e => setFormData({...formData, summary: e.target.value})}
+                                            onChange={e => setFormData({ ...formData, summary: e.target.value })}
                                             rows={6}
                                             className="w-full rounded-2xl border border-[#176637]/15 bg-[#FFF6DB] px-4 py-3 text-[13px] leading-7 text-[#176637] outline-none focus:border-[#72AD43]"
                                         />
@@ -2243,7 +2235,7 @@ function MenuTab() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div className="mt-8 flex items-center justify-end gap-4 border-t border-[#176637]/10 pt-6">
                                 <button type="button" onClick={() => setSelectedId(null)} className="rounded-full px-5 py-2.5 text-sm font-semibold text-[#176637] transition hover:bg-[#FFF6DB]">
                                     Batal
@@ -2297,9 +2289,9 @@ function InvestorTab() {
 
     const openEdit = (investor) => {
         setSelectedId(investor.id);
-        setFormData({ 
-            name: investor.name, 
-            email: investor.email, 
+        setFormData({
+            name: investor.name,
+            email: investor.email,
             password: ''
         });
     };
@@ -2344,15 +2336,15 @@ function InvestorTab() {
                         <div className="flex flex-col gap-5">
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Nama Investor</label>
-                                <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Email (Username Login)</label>
-                                <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Password Login {selectedId !== 'new' && <span className="font-normal text-gray-500">(Kosongkan jika tidak diubah)</span>}</label>
-                                <input required={selectedId === 'new'} type="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <input required={selectedId === 'new'} type="password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
                             </div>
                         </div>
                         <div className="rounded-2xl border border-[#176637]/10 bg-[#FFF6DB]/30 p-5">
@@ -2749,9 +2741,8 @@ function ReportSectionTable({ title, rows, columns, renderRow, actions = [], pag
                         <button
                             key={`${title}-${action.label}`}
                             onClick={action.onClick}
-                            className={`rounded-full px-3 py-1.5 text-xs font-bold ${
-                                action.label === 'PDF' ? 'bg-[#176637] text-[#FFF6DB]' : 'border border-[#176637]/15 bg-white text-[#176637]'
-                            }`}
+                            className={`rounded-full px-3 py-1.5 text-xs font-bold ${action.label === 'PDF' ? 'bg-[#176637] text-[#FFF6DB]' : 'border border-[#176637]/15 bg-white text-[#176637]'
+                                }`}
                         >
                             {action.label}
                         </button>
@@ -2878,6 +2869,15 @@ export default function AdminDashboardPage({ data = {} }) {
 
                 ::-webkit-scrollbar-track {
                     background: #FFF6DB;
+                }
+
+                ::-webkit-scrollbar {
+                    width: 6px;
+                    height: 6px;
+                }
+                
+                ::-webkit-scrollbar-track {
+                    background: transparent;
                 }
 
                 ::-webkit-scrollbar-thumb {

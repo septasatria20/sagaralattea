@@ -11,7 +11,9 @@ class PublicOrderPageController extends Controller
     public function __invoke()
     {
         $outlets = Outlet::where('status', 'Aktif')->get();
-        $menuItems = MenuItem::where('is_featured', true)->orderBy('sort_order')->get();
+        $menuItems = MenuItem::whereIn('status', ['Aktif', 'Habis'])
+            ->orderBy('sort_order')
+            ->get();
         
         return view('app', [
             'pageData' => [

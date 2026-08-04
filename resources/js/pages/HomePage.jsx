@@ -58,14 +58,14 @@ function JoinUsModal({ isOpen, onClose }) {
                 </button>
                 <h3 className="font-gabriela text-3xl text-[#176637]">Bergabung Bersama Kami</h3>
                 <p className="mt-3 text-sm text-[#176637]/80 leading-relaxed">Pilih opsi di bawah ini untuk terhubung langsung dengan WhatsApp tim Admin Sagara Lattea.</p>
-                
+
                 <div className="mt-8 flex flex-col gap-4">
                     <a href={`https://wa.me/${adminWa}?text=${messageMitra}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 rounded-2xl border-2 border-[#176637] bg-white p-4 font-bold text-[#176637] transition hover:bg-[#176637] hover:text-[#FFF6DB]">
-                        <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.441-1.273.606-1.446c.166-.173.359-.217.479-.217.119 0 .24-.002.346-.002.106-.002.253-.04.394.303.144.351.488 1.196.532 1.284.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564c.173.087.289.129.332.202.043.073.043.423-.101.827z"/></svg>
+                        <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.441-1.273.606-1.446c.166-.173.359-.217.479-.217.119 0 .24-.002.346-.002.106-.002.253-.04.394.303.144.351.488 1.196.532 1.284.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564c.173.087.289.129.332.202.043.073.043.423-.101.827z" /></svg>
                         Daftar Mitra / Outlet
                     </a>
                     <a href={`https://wa.me/${adminWa}?text=${messageKaryawan}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 rounded-2xl bg-[#FF901A] p-4 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_#176637]">
-                        <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.441-1.273.606-1.446c.166-.173.359-.217.479-.217.119 0 .24-.002.346-.002.106-.002.253-.04.394.303.144.351.488 1.196.532 1.284.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564c.173.087.289.129.332.202.043.073.043.423-.101.827z"/></svg>
+                        <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.441-1.273.606-1.446c.166-.173.359-.217.479-.217.119 0 .24-.002.346-.002.106-.002.253-.04.394.303.144.351.488 1.196.532 1.284.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564c.173.087.289.129.332.202.043.073.043.423-.101.827z" /></svg>
                         Daftar Karyawan
                     </a>
                 </div>
@@ -86,7 +86,7 @@ function Navbar({ scrolled = false, onJoinUsClick, data = {} }) {
         <header className={`fixed left-0 top-0 z-50 w-full transition-all duration-300 ${navClass}`}>
             <nav className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 md:gap-4 md:px-8">
                 <LogoMark variant={scrolled ? 'dark' : 'light'} />
-                
+
                 <div className="flex items-center gap-3 md:gap-6 ml-auto">
                     {/* Desktop Menu */}
                     <div className="hidden items-center gap-6 font-medium md:flex">
@@ -172,21 +172,21 @@ function MobileBottomNav({ data }) {
         <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-[#176637]/10 pb-safe shadow-[0_-4px_20px_rgba(23,102,55,0.05)]">
             <div className="flex justify-around items-center h-16">
                 <a href="/" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${!isOrder ? 'text-[#FF901A]' : 'text-[#176637]/40 hover:text-[#176637]'}`}>
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /></svg>
                     <span className="text-[10px] font-bold">Beranda</span>
                 </a>
                 <a href="/order" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isOrder ? 'text-[#FF901A]' : 'text-[#176637]/40 hover:text-[#176637]'}`}>
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17 18c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zM7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm0-3l1.1-2h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/></svg>
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17 18c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zM7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm0-3l1.1-2h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z" /></svg>
                     <span className="text-[10px] font-bold">Pesan</span>
                 </a>
                 {data.user ? (
                     <a href={data.user.dashboardUrl} className="flex flex-col items-center justify-center w-full h-full space-y-1 text-[#176637]/40 hover:text-[#176637]">
-                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" /></svg>
                         <span className="text-[10px] font-bold">Akun</span>
                     </a>
                 ) : (
                     <a href="/login" className="flex flex-col items-center justify-center w-full h-full space-y-1 text-[#176637]/40 hover:text-[#176637]">
-                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></svg>
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z" /></svg>
                         <span className="text-[10px] font-bold">Login</span>
                     </a>
                 )}
@@ -402,20 +402,20 @@ function ProductSection({ items, onNotificationAction }) {
             status: 'Tersedia'
         },
     ];
-    
+
     const products = items?.length
         ? items.map((item, index) => ({
-              id: item.id ?? index,
-              name: item.name,
-              desc: item.tagline ?? item.description ?? '',
-              price: item.price,
-              color: item.accent_color ?? fallback[index % fallback.length].color,
-              image: item.image ?? fallback[index % fallback.length].image,
-              category: item.category ?? fallback[index % fallback.length].category,
-              status: item.status ?? 'Tersedia',
-          }))
+            id: item.id ?? index,
+            name: item.name,
+            desc: item.tagline ?? item.description ?? '',
+            price: item.price,
+            color: item.accent_color ?? fallback[index % fallback.length].color,
+            image: item.image ?? fallback[index % fallback.length].image,
+            category: item.category ?? fallback[index % fallback.length].category,
+            status: item.status ?? 'Tersedia',
+        }))
         : fallback;
-        
+
     const categories = ['Semua Menu', ...new Set(products.map((item) => item.category).filter(Boolean))];
     const visibleProducts = activeCategory === 'Semua Menu' ? products : products.filter((item) => item.category === activeCategory);
 
@@ -432,11 +432,10 @@ function ProductSection({ items, onNotificationAction }) {
                     <button
                         key={category}
                         onClick={() => setActiveCategory(category)}
-                        className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                            activeCategory === category
+                        className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeCategory === category
                                 ? 'bg-[#176637] text-[#FFF6DB] shadow-[3px_3px_0px_#0f3f22]'
                                 : 'border border-[#176637]/10 bg-[#FFF6DB] text-[#176637] hover:border-[#72AD43]'
-                        }`}
+                            }`}
                     >
                         {category}
                     </button>
@@ -477,7 +476,7 @@ function ProductSection({ items, onNotificationAction }) {
                                     <span className="text-[13px] font-bold tabular-nums text-[#FF901A]">Rp {Number(item.price).toLocaleString('id-ID')}</span>
                                     {isHabis && <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[9px] font-bold text-red-600 uppercase tracking-widest">Habis</span>}
                                 </div>
-                                <button 
+                                <button
                                     onClick={() => window.location.href = '/order'}
                                     disabled={isHabis}
                                     className={`w-full rounded-lg py-2 text-xs font-bold shadow-sm transition ${isHabis ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#176637] text-[#FFF6DB] hover:bg-[#72AD43] shadow-[2px_2px_0px_#FF901A] hover:-translate-y-px hover:shadow-[1px_1px_0px_#FF901A]'}`}
@@ -499,7 +498,7 @@ function OutletSection({ onNotificationAction }) {
     return (
         <section id="outlet" className="mx-auto grid max-w-7xl gap-10 md:gap-16 px-6 py-12 md:py-20 md:px-8 lg:grid-cols-2">
             <div>
-                <SectionTitle eyebrow="Lokasi Kami" title="Outlet pusat - Harmoni" />
+                <SectionTitle eyebrow="Lokasi Kami" title="Outlet Utama - Polinema" />
                 <div className="relative mt-6 md:mt-8 overflow-hidden rounded-tr-[40px] rounded-bl-[40px] md:rounded-tr-[50px] md:rounded-bl-[50px] border border-[#176637]/10 bg-white p-5 shadow-lg md:p-8">
                     <LeafArt className="left-[-55px] top-[-40px] h-36 w-36" crop="left" opacityClass="opacity-[0.08]" />
                     <div className="mb-4 flex items-start gap-3">
@@ -507,7 +506,7 @@ function OutletSection({ onNotificationAction }) {
                             <path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z" />
                         </svg>
                         <div>
-                            <h3 className="text-xl font-bold text-[#176637]">Politeknik Negeri Malang</h3>
+                            <h3 className="text-xl font-bold text-[#176637]">Politeknik Negeri Malang (Gedung Sipil)</h3>
                             <p className="mt-1 text-sm text-[#176637]/80">Buka: 09.00 - 20.00</p>
                         </div>
                     </div>
@@ -572,19 +571,42 @@ function Footer({ onNotificationAction }) {
                     <h4 className="mb-6 font-gabriela text-xl text-[#FF901A]">Kontak Kami</h4>
                     <div className="space-y-3 text-sm opacity-90">
                         <p>
-                            Jl. Ketenangan No. 1,
+                            Jl. Soekarno Hatta No. 9,
                             <br />
-                            Kota Harmoni, 60231
+                            Gedung Sipil Lt 1, Malang
                         </p>
-                        <p className="pt-2">hello@sagaralattea.com</p>
+                        <p className="pt-2">lattea.sagara@gmail.com</p>
                         <p>+62 811 2233 4455</p>
                     </div>
                 </div>
                 <div className="md:col-span-4">
                     <h4 className="mb-6 font-gabriela text-xl text-[#FF901A]">Saran & Komplain</h4>
-                    <form className="flex flex-col gap-3" onSubmit={(e) => { e.preventDefault(); onNotificationAction('Terima kasih! Pesan Anda telah tersimpan secara lokal (Simulasi form submission).'); }}>
-                        <input required className="w-full rounded-lg border border-[#FFF6DB]/20 bg-[#FFF6DB]/5 px-4 py-3 text-sm text-[#FFF6DB] placeholder:text-[#FFF6DB]/40 focus:border-[#FF901A] focus:outline-none" placeholder="Nama Anda" />
-                        <textarea required className="w-full resize-none rounded-lg border border-[#FFF6DB]/20 bg-[#FFF6DB]/5 px-4 py-3 text-sm text-[#FFF6DB] placeholder:text-[#FFF6DB]/40 focus:border-[#FF901A] focus:outline-none" placeholder="Pesan, saran, atau komplain..." rows={3} />
+                    <form className="flex flex-col gap-3" onSubmit={async (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.target);
+                        try {
+                            const res = await fetch('/api/feedback', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
+                                },
+                                body: JSON.stringify(Object.fromEntries(formData))
+                            });
+                            if (res.ok) {
+                                onNotificationAction('Terima kasih! Pesan, saran, atau komplain Anda telah berhasil dikirim ke Sagara Lattea.');
+                                e.target.reset();
+                            } else {
+                                onNotificationAction('Maaf, terjadi kesalahan saat mengirim pesan.');
+                            }
+                        } catch (err) {
+                            onNotificationAction('Terima kasih! Pesan Anda telah tersimpan secara lokal.');
+                            e.target.reset();
+                        }
+                    }}>
+                        <input name="name" required className="w-full rounded-lg border border-[#FFF6DB]/20 bg-[#FFF6DB]/5 px-4 py-3 text-sm text-[#FFF6DB] placeholder:text-[#FFF6DB]/40 focus:border-[#FF901A] focus:outline-none" placeholder="Nama Anda" />
+                        <textarea name="message" required className="w-full resize-none rounded-lg border border-[#FFF6DB]/20 bg-[#FFF6DB]/5 px-4 py-3 text-sm text-[#FFF6DB] placeholder:text-[#FFF6DB]/40 focus:border-[#FF901A] focus:outline-none" placeholder="Pesan, saran, atau komplain..." rows={3} />
                         <button type="submit" className="mt-1 rounded-lg bg-[#FF901A] py-3 font-bold text-[#176637] transition hover:bg-[#FFF6DB]">
                             Kirim Pesan
                         </button>
@@ -612,7 +634,7 @@ function ChatbotWidget() {
 
     const qna = [
         { q: 'Apa menu best seller?', a: 'Menu best seller kami adalah Matcha Lattea dan Hojicha, lho! Seger banget buat nemenin harimu.' },
-        { q: 'Lokasi outlet dimana saja?', a: 'Saat ini Sagara Lattea ada di Kota Harmoni, Malang, dan sekitarnya. Yuk mampir!' },
+        { q: 'Lokasi outlet dimana saja?', a: 'Saat ini Sagara Lattea ada di Polinema (Jl Soekarno Hatta No 9, Gedung Sipil Lt 1) dan Poli9 Graha Polinema. Yuk mampir!' },
         { q: 'Buka jam berapa?', a: 'Outlet kami buka setiap hari mulai pukul 09.00 hingga 20.00 malam.' },
         { q: 'Cara daftar mitra?', a: 'Keren! Kamu bisa klik tombol "Bergabung Bersama Kami" di menu atas untuk info lebih lanjut ya.' }
     ];
@@ -640,7 +662,7 @@ function ChatbotWidget() {
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
-                    
+
                     <div className="flex-1 overflow-y-auto p-4 bg-[#FFF6DB]/30 space-y-3 scrollbar-hide">
                         {messages.map((msg, idx) => (
                             <div key={idx} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -667,8 +689,8 @@ function ChatbotWidget() {
                     </div>
                 </div>
             )}
-            
-            <button 
+
+            <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex h-14 w-14 items-center justify-center rounded-full bg-[#176637] text-[#FFF6DB] shadow-[0_8px_30px_rgba(23,102,55,0.4)] transition hover:-translate-y-1 hover:bg-[#FF901A] hover:text-[#176637]"
             >
@@ -687,7 +709,7 @@ export default function HomePage({ data = {} }) {
     const testimonials = data.testimonials ?? [];
     const promos = data.promos ?? [];
     const outlets = data.outlets ?? [];
-    
+
     const [scrolled, setScrolled] = useState(false);
     const [modalState, setModalState] = useState({ isOpen: false, message: '', title: 'Pemberitahuan' });
     const [isJoinUsModalOpen, setIsJoinUsModalOpen] = useState(false);
@@ -706,7 +728,8 @@ export default function HomePage({ data = {} }) {
 
     return (
         <div className="relative min-h-screen bg-[#FFF6DB] font-sans text-[#176637] overflow-x-hidden">
-            <style dangerouslySetInnerHTML={{__html: `
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 @keyframes steamRise {
                     0% { transform: translateY(0) scale(1); opacity: 0; }
                     50% { opacity: 0.6; }
@@ -748,8 +771,8 @@ export default function HomePage({ data = {} }) {
                     animation: fadeUp 0.6s ease both;
                 }
             `}} />
-            
-            <button 
+
+            <button
                 onClick={() => setIsJoinUsModalOpen(true)}
                 className="fixed right-0 top-32 z-[9998] flex items-center gap-2 rounded-l-2xl bg-[#FF901A] pl-4 pr-3 py-3 font-gabriela text-sm md:text-base font-bold text-[#176637] shadow-[-4px_4px_20px_rgba(23,102,55,0.2)] hover:bg-[#FFF6DB] animate-bounce-horizontal cursor-pointer group"
             >
@@ -765,15 +788,15 @@ export default function HomePage({ data = {} }) {
             <NotificationModal isOpen={modalState.isOpen} title={modalState.title} message={modalState.message} onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))} />
             <JoinUsModal isOpen={isJoinUsModalOpen} onClose={() => setIsJoinUsModalOpen(false)} />
             <MobileBottomNav data={data} />
-            
+
             <Navbar scrolled={scrolled} onJoinUsClick={() => setIsJoinUsModalOpen(true)} data={data} />
             <main>
                 <Hero brand={data.brand} />
                 <SproutDivider />
                 <PromoSection promos={promos} onNotificationAction={handleNotificationAction} />
-                <ProductSection 
-                    items={menuItems} 
-                    onNotificationAction={handleNotificationAction} 
+                <ProductSection
+                    items={menuItems}
+                    onNotificationAction={handleNotificationAction}
                 />
                 <OutletSection onNotificationAction={handleNotificationAction} />
                 <section className="mx-auto max-w-7xl px-6 py-8 md:py-10 md:px-8">

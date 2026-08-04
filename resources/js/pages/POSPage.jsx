@@ -696,7 +696,7 @@ export default function POSPage({ data }) {
                     </style>
                     <div className="thermal-header">
                         <p className="thermal-title">SAGARA LATTEA</p>
-                        <p className="thermal-subtitle">Jl. Kopi Nikmat No. 123, Bandung</p>
+                        <p className="thermal-subtitle">Polinema (Jl Soekarno Hatta No 9, Gedung Sipil Lt 1)</p>
                     </div>
                     <div className="thermal-line"></div>
                     <p>Waktu: {receiptData.print_time}</p>
