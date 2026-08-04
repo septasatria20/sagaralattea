@@ -74,6 +74,95 @@ function JoinUsModal({ isOpen, onClose }) {
     );
 }
 
+function RegisterMemberModal({ isOpen, onClose }) {
+    if (!isOpen) return null;
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        alert('Terima kasih! Pendaftaran member Anda sedang diproses.');
+        onClose();
+    };
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-[#176637]/60 px-4 py-4 backdrop-blur-sm" onClick={onClose}>
+            <div className="reveal relative w-full max-w-md rounded-[32px] border border-[#72AD43]/20 bg-white p-8 text-center shadow-2xl" onClick={e => e.stopPropagation()}>
+                <button onClick={onClose} className="absolute right-6 top-6 text-[#176637]/40 hover:text-[#FF901A]">
+                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                <h3 className="font-gabriela text-3xl text-[#176637]">Daftar Loyalty Club</h3>
+                <p className="mt-3 text-sm text-[#176637]/80 leading-relaxed">Isi form di bawah ini untuk bergabung menjadi member dan dapatkan berbagai keuntungan.</p>
+
+                <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4 text-left">
+                    <div>
+                        <label className="mb-1 block text-sm font-bold text-[#176637]">Nama Lengkap</label>
+                        <input name="name" required className="w-full rounded-2xl border border-[#176637]/20 bg-[#FFF6DB]/50 px-4 py-3 text-sm outline-none focus:border-[#72AD43]" placeholder="Masukkan nama lengkap" />
+                    </div>
+                    <div>
+                        <label className="mb-1 block text-sm font-bold text-[#176637]">Nomor HP (WhatsApp)</label>
+                        <input name="phone" type="tel" required className="w-full rounded-2xl border border-[#176637]/20 bg-[#FFF6DB]/50 px-4 py-3 text-sm outline-none focus:border-[#72AD43]" placeholder="08xxxxxxxxxx" />
+                    </div>
+                    <div>
+                        <label className="mb-1 block text-sm font-bold text-[#176637]">Tanggal Lahir</label>
+                        <input name="birthdate" type="date" required className="w-full rounded-2xl border border-[#176637]/20 bg-[#FFF6DB]/50 px-4 py-3 text-sm outline-none focus:border-[#72AD43]" />
+                    </div>
+                    <div>
+                        <label className="mb-1 block text-sm font-bold text-[#176637]">Email (Opsional)</label>
+                        <input name="email" type="email" className="w-full rounded-2xl border border-[#176637]/20 bg-[#FFF6DB]/50 px-4 py-3 text-sm outline-none focus:border-[#72AD43]" placeholder="email@contoh.com" />
+                    </div>
+
+                    <button type="submit" className="mt-4 w-full rounded-2xl bg-[#FF901A] px-4 py-4 font-bold text-[#FFF6DB] shadow-[4px_4px_0px_#176637] transition hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_#176637]">
+                        Daftar Sekarang
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+}
+
+function CallToActionSection({ onRegisterClick, onJoinUsClick }) {
+    return (
+        <section className="mx-auto max-w-7xl px-6 py-8 md:py-10 md:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Loyalty Club Card */}
+                <div className="relative overflow-hidden rounded-[32px] bg-[#0f4e2a] p-8 md:p-10 text-white shadow-xl">
+                    <div className="inline-block rounded-full bg-[#a3e670] px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#0f4e2a]">
+                        Exclusively for you
+                    </div>
+                    <h3 className="mt-6 font-gabriela text-3xl md:text-4xl text-[#FFF6DB]">Sagara Loyalty Club</h3>
+                    <p className="mt-4 text-sm md:text-base leading-relaxed text-[#FFF6DB]/80">
+                        Dapatkan poin di setiap tegukan. Tukarkan dengan minuman gratis, merchandise eksklusif, dan akses awal ke menu baru.
+                    </p>
+                    <div className="mt-8 flex items-center gap-4">
+                        <button onClick={onRegisterClick} className="rounded-full bg-[#FF901A] px-6 py-3 text-sm font-bold text-[#FFF6DB] shadow-[4px_4px_0px_rgba(23,102,55,0.3)] transition hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_rgba(23,102,55,0.3)]">
+                            Daftar Sekarang
+                        </button>
+                        <div className="flex -space-x-3">
+                            <img src="https://i.pravatar.cc/100?img=11" alt="Member 1" className="h-10 w-10 rounded-full border-2 border-[#0f4e2a] object-cover" />
+                            <img src="https://i.pravatar.cc/100?img=12" alt="Member 2" className="h-10 w-10 rounded-full border-2 border-[#0f4e2a] object-cover" />
+                            <img src="https://i.pravatar.cc/100?img=13" alt="Member 3" className="h-10 w-10 rounded-full border-2 border-[#0f4e2a] object-cover" />
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#0f4e2a] bg-[#FFF6DB] text-[10px] font-bold text-[#0f4e2a]">+2k</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Kemitraan Card */}
+                <div className="relative overflow-hidden rounded-[32px] bg-[#a3e670] p-8 md:p-10 text-[#0f4e2a] shadow-xl">
+                    <h3 className="font-gabriela text-3xl md:text-4xl">Gabung Kemitraan<br />Sagara Lattea</h3>
+                    <p className="mt-4 text-sm md:text-base leading-relaxed opacity-80">
+                        Bangun masa depan cerah bersama brand teh organik Indonesia. Sistem franchise yang transparan dan menguntungkan.
+                    </p>
+                    <div className="mt-8">
+                        <button onClick={onJoinUsClick} className="inline-flex items-center gap-2 rounded-full bg-[#176637] px-6 py-3 text-sm font-bold text-[#FFF6DB] shadow-[4px_4px_0px_rgba(15,78,42,0.3)] transition hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_rgba(15,78,42,0.3)]">
+                            Mulai Bisnismu
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
 function Navbar({ scrolled = false, onJoinUsClick, data = {} }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navClass = scrolled
@@ -433,8 +522,8 @@ function ProductSection({ items, onNotificationAction }) {
                         key={category}
                         onClick={() => setActiveCategory(category)}
                         className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeCategory === category
-                                ? 'bg-[#176637] text-[#FFF6DB] shadow-[3px_3px_0px_#0f3f22]'
-                                : 'border border-[#176637]/10 bg-[#FFF6DB] text-[#176637] hover:border-[#72AD43]'
+                            ? 'bg-[#176637] text-[#FFF6DB] shadow-[3px_3px_0px_#0f3f22]'
+                            : 'border border-[#176637]/10 bg-[#FFF6DB] text-[#176637] hover:border-[#72AD43]'
                             }`}
                     >
                         {category}
@@ -549,7 +638,7 @@ function OutletSection({ onNotificationAction }) {
 
 function Footer({ onNotificationAction, outlets = [] }) {
     return (
-        <footer id="sosial-media" className="relative mt-10 overflow-hidden bg-[#176637] pt-20 pb-8 text-[#FFF6DB]">
+        <footer id="sosial-media" className="relative overflow-hidden bg-[#176637] pt-10 pb-6 text-[#FFF6DB]">
             <div className="absolute left-0 top-0 h-12 w-full opacity-30">
                 <svg viewBox="0 0 1200 40" className="h-full w-full fill-none stroke-[#FFF6DB] stroke-[2px]">
                     <path d="M0,20 Q150,40 300,20 T600,20 T900,20 T1200,20" />
@@ -557,10 +646,10 @@ function Footer({ onNotificationAction, outlets = [] }) {
             </div>
             <LeafArt className="left-[-80px] top-[40px] h-56 w-56" crop="left" opacityClass="opacity-10" />
             <LeafArt className="right-[-70px] top-[10px] h-44 w-44" crop="right" flip opacityClass="opacity-10" />
-            <div className="mx-auto grid max-w-7xl gap-12 px-6 md:grid-cols-12 md:px-8">
+            <div className="mx-auto grid max-w-7xl gap-8 px-6 md:grid-cols-12 md:px-8">
                 <div className="md:col-span-5">
-                    <div className="mb-6">
-                        <img src="/logofooter.png" alt="Sagara Lattea" className="h-20 w-auto object-contain" />
+                    <div className="mb-4">
+                        <img src="/logofooter.png" alt="Sagara Lattea" className="h-14 w-auto object-contain" />
                         <div className="mt-2 text-[10px] font-semibold uppercase tracking-[0.38em] text-[#FFF6DB]/80">Special fresh latte tea</div>
                     </div>
                     <p className="max-w-sm text-sm leading-relaxed opacity-90">
@@ -568,7 +657,7 @@ function Footer({ onNotificationAction, outlets = [] }) {
                     </p>
                 </div>
                 <div className="md:col-span-3">
-                    <h4 className="mb-6 font-gabriela text-xl text-[#FF901A]">Kontak Kami</h4>
+                    <h4 className="mb-4 font-gabriela text-xl text-[#FF901A]">Kontak Kami</h4>
                     <div className="space-y-3 text-sm opacity-90">
                         <p>
                             Jl. Soekarno Hatta No. 9,
@@ -580,7 +669,7 @@ function Footer({ onNotificationAction, outlets = [] }) {
                     </div>
                 </div>
                 <div className="md:col-span-4">
-                    <h4 className="mb-6 font-gabriela text-xl text-[#FF901A]">Saran & Komplain</h4>
+                    <h4 className="mb-4 font-gabriela text-xl text-[#FF901A]">Saran & Komplain</h4>
                     <form className="flex flex-col gap-3" onSubmit={async (e) => {
                         e.preventDefault();
                         const formData = new FormData(e.target);
@@ -616,7 +705,7 @@ function Footer({ onNotificationAction, outlets = [] }) {
                     </form>
                 </div>
             </div>
-            <div className="mx-auto mt-16 flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-[#FFF6DB]/10 px-6 pt-8 text-center text-xs opacity-70 md:flex-row md:px-8">
+            <div className="mx-auto mt-10 flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-[#FFF6DB]/10 px-6 pt-6 text-center text-xs opacity-70 md:flex-row md:px-8">
                 <p>&copy; 2026 Sagara Lattea. All rights reserved.</p>
                 <div className="flex gap-6">
                     <a href="#" className="transition hover:text-[#FF901A]">Syarat & Ketentuan</a>
@@ -716,6 +805,7 @@ export default function HomePage({ data = {} }) {
     const [scrolled, setScrolled] = useState(false);
     const [modalState, setModalState] = useState({ isOpen: false, message: '', title: 'Pemberitahuan' });
     const [isJoinUsModalOpen, setIsJoinUsModalOpen] = useState(false);
+    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
     const handleNotificationAction = (message, title = 'Pemberitahuan') => {
         setModalState({ isOpen: true, message, title });
@@ -790,6 +880,7 @@ export default function HomePage({ data = {} }) {
 
             <NotificationModal isOpen={modalState.isOpen} title={modalState.title} message={modalState.message} onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))} />
             <JoinUsModal isOpen={isJoinUsModalOpen} onClose={() => setIsJoinUsModalOpen(false)} />
+            <RegisterMemberModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} />
             <MobileBottomNav data={data} />
 
             <Navbar scrolled={scrolled} onJoinUsClick={() => setIsJoinUsModalOpen(true)} data={data} />
@@ -817,6 +908,10 @@ export default function HomePage({ data = {} }) {
                         ))}
                     </div>
                 </section>
+                <CallToActionSection
+                    onRegisterClick={() => setIsRegisterModalOpen(true)}
+                    onJoinUsClick={() => setIsJoinUsModalOpen(true)}
+                />
             </main>
             <Footer onNotificationAction={handleNotificationAction} outlets={outlets} />
         </div>
