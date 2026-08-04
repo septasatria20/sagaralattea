@@ -167,7 +167,7 @@ function Sidebar({ logoUrl, activeTab, setActiveTab, isMobileSidebarOpen, setIsM
                     onClick={() => setIsMobileSidebarOpen(false)}
                 />
             )}
-            <aside className={`fixed inset-y-0 left-0 z-50 flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl transition-transform duration-300 md:relative md:translate-x-0 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <aside className={`fixed inset-y-0 left-0 z-50 flex h-full w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl transition-transform duration-300 md:relative md:translate-x-0 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
                 <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
             </svg>
@@ -718,9 +718,8 @@ export default function InvestorDashboardPage({ data }) {
                         {activeTab === 'report' && (() => {
                             const currentOutletLabel = selectedOutlet === 'Semua Outlet' ? 'Konsolidasi seluruh outlet' : selectedOutlet;
                             return (
-                                <div className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-3 xl:grid-cols-4 animate-slide-up mt-2">
-                                    <div className="flex flex-col gap-4 md:gap-6 lg:col-span-2 xl:col-span-3">
-                                        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                                <div className="animate-slide-up space-y-8">
+                                    <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
                                         <div>
                                             <h2 className="font-gabriela text-4xl text-[#176637]">Rekap Laporan</h2>
                                             <p className="mt-2 text-base text-[#176637]/70">Fokus investor hanya pada performa finansial, outlet, dan riwayat transaksi.</p>
@@ -860,7 +859,6 @@ export default function InvestorDashboardPage({ data }) {
                                                 </>
                                             )}
                                         />
-                                    </div>
                                     </div>
                                 </div>
                             );

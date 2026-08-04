@@ -184,16 +184,10 @@ function TableQr({ value }) {
     );
 }
 
-function QrGeneratorModal({ isOpen, onClose, tables = [] }) {
-    const [selectedTable, setSelectedTable] = useState('');
-
-    React.useEffect(() => {
-        if (isOpen && tables.length > 0 && !selectedTable) {
-            setSelectedTable(tables[0].table_number);
-        }
-    }, [isOpen, tables]);
-
+function QrGeneratorModal({ isOpen, onClose, user }) {
     if (!isOpen) return null;
+
+    const qrUrl = `https://sagaralattea.com/order?outlet_id=${user?.outlet_id || ''}`;
 
     return (
         <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-[#176637]/40 px-4 py-4 backdrop-blur-sm sm:items-center sm:py-6" onClick={onClose}>
@@ -204,22 +198,16 @@ function QrGeneratorModal({ isOpen, onClose, tables = [] }) {
                 </div>
                 
                 <div className="max-h-[calc(100vh-12rem)] overflow-y-auto p-6 sm:max-h-[calc(100vh-14rem)] sm:p-8">
-                    <select 
-                        value={selectedTable}
-                        onChange={(e) => setSelectedTable(e.target.value)}
-                        className="mb-6 w-full rounded-xl border-2 border-[#176637]/10 bg-[#FFF6DB]/30 p-3 text-center text-lg font-bold text-[#176637] focus:border-[#72AD43] focus:outline-none"
-                    >
-                        {tables.map(t => (
-                            <option key={t.id} value={t.table_number}>Meja {t.table_number}</option>
-                        ))}
-                    </select>
-
-                    <div className="mx-auto mb-6 h-48 w-48 overflow-hidden rounded-[20px] border-4 border-[#FF901A] bg-white p-2 shadow-lg">
-                        <TableQr value={`https://sagaralattea.com/meja/${selectedTable.toLowerCase()}`} />
+                    <div className="mb-4 text-[#176637] font-bold text-sm bg-[#FFF6DB]/50 p-3 rounded-xl border border-[#176637]/10">
+                        Scan QR ini untuk memesan. Pelanggan dapat memasukkan nomor meja (Dine In) atau langsung pesan (Ambil di Outlet).
                     </div>
 
-                    <div className="rounded-xl border border-dashed border-[#176637]/20 bg-[#FFF6DB]/20 p-3 text-xs text-[#176637]/70">
-                        Link permanen: <strong>sagaralattea.com/meja/{selectedTable.toLowerCase()}</strong>
+                    <div className="mx-auto mb-6 h-48 w-48 overflow-hidden rounded-[20px] border-4 border-[#FF901A] bg-white p-2 shadow-lg">
+                        <TableQr value={qrUrl} />
+                    </div>
+
+                    <div className="rounded-xl border border-dashed border-[#176637]/20 bg-[#FFF6DB]/20 p-3 text-xs text-[#176637]/70 break-all">
+                        Link permanen: <strong>{qrUrl.replace('https://', '')}</strong>
                     </div>
 
                     <div className="mt-6 flex gap-3">
@@ -421,7 +409,7 @@ function Sidebar({ activeTab, setActiveTab, logoUrl, user, isMobileSidebarOpen, 
                     onClick={() => setIsMobileSidebarOpen(false)}
                 />
             )}
-            <aside className={`fixed inset-y-0 left-0 z-50 flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl transition-transform duration-300 md:relative md:translate-x-0 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <aside className={`fixed inset-y-0 left-0 z-50 flex h-full w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl transition-transform duration-300 md:relative md:translate-x-0 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
                 <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
             </svg>
@@ -662,7 +650,7 @@ function DashboardView() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-4">
-                <div className="relative overflow-hidden rounded-tl-[30px] rounded-br-[30px] md:rounded-tl-[40px] md:rounded-br-[40px] border border-[#176637]/5 bg-white p-4 md:p-6 shadow-sm lg:col-span-2">
+                <div className="relative overflow-hidden rounded-tl-[30px] rounded-br-[30px] md:rounded-tl-[40px] md:rounded-br-[40px] border border-[#176637]/5 bg-white p-4 md:p-6 shadow-sm lg:col-span-3">
                     <div className="absolute right-6 top-4 opacity-10">
                         <svg width="48" height="36" viewBox="0 0 48 36" fill="#176637">
                             <path d="M24 36C24 18 12 12 0 18C6 6 18 6 24 18C30 6 42 6 48 18C36 12 24 18 24 36Z" />
@@ -818,7 +806,7 @@ function ManajemenPOSView({ user }) {
     const filteredMenus = menus.filter(menu => menu.name.toLowerCase().includes(searchMenu.toLowerCase()));
 
     return (
-        <div className="animate-slide-up flex flex-col h-full overflow-y-auto p-4 md:p-6 lg:p-8">
+        <div className="animate-slide-up flex flex-col p-4 md:p-6 lg:p-8">
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h2 className="font-gabriela text-4xl text-[#176637]">Manajemen POS</h2>
@@ -903,7 +891,7 @@ function ManajemenPOSView({ user }) {
                             </div>
                         </div>
                     )}
-                    <QrGeneratorModal isOpen={qrModalOpen} onClose={() => setQrModalOpen(false)} tables={tables} />
+                    <QrGeneratorModal isOpen={qrModalOpen} onClose={() => setQrModalOpen(false)} user={user} />
                 </div>
             )}
 
@@ -1384,7 +1372,7 @@ export default function MitraDashboardPage({ data = {} }) {
     return (
         <>
             <GlobalStyles />
-            <div className="flex h-screen bg-[#FFF6DB] text-[#176637]">
+            <div className="flex h-screen w-full overflow-hidden bg-[#FFF6DB] text-[#176637]">
                 {!isPos && <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} logoUrl={logoUrl} user={pageData.user} isMobileSidebarOpen={isMobileSidebarOpen} setIsMobileSidebarOpen={setIsMobileSidebarOpen} />}
                 <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
                     <Header title={titles[activeTab]} setActiveMenu={setActiveTab} user={pageData.user} setIsMobileSidebarOpen={setIsMobileSidebarOpen} />

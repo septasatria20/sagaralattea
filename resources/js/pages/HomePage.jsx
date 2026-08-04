@@ -547,7 +547,7 @@ function OutletSection({ onNotificationAction }) {
     );
 }
 
-function Footer({ onNotificationAction }) {
+function Footer({ onNotificationAction, outlets = [] }) {
     return (
         <footer id="sosial-media" className="relative mt-10 overflow-hidden bg-[#176637] pt-20 pb-8 text-[#FFF6DB]">
             <div className="absolute left-0 top-0 h-12 w-full opacity-30">
@@ -598,18 +598,21 @@ function Footer({ onNotificationAction }) {
                                 onNotificationAction('Terima kasih! Pesan, saran, atau komplain Anda telah berhasil dikirim ke Sagara Lattea.');
                                 e.target.reset();
                             } else {
-                                onNotificationAction('Maaf, terjadi kesalahan saat mengirim pesan.');
+                                onNotificationAction('Maaf, terjadi kesalahan. Silakan coba lagi nanti.');
                             }
                         } catch (err) {
-                            onNotificationAction('Terima kasih! Pesan Anda telah tersimpan secara lokal.');
-                            e.target.reset();
+                            onNotificationAction('Gagal terhubung ke server.');
                         }
                     }}>
-                        <input name="name" required className="w-full rounded-lg border border-[#FFF6DB]/20 bg-[#FFF6DB]/5 px-4 py-3 text-sm text-[#FFF6DB] placeholder:text-[#FFF6DB]/40 focus:border-[#FF901A] focus:outline-none" placeholder="Nama Anda" />
-                        <textarea name="message" required className="w-full resize-none rounded-lg border border-[#FFF6DB]/20 bg-[#FFF6DB]/5 px-4 py-3 text-sm text-[#FFF6DB] placeholder:text-[#FFF6DB]/40 focus:border-[#FF901A] focus:outline-none" placeholder="Pesan, saran, atau komplain..." rows={3} />
-                        <button type="submit" className="mt-1 rounded-lg bg-[#FF901A] py-3 font-bold text-[#176637] transition hover:bg-[#FFF6DB]">
-                            Kirim Pesan
-                        </button>
+                        <input type="text" name="name" placeholder="Nama Anda" required className="rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/60 outline-none backdrop-blur-md focus:border-[#FF901A] focus:bg-white/20" />
+                        <select name="outlet_id" className="rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none backdrop-blur-md focus:border-[#FF901A] focus:bg-white/20 appearance-none">
+                            <option value="" className="text-[#176637]">Umum (Semua Outlet)</option>
+                            {outlets.map(o => (
+                                <option key={o.id} value={o.id} className="text-[#176637]">{o.name}</option>
+                            ))}
+                        </select>
+                        <textarea name="message" rows="3" placeholder="Pesan, saran, atau komplain..." required className="resize-none rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/60 outline-none backdrop-blur-md focus:border-[#FF901A] focus:bg-white/20" />
+                        <button type="submit" className="rounded-xl bg-[#FF901A] px-6 py-3 text-sm font-bold text-[#176637] shadow-[3px_3px_0px_#FFF6DB] transition hover:-translate-y-0.5 hover:shadow-[1px_1px_0px_#FFF6DB]">Kirim Pesan</button>
                     </form>
                 </div>
             </div>
@@ -815,7 +818,7 @@ export default function HomePage({ data = {} }) {
                     </div>
                 </section>
             </main>
-            <Footer onNotificationAction={handleNotificationAction} />
+            <Footer onNotificationAction={handleNotificationAction} outlets={outlets} />
         </div>
     );
 }

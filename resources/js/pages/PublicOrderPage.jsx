@@ -91,13 +91,14 @@ export default function PublicOrderPage({ data = {} }) {
     const [appliedPromo, setAppliedPromo] = useState(null);
     const [isPromoModalOpen, setIsPromoModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [tableNumber, setTableNumber] = useState('');
 
     const [modalState, setModalState] = useState({ isOpen: false, title: '', message: '' });
 
     // Handle QR Params
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        const urlOutletId = params.get('outlet');
+        const urlOutletId = params.get('outlet') || params.get('outlet_id');
         const urlType = params.get('type');
         
         let shouldSkipToStep2 = false;
@@ -217,12 +218,14 @@ export default function PublicOrderPage({ data = {} }) {
             outlet_id: selectedOutletId,
             customer_name: name,
             phone_number: phone,
-            type: orderType === 'Ambil di Outlet' ? 'Take Away' : 'Dine In',
-            pickup_time: pickupTime,
+            type: orderType,
+            pickup_time: orderType === 'Ambil di Outlet' ? pickupTime : null,
+            table_number: orderType === 'Dine In' ? tableNumber : null,
             items: cart.map(item => ({
                 menu_item_id: item.id,
                 quantity: item.quantity,
-                price: item.price
+                price: item.price,
+                notes: '' 
             }))
         };
 
@@ -517,6 +520,14 @@ export default function PublicOrderPage({ data = {} }) {
                                             <label className="block text-xs font-bold text-[#176637] mb-1.5 uppercase tracking-wide">Rencana Jam Ambil (Opsional)</label>
                                             <input value={pickupTime} onChange={e => setPickupTime(e.target.value)} type="time" className="w-full rounded-xl border-2 border-[#176637]/15 bg-[#FFF6DB]/30 px-4 py-3 text-sm text-[#176637] focus:border-[#FF901A] focus:bg-white focus:outline-none max-w-[200px]" />
                                             <p className="text-xs text-[#176637]/60 mt-2">Biarkan kosong jika Anda ingin mengambil sesegera mungkin.</p>
+                                        </div>
+                                    )}
+
+                                    {orderType === 'Dine In' && (
+                                        <div className="mt-4">
+                                            <label className="block text-xs font-bold text-[#176637] mb-1.5 uppercase tracking-wide">Nomor Meja</label>
+                                            <input required value={tableNumber} onChange={e => setTableNumber(e.target.value)} type="text" placeholder="Contoh: 01, A2" className="w-full rounded-xl border-2 border-[#176637]/15 bg-[#FFF6DB]/30 px-4 py-3 text-sm text-[#176637] focus:border-[#FF901A] focus:bg-white focus:outline-none" />
+                                            <p className="text-xs text-[#176637]/60 mt-2">Silakan isi nomor meja tempat Anda duduk.</p>
                                         </div>
                                     )}
                                 </div>

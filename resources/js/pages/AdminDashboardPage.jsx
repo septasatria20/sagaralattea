@@ -132,7 +132,7 @@ function Sidebar({ activeMenu, setActiveMenu, logoUrl, isMobileSidebarOpen, setI
                     onClick={() => setIsMobileSidebarOpen(false)}
                 />
             )}
-            <aside className={`fixed inset-y-0 left-0 z-50 flex min-h-screen w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl transition-transform duration-300 md:relative md:translate-x-0 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <aside className={`fixed inset-y-0 left-0 z-50 flex h-full w-64 shrink-0 flex-col overflow-hidden bg-[#176637] text-[#FFF6DB] shadow-xl transition-transform duration-300 md:relative md:translate-x-0 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <svg className="pointer-events-none absolute left-[-20px] top-[-20px] opacity-10" width="150" height="150" viewBox="0 0 100 100" fill="#FFF6DB">
                     <path d="M10,90 C10,50 30,20 60,10 C80,30 50,60 40,80 C30,100 20,95 10,90 Z" />
                 </svg>
@@ -1096,7 +1096,7 @@ function PromoTab() {
                 <div className={`grid grid-cols-1 gap-6 lg:grid-cols-3 transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
                     {promos.map((promo) => (
                         <article key={promo.id} className="relative rounded-tr-[36px] rounded-bl-[36px] rounded-tl-xl rounded-br-xl border border-[#176637]/10 bg-white p-5 shadow-sm">
-                            {promo.is_featured && (
+                            {promo.is_featured == 1 && (
                                 <div className="absolute top-0 right-0 rounded-bl-[36px] rounded-tr-[36px] bg-[#FF901A] px-4 py-1.5 text-[10px] font-bold text-[#FFF6DB] uppercase tracking-wider">
                                     Utama
                                 </div>
@@ -2847,7 +2847,7 @@ export default function AdminDashboardPage({ data = {} }) {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     return (
-        <div className="flex min-h-screen bg-[#FFF6DB] text-[#176637]">
+        <div className="flex h-screen w-full overflow-hidden bg-[#FFF6DB] text-[#176637]">
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Gabriela&family=Inter:wght@400;500;600;700;800&display=swap');
 
