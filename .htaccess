@@ -1,0 +1,82 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # =========================================================
+    # AREA KEAMANAN (WAJIB ADA UNTUK DEPLOY DI ROOT)
+    # =========================================================
+    
+    # Proteksi file konfigurasi sensitif (termasuk .env)
+    <FilesMatch "^\.env|composer\.(json|lock)|package(-lock)?\.json|artisan|phpunit\.xml|vite\.config\.js|server\.php|webpack\.mix\.js|\.editorconfig|\.gitignore|\.gitattributes">
+        Require all denied
+    </FilesMatch>
+    
+    # Proteksi file backup dan system
+    <FilesMatch "\.(bak|old|backup|swp|tmp|log|sql|db|sqlite)$|~$">
+        Require all denied
+    </FilesMatch>
+    
+    # Proteksi direktori utama backend
+    RewriteRule ^\.git - [F,L]
+    RewriteRule ^vendor/.*$ - [F,L]
+    RewriteRule ^storage/(?!app/public/).*$ - [F,L]
+    RewriteRule ^bootstrap/cache/.*$ - [F,L]
+
+    # =========================================================
+    # ANTI-INJECTION & WEB EXPLOIT PROTECTION
+    # =========================================================
+    # Memblokir pola karakter umum serangan SQL Injection & XSS pada URL (Query String)
+    RewriteCond %{QUERY_STRING} (<|%3C).*script.*(>|%3E) [NC,OR]
+    RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+    RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2}) [OR]
+    RewriteCond %{QUERY_STRING} (base64_encode|localhost|loopback) [NC,OR]
+    RewriteCond %{QUERY_STRING} (\|%7C|%60|\%27|'|"|%22|%2b|\%0d|\%0a|\%00|\%20)(select|insert|update|delete|drop|union|declare) [NC,OR]
+    RewriteCond %{QUERY_STRING} (;|%3B)(.*)(select|insert|update|delete|drop|union|declare) [NC]
+    RewriteRule .* - [F,L]
+
+    # Mencegah eksekusi file PHP di dalam folder storage atau upload
+    RewriteRule ^storage/.*\.(php|pl|py|jsp|asp|sh|cgi)$ - [F,L]
+
+    # =========================================================
+    # ROUTING UTAMA KE LARAVEL (Jika Document Root tidak diatur ke /public)
+    # =========================================================
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Arahkan semua request ke folder public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>
+
+<IfModule mod_headers.c>
+    # =========================================================
+    # HTTP SECURITY HEADERS
+    # =========================================================
+    # Mencegah Clickjacking (Website kita tidak bisa di-embed/iframe oleh website jahat)
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # Mencegah browser menebak-nebak tipe file (Mencegah serangan XSS via file palsu)
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Mengaktifkan proteksi XSS bawaan browser
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Mencegah informasi server bocor (Menyembunyikan PHP)
+    Header always unset X-Powered-By
+    ServerSignature Off
+</IfModule>
+
+# Disable directory browsing secara global
+Options -Indexes
+
+# Proteksi fallback untuk Apache versi jadul (< 2.4)
+<IfVersion < 2.4>
+    <FilesMatch "^\.env">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfVersion>
