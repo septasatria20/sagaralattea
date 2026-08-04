@@ -10,6 +10,38 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminOutletController extends Controller
 {
+    private function extractCoordinatesFromUrl($url)
+    {
+        if (empty($url)) return ['latitude' => null, 'longitude' => null];
+
+        // cURL to resolve redirects if short URL
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        $response = curl_exec($ch);
+        $effectiveUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+        curl_close($ch);
+
+        $latitude = null;
+        $longitude = null;
+
+        if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $effectiveUrl, $matches)) {
+            $latitude = $matches[1];
+            $longitude = $matches[2];
+        } elseif (preg_match('/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/', $effectiveUrl, $matches)) {
+            $latitude = $matches[1];
+            $longitude = $matches[2];
+        } elseif (preg_match('/[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/', $effectiveUrl, $matches)) {
+            $latitude = $matches[1];
+            $longitude = $matches[2];
+        }
+
+        return ['latitude' => $latitude, 'longitude' => $longitude];
+    }
+
     public function index()
     {
         $outlets = Outlet::with(['employees' => function($q) {
@@ -52,11 +84,15 @@ class AdminOutletController extends Controller
             'mitra_password' => 'required|string|min:6',
         ]);
 
+        $coords = $this->extractCoordinatesFromUrl($validated['maps_url'] ?? null);
+
         $outlet = Outlet::create([
             'name' => $validated['name'],
             'location' => $validated['location'],
             'address' => $validated['address'],
             'maps_url' => $validated['maps_url'] ?? null,
+            'latitude' => $coords['latitude'],
+            'longitude' => $coords['longitude'],
             'status' => $validated['status'],
         ]);
 
@@ -87,11 +123,15 @@ class AdminOutletController extends Controller
             'mitra_password' => 'nullable|string|min:6',
         ]);
 
+        $coords = $this->extractCoordinatesFromUrl($validated['maps_url'] ?? null);
+
         $outlet->update([
             'name' => $validated['name'],
             'location' => $validated['location'],
             'address' => $validated['address'],
             'maps_url' => $validated['maps_url'] ?? null,
+            'latitude' => $coords['latitude'],
+            'longitude' => $coords['longitude'],
             'status' => $validated['status'],
         ]);
 

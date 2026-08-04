@@ -12,6 +12,34 @@ composer install --optimize-autoloader --no-dev --ignore-platform-reqs
 
 ---
 
+## Strategi Deploy Mudah ke Shared Hosting (public_html)
+
+Biasanya, mendeploy Laravel ke Shared Hosting (seperti Hostinger) yang memiliki root di `public_html` sangat merepotkan. Developer biasanya harus:
+1. Memindahkan isi folder `public/` ke root `public_html`.
+2. Mengubah path autoload di `index.php`.
+3. Mengotori struktur asli Laravel.
+
+**Di proyek Sagara Lattea ini, Anda TIDAK PERLU melakukan itu semua!**
+
+Mengapa bisa langsung tampil saat di-clone ke `public_html`?
+Rahasia utamanya ada pada file `.htaccess` khusus yang sudah diletakkan di *root* proyek ini. File tersebut melakukan **Invisible Redirect**.
+Ketika ada pengunjung mengakses `domain.com`, `.htaccess` tersebut secara diam-diam membelokkan trafik langsung ke dalam folder `public/` milik Laravel menggunakan aturan Apache `mod_rewrite`, tanpa mengubah URL yang terlihat di browser pengunjung.
+
+Selain itu, `.htaccess` tersebut juga mengamankan seluruh file sensitif yang terekspos di `public_html` dengan memblokir total akses langsung ke:
+- `.env`
+- Folder `vendor/`
+- Folder `.git/`
+- Folder `storage/`
+
+**Tutorial Singkat Deploy Cepat via Git di Hostinger:**
+1. Masuk ke SSH Hostinger dan arahkan ke `public_html`: `cd public_html`.
+2. Hapus isi bawaan jika ada, lalu clone/pull proyek secara langsung: `git pull origin main`.
+3. Jalankan bypass composer: `composer install --optimize-autoloader --no-dev --ignore-platform-reqs`.
+4. Jika belum, symlink storage Anda menggunakan terminal native (jangan artisan): `ln -s $(pwd)/storage/app/public $(pwd)/public/storage`.
+5. Web langsung online dan aman!
+
+---
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">

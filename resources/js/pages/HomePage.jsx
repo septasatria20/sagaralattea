@@ -739,7 +739,7 @@ function ChatbotWidget() {
     };
 
     return (
-        <div className="fixed bottom-4 right-4 z-[9999] flex flex-col items-end">
+        <div className="fixed bottom-20 md:bottom-4 right-4 z-[9999] flex flex-col items-end">
             {isOpen && (
                 <div className="mb-4 w-[300px] sm:w-[350px] overflow-hidden rounded-2xl border-2 border-[#176637]/20 bg-white shadow-2xl reveal flex flex-col h-[400px]">
                     <div className="flex items-center justify-between bg-[#176637] p-4 text-[#FFF6DB]">

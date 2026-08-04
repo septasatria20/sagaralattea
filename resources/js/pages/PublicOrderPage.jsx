@@ -76,6 +76,9 @@ export default function PublicOrderPage({ data = {} }) {
     // State
     const [step, setStep] = useState(1);
     const [selectedOutletId, setSelectedOutletId] = useState(outlets.length > 0 ? outlets[0].id : null);
+    const [sortedOutlets, setSortedOutlets] = useState(outlets);
+    const [userLocation, setUserLocation] = useState(null);
+    const [isLocating, setIsLocating] = useState(false);
     const [activeCategory, setActiveCategory] = useState('Semua Menu');
     const [cart, setCart] = useState([]);
 
@@ -113,6 +116,56 @@ export default function PublicOrderPage({ data = {} }) {
             setStep(2);
         }
     }, []);
+
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        if (!lat1 || !lon1 || !lat2 || !lon2) return Infinity;
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    };
+
+    const handleFindNearest = () => {
+        setIsLocating(true);
+        if (!navigator.geolocation) {
+            alert('Browser Anda tidak mendukung fitur lokasi (GPS).');
+            setIsLocating(false);
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+                setUserLocation({ lat: userLat, lng: userLng });
+
+                const outletsWithDistance = outlets.map(outlet => {
+                    const distance = calculateDistance(userLat, userLng, outlet.latitude, outlet.longitude);
+                    return { ...outlet, distance };
+                });
+
+                outletsWithDistance.sort((a, b) => a.distance - b.distance);
+                setSortedOutlets(outletsWithDistance);
+                
+                if (outletsWithDistance.length > 0 && outletsWithDistance[0].distance !== Infinity) {
+                    setSelectedOutletId(outletsWithDistance[0].id);
+                }
+                
+                setIsLocating(false);
+            },
+            (error) => {
+                console.error('Error obtaining location', error);
+                alert('Gagal mendapatkan lokasi. Pastikan GPS aktif dan Anda memberikan izin akses lokasi.');
+                setIsLocating(false);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    };
 
     // Validasi ulang promo jika keranjang berubah
     useEffect(() => {
@@ -315,10 +368,21 @@ export default function PublicOrderPage({ data = {} }) {
                         <div className="text-center mb-10">
                             <h1 className="font-gabriela text-4xl text-[#176637]">Pilih Lokasi Pemesanan</h1>
                             <p className="text-[#176637]/70 mt-3">Silakan pilih outlet terdekat untuk melihat ketersediaan menu.</p>
+                            <button
+                                onClick={handleFindNearest}
+                                disabled={isLocating}
+                                className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#176637] px-5 py-2.5 text-sm font-semibold text-[#FFF6DB] transition hover:bg-[#72AD43] disabled:opacity-50"
+                            >
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.242-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                {isLocating ? 'Mencari lokasi...' : '📍 Cari Outlet Terdekat dari Saya'}
+                            </button>
                         </div>
 
                         <div className="grid gap-4">
-                            {outlets.map(outlet => (
+                            {sortedOutlets.map(outlet => (
                                 <button
                                     key={outlet.id}
                                     onClick={() => setSelectedOutletId(outlet.id)}
@@ -326,7 +390,14 @@ export default function PublicOrderPage({ data = {} }) {
                                 >
                                     <div className="flex justify-between items-center">
                                         <div>
-                                            <h3 className="font-bold text-lg text-[#176637]">{outlet.name}</h3>
+                                            <div className="flex items-center gap-2">
+                                                <h3 className="font-bold text-lg text-[#176637]">{outlet.name}</h3>
+                                                {outlet.distance !== undefined && outlet.distance !== Infinity && (
+                                                    <span className="rounded-full bg-[#FF901A]/20 px-2.5 py-0.5 text-[10px] font-bold text-[#FF901A]">
+                                                        {outlet.distance < 1 ? `${Math.round(outlet.distance * 1000)} m` : `${outlet.distance.toFixed(1)} km`}
+                                                    </span>
+                                                )}
+                                            </div>
                                             <p className="text-sm text-[#176637]/60 mt-1">{outlet.location || outlet.address || 'Lokasi Outlet'}</p>
                                         </div>
                                         {selectedOutletId === outlet.id && (

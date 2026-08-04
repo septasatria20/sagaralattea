@@ -500,17 +500,17 @@ function Header({ title, user, setActiveMenu, setIsMobileSidebarOpen }) {
     }, []);
 
     return (
-        <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 border-b border-[#176637]/10 bg-[#FFF6DB]/80 px-4 py-4 backdrop-blur-md md:px-8 md:py-5">
-            <div className="flex items-center gap-3">
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-[#176637]/10 bg-[#FFF6DB]/80 px-4 py-4 backdrop-blur-md md:px-8 md:py-5">
+            <div className="flex items-center gap-3 min-w-0">
                 <button 
                     onClick={() => setIsMobileSidebarOpen(true)}
-                    className="md:hidden p-2 text-[#176637] hover:bg-[#176637]/5 rounded-lg -ml-2"
+                    className="md:hidden p-2 text-[#176637] hover:bg-[#176637]/5 rounded-lg -ml-2 shrink-0"
                 >
                     <Icon name="menu" className="w-6 h-6" stroke />
                 </button>
-                <h1 className="font-gabriela flex items-center gap-3 text-xl md:text-2xl text-[#176637]">{title}</h1>
+                <h1 className="font-gabriela flex items-center gap-3 text-xl md:text-2xl text-[#176637] truncate">{title}</h1>
             </div>
-            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-4 sm:gap-6 shrink-0">
                 <div className="relative" ref={notifRef}>
                     <button 
                         onClick={() => setNotifMenuOpen((value) => !value)}

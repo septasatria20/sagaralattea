@@ -194,17 +194,17 @@ function Header({ title, setActiveMenu, setIsMobileSidebarOpen }) {
     }, []);
 
     return (
-        <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 border-b border-[#176637]/10 bg-[#FFF6DB]/80 px-4 py-4 backdrop-blur-md md:px-8 md:py-5">
-            <div className="flex items-center gap-3">
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-[#176637]/10 bg-[#FFF6DB]/80 px-4 py-4 backdrop-blur-md md:px-8 md:py-5">
+            <div className="flex items-center gap-3 min-w-0">
                 <button
                     onClick={() => setIsMobileSidebarOpen(true)}
-                    className="md:hidden p-2 text-[#176637] hover:bg-[#176637]/5 rounded-lg -ml-2"
+                    className="md:hidden p-2 text-[#176637] hover:bg-[#176637]/5 rounded-lg -ml-2 shrink-0"
                 >
                     <Icon name="menu" className="w-6 h-6" stroke />
                 </button>
-                <h1 className="font-gabriela flex items-center gap-3 text-xl md:text-2xl text-[#176637]">{title}</h1>
+                <h1 className="font-gabriela flex items-center gap-3 text-xl md:text-2xl text-[#176637] truncate">{title}</h1>
             </div>
-            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-4 sm:gap-6 shrink-0">
                 <div className="relative" ref={notifRef}>
                     <button
                         onClick={() => setNotifMenuOpen((value) => !value)}
@@ -700,6 +700,7 @@ function OutletTab() {
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Link Google Maps</label>
                                 <input value={formData.maps_url} onChange={e => setFormData({ ...formData, maps_url: e.target.value })} placeholder="https://maps.google.com/..." className="w-full rounded-xl border-2 border-[#176637]/20 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-[#72AD43]" />
+                                <p className="mt-1 text-xs text-[#176637]/60">Sistem akan otomatis mengambil titik lokasi GPS dari Link Maps ini.</p>
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-bold text-[#176637]">Status</label>
